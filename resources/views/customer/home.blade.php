@@ -78,6 +78,49 @@
 
     </div>
 
+    <!-- Our 3 Core Services Preview (Water Can Supply, Car Wash, Rental/Lease/Sales) -->
+    <div class="space-y-3">
+        <div class="flex items-center justify-between">
+            <h3 class="text-sm font-extrabold text-slate-900 tracking-tight flex items-center space-x-2">
+                <i class="fa-solid fa-bell-concierge text-ocean-600"></i>
+                <span>Our Services</span>
+            </h3>
+            <a href="{{ route('customer.services') }}" class="text-xs text-ocean-600 font-bold hover:underline">View All &rarr;</a>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <!-- 1. Water Can Supply -->
+            <a href="{{ route('customer.cart') }}" class="card-interactive bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex items-center space-x-3.5 group">
+                <div class="w-12 h-12 rounded-2xl bg-sky-50 text-ocean-600 flex items-center justify-center text-lg shadow-sm group-hover:bg-ocean-600 group-hover:text-white transition-all shrink-0">
+                    <i class="fa-solid fa-bottle-water"></i>
+                </div>
+                <div class="min-w-0">
+                    <span class="text-xs font-black text-slate-900 block truncate group-hover:text-ocean-600">Water Can Supply</span>
+                    <span class="text-[11px] text-slate-400 block truncate">20L & 10L Doorstep Delivery</span>
+                </div>
+            </a>
+            <!-- 2. Car Wash -->
+            <a href="{{ route('customer.services') }}" class="card-interactive bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex items-center space-x-3.5 group">
+                <div class="w-12 h-12 rounded-2xl bg-cyan-50 text-cyan-600 flex items-center justify-center text-lg shadow-sm group-hover:bg-cyan-600 group-hover:text-white transition-all shrink-0">
+                    <i class="fa-solid fa-car-wash"></i>
+                </div>
+                <div class="min-w-0">
+                    <span class="text-xs font-black text-slate-900 block truncate group-hover:text-cyan-600">Car Wash</span>
+                    <span class="text-[11px] text-slate-400 block truncate">Pressure Foam & Vacuum</span>
+                </div>
+            </a>
+            <!-- 3. Rental House, Lease, Buy & Sales -->
+            <a href="{{ route('customer.services') }}" class="card-interactive bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex items-center space-x-3.5 group">
+                <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg shadow-sm group-hover:bg-indigo-600 group-hover:text-white transition-all shrink-0">
+                    <i class="fa-solid fa-building-circle-check"></i>
+                </div>
+                <div class="min-w-0">
+                    <span class="text-xs font-black text-slate-900 block truncate group-hover:text-indigo-600">Rental, Lease & Sales</span>
+                    <span class="text-[11px] text-slate-400 block truncate">Flats, Villas & Plots</span>
+                </div>
+            </a>
+        </div>
+    </div>
+
     <!-- Quick Action Reorder & Schedule Buttons (Responsive Grid) -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <a href="{{ route('customer.cart') }}" class="card-interactive bg-white p-4 sm:p-5 rounded-3xl border border-slate-100 shadow-sm flex items-center space-x-4 group">

@@ -55,6 +55,11 @@ class CustomerController extends Controller
         return view('customer.home', compact('user', 'profile', 'categories', 'featuredProducts', 'upcomingDeliveries', 'recentOrders', 'defaultAddress'));
     }
 
+    public function services()
+    {
+        return view('customer.services');
+    }
+
     public function products()
     {
         $products = Product::where('is_active', true)->orderBy('selling_price', 'asc')->get();

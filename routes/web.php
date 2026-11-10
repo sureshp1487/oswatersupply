@@ -28,6 +28,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 // Customer Application Routes (Mobile-first)
 Route::middleware(['auth', 'role:customer'])->prefix('app')->name('customer.')->group(function () {
     Route::get('/home', [CustomerController::class, 'home'])->name('home');
+    Route::get('/services', [CustomerController::class, 'services'])->name('services');
     Route::get('/products', [CustomerController::class, 'products'])->name('products');
     Route::get('/cart', [CustomerController::class, 'bookWater'])->name('cart');
     Route::get('/book', [CustomerController::class, 'bookWater'])->name('book');

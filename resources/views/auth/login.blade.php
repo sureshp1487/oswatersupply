@@ -149,7 +149,10 @@
                                 <i class="fa-solid fa-lock text-xs"></i>
                             </div>
                             <input type="password" name="password" id="passwordInput" value="customer123" required placeholder="Enter password"
-                                   class="w-full pl-9 pr-4 py-3 rounded-2xl border border-slate-200 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition bg-slate-50/50 hover:bg-white focus:bg-white">
+                                   class="w-full pl-9 pr-10 py-3 rounded-2xl border border-slate-200 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition bg-slate-50/50 hover:bg-white focus:bg-white">
+                            <button type="button" id="togglePasswordBtn" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer" title="Show/Hide Password" aria-label="Toggle password visibility">
+                                <i class="fa-regular fa-eye text-sm" id="togglePasswordIcon"></i>
+                            </button>
                         </div>
                         <p id="error-passwordInput" class="text-[11px] text-rose-600 font-semibold mt-1 hidden"></p>
                     </div>
@@ -246,6 +249,19 @@
                 $('#error-' + fieldId).addClass('hidden');
                 if (!$('#loginInput').hasClass('border-rose-400') && !$('#passwordInput').hasClass('border-rose-400')) {
                     $('#loginFormAlert').addClass('hidden');
+                }
+            });
+
+            // Toggle Password Visibility
+            $('#togglePasswordBtn').on('click', function() {
+                const passInput = $('#passwordInput');
+                const icon = $('#togglePasswordIcon');
+                if (passInput.attr('type') === 'password') {
+                    passInput.attr('type', 'text');
+                    icon.removeClass('fa-eye').addClass('fa-eye-slash');
+                } else {
+                    passInput.attr('type', 'password');
+                    icon.removeClass('fa-eye-slash').addClass('fa-eye');
                 }
             });
         });

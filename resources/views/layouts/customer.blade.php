@@ -83,7 +83,10 @@
             background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
         }
         .pb-safe {
-            padding-bottom: calc(7.5rem + env(safe-area-inset-bottom, 0px));
+            padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
+        }
+        .pb-safe-nav {
+            padding-bottom: env(safe-area-inset-bottom, 0px);
         }
 
         /* Micro-Animations & Ripple Effects */
@@ -134,13 +137,13 @@
 
     <!-- Header / Brand -->
     <header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-100 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <a href="{{ route('customer.home') }}" class="flex items-center space-x-2">
-                    <img src="/icons/logo.svg" alt="HydroPro Logo" class="w-9 h-9 rounded-xl shadow-md shadow-indigo-500/20 object-contain p-0.5 bg-gradient-to-br from-blue-500 to-indigo-600">
-                    <div>
-                        <span class="text-xs font-black uppercase tracking-wider text-ocean-600 block leading-none">{{ $appSettings['business_name'] ?? 'HydroPro' }}</span>
-                        <h1 class="text-sm font-extrabold text-slate-900 leading-tight">Drinking Water</h1>
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3 flex items-center justify-between gap-2">
+            <div class="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
+                <a href="{{ route('customer.home') }}" class="flex items-center space-x-2 min-w-0">
+                    <img src="/icons/logo.svg" alt="HydroPro Logo" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl shadow-md shadow-indigo-500/20 object-contain p-0.5 bg-gradient-to-br from-blue-500 to-indigo-600 shrink-0">
+                    <div class="min-w-0">
+                        <span class="text-[11px] sm:text-xs font-black uppercase tracking-wider text-ocean-600 block leading-tight truncate">{{ $appSettings['business_name'] ?? 'HydroPro' }}</span>
+                        <h1 class="text-xs sm:text-sm font-extrabold text-slate-900 leading-tight truncate">Drinking Water</h1>
                     </div>
                 </a>
 
@@ -149,8 +152,8 @@
                     <a href="{{ route('customer.home') }}" class="px-3 py-2 rounded-xl transition {{ request()->routeIs('customer.home') ? 'bg-sky-50 text-ocean-600' : 'hover:bg-slate-50' }}">
                         <i class="fa-solid fa-house mr-1"></i> Home
                     </a>
-                    <a href="{{ route('customer.cart') }}" class="px-3 py-2 rounded-xl transition {{ request()->routeIs('customer.cart', 'customer.book') ? 'bg-sky-50 text-ocean-600' : 'hover:bg-slate-50' }}">
-                        <i class="fa-solid fa-cart-shopping mr-1"></i> Cart
+                    <a href="{{ route('customer.services') }}" class="px-3 py-2 rounded-xl transition {{ request()->routeIs('customer.services') ? 'bg-sky-50 text-ocean-600' : 'hover:bg-slate-50' }}">
+                        <i class="fa-solid fa-bell-concierge mr-1"></i> Services
                     </a>
                     <a href="{{ route('customer.orders') }}" class="px-3 py-2 rounded-xl transition {{ request()->routeIs('customer.orders*') ? 'bg-sky-50 text-ocean-600' : 'hover:bg-slate-50' }}">
                         <i class="fa-solid fa-boxes-stacked mr-1"></i> My Orders
@@ -162,9 +165,9 @@
             </div>
 
             <!-- Header Action Links -->
-            <div class="flex items-center space-x-2 sm:space-x-3">
-                <!-- PWA Install Button (Dynamic) -->
-                <button id="pwaInstallHeaderBtn" onclick="triggerPwaInstall()" class="hidden items-center space-x-1.5 px-3 py-1.5 text-xs font-bold bg-sky-50 hover:bg-sky-100 text-ocean-700 border border-sky-200 rounded-full shadow-sm transition-all animate-pulse">
+            <div class="flex items-center space-x-2 sm:space-x-3 shrink-0">
+                <!-- PWA Install Button (Desktop & Tablet only; hidden on mobile header to prevent horizontal wrapping) -->
+                <button id="pwaInstallHeaderBtn" onclick="triggerPwaInstall()" class="hidden md:inline-flex items-center space-x-1.5 px-3 py-1.5 text-xs font-bold bg-sky-50 hover:bg-sky-100 text-ocean-700 border border-sky-200 rounded-full shadow-sm transition-all animate-pulse">
                     <i class="fa-solid fa-cloud-arrow-down text-ocean-600"></i>
                     <span>Install App</span>
                 </button>
@@ -177,13 +180,6 @@
                     </span>
                 </a>
 
-                <a href="{{ route('customer.payments') }}" class="relative p-2 text-slate-600 hover:text-ocean-600 rounded-full hover:bg-slate-100 transition" title="Payments & Dues">
-                    <i class="fa-solid fa-wallet text-lg"></i>
-                    @if(auth()->user()->customerProfile && auth()->user()->customerProfile->total_due_balance > 0)
-                        <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full ring-2 ring-white"></span>
-                    @endif
-                </a>
-
                 <div class="hidden sm:flex items-center space-x-2 pl-2 border-l border-slate-200">
                     <a href="{{ route('customer.profile') }}" class="text-xs font-bold text-slate-700 hover:text-ocean-600 flex items-center space-x-1.5">
                         <i class="fa-solid fa-circle-user text-base text-ocean-600"></i>
@@ -191,7 +187,7 @@
                     </a>
                 </div>
 
-                <form action="{{ route('logout') }}" method="POST" class="inline">
+                <form action="{{ route('logout') }}" method="POST" class="inline" onsubmit="if(window.CartManager){ window.CartManager.saveCart({}); }">
                     @csrf
                     <button type="submit" class="p-2 text-slate-400 hover:text-rose-600 rounded-full hover:bg-slate-100 transition" title="Logout">
                         <i class="fa-solid fa-arrow-right-from-bracket"></i>
@@ -243,12 +239,12 @@
     </main>
 
     <!-- Customer Mobile Bottom Navigation Bar -->
-    <nav class="md:hidden fixed bottom-0 inset-x-0 z-50 bg-white/95 backdrop-blur border-t border-slate-200/80 shadow-lg pb-safe">
+    <nav class="md:hidden fixed bottom-0 inset-x-0 z-50 bg-white/95 backdrop-blur border-t border-slate-200/80 shadow-lg pb-safe-nav">
         <div class="max-w-md mx-auto px-4 h-16 flex items-center justify-around">
-            <!-- Home -->
-            <a href="{{ route('customer.home') }}" class="flex flex-col items-center justify-center flex-1 py-1 {{ request()->routeIs('customer.home') ? 'text-ocean-600 font-bold' : 'text-slate-500 hover:text-slate-800' }}">
-                <i class="fa-solid fa-house text-lg mb-1"></i>
-                <span class="text-[11px]">Home</span>
+            <!-- Services (Left First) -->
+            <a href="{{ route('customer.services') }}" class="flex flex-col items-center justify-center flex-1 py-1 {{ request()->routeIs('customer.services') ? 'text-ocean-600 font-bold' : 'text-slate-500 hover:text-slate-800' }}">
+                <i class="fa-solid fa-bell-concierge text-lg mb-1"></i>
+                <span class="text-[11px]">Services</span>
             </a>
 
             <!-- Orders -->
@@ -257,12 +253,11 @@
                 <span class="text-[11px]">My Orders</span>
             </a>
 
-            <!-- Prominent Cart Floating Action Button -->
+            <!-- Prominent Center Home Floating Action Button -->
             <div class="flex-1 flex justify-center -mt-6">
-                <a href="{{ route('customer.cart') }}" class="w-14 h-14 rounded-full water-wave-bg text-white shadow-xl shadow-sky-600/35 flex flex-col items-center justify-center border-4 border-slate-50 hover:scale-105 active:scale-95 transition-transform relative">
-                    <i class="fa-solid fa-cart-shopping text-xl"></i>
-                    <span class="text-[9px] font-extrabold uppercase mt-0.5 tracking-tighter">Cart</span>
-                    <span id="mobileCartBadge" class="absolute -top-1 -right-1 w-5 h-5 bg-rose-500 text-white text-[9px] font-black rounded-full flex items-center justify-center border-2 border-white hidden">0</span>
+                <a href="{{ route('customer.home') }}" class="w-14 h-14 rounded-full water-wave-bg text-white shadow-xl shadow-sky-600/35 flex flex-col items-center justify-center border-4 border-slate-50 hover:scale-105 active:scale-95 transition-transform relative {{ request()->routeIs('customer.home') ? 'ring-2 ring-ocean-500' : '' }}">
+                    <i class="fa-solid fa-house text-xl"></i>
+                    <span class="text-[9px] font-extrabold uppercase mt-0.5 tracking-tighter">Home</span>
                 </a>
             </div>
 
@@ -331,9 +326,9 @@
             // Stash the event so it can be triggered later.
             deferredPwaPrompt = e;
             
-            // Show custom install buttons / banner
+            // Show custom install buttons / banner (Desktop header button only)
             const installBtn = document.getElementById('pwaInstallHeaderBtn');
-            if (installBtn) {
+            if (installBtn && window.innerWidth >= 768) {
                 installBtn.classList.remove('hidden');
                 installBtn.classList.add('inline-flex');
             }
@@ -410,9 +405,10 @@
             });
         });
 
-        // Global Cart Storage Helper for synchronizing Cart Badge and Selection
+        // Global Cart Storage Helper scoped per authenticated user
         window.CartManager = {
-            storageKey: 'hydropro_cart',
+            storageKey: 'hydropro_cart_user_{{ auth()->id() ?? "guest" }}',
+            legacyKey: 'hydropro_cart',
             getCart: function() {
                 try {
                     const data = localStorage.getItem(this.storageKey);
@@ -474,6 +470,10 @@
         };
 
         document.addEventListener('DOMContentLoaded', function() {
+            // Clean up any legacy shared cart key
+            try {
+                localStorage.removeItem(window.CartManager.legacyKey);
+            } catch(e) {}
             window.CartManager.updateBadge();
         });
 

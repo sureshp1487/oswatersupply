@@ -169,7 +169,6 @@
                                     <i class="fa-regular fa-clock text-ocean-600"></i>
                                     <span class="font-bold text-slate-800">{{ $slot->name }}</span>
                                 </div>
-                                <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">{{ $slot->max_daily_capacity }}/day</span>
                             </div>
                         </label>
                         @endforeach
@@ -286,8 +285,6 @@
                     <i class="fa-solid fa-arrow-right text-xs"></i>
                 </button>
             </div>
-            <!-- Extra mobile space to guarantee full clearance above bottom menu -->
-            <div class="h-16 md:hidden"></div>
         </div>
 
     </form>
