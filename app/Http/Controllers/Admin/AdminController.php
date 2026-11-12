@@ -438,11 +438,9 @@ class AdminController extends Controller
         if ($request->hasFile('logo')) {
             $logoFile = $request->file('logo');
             $ext = $logoFile->getClientOriginalExtension();
-            $logoFile->move(public_path('icons'), "logo.{$ext}");
-            if ($ext !== 'svg') {
-                $logoFile->move(public_path('icons'), 'custom-logo.' . $ext);
-                Setting::set('custom_logo_url', "/icons/custom-logo.{$ext}", 'customization');
-            }
+            $targetName = "logo.{$ext}";
+            $logoFile->move(public_path('icons'), $targetName);
+            Setting::set('custom_logo_url', "/icons/{$targetName}", 'customization');
         }
 
         // Handle Favicon Upload if provided

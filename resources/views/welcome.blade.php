@@ -15,7 +15,7 @@
     <!-- Open Graph (Facebook / WhatsApp / LinkedIn) -->
     <meta property="og:locale" content="en_IN">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="20 Litre Water Can Supply – Fresh Drinking Water Delivered to Your Doorstep">
+    <meta property="og:title" content="20L Water Can – Fresh Water at Your Doorstep.">
     <meta property="og:description" content="Order 20 litre drinking water cans online in Chennai. Reliable doorstep delivery for homes, apartments, and offices with cash on delivery and monthly subscriptions.">
     <meta property="og:url" content="{{ url('/') }}">
     <meta property="og:site_name" content="{{ $appSettings['business_name'] ?? 'AquaFlow' }} Water Logistics">
@@ -212,21 +212,33 @@
 </head>
 <body class="bg-white text-slate-800 antialiased selection:bg-[var(--brand-primary)] selection:text-white">
 
+    <!-- Announcement Banner from Admin Customization if Enabled -->
+    @if(!empty($appSettings['banner_enabled']) && $appSettings['banner_enabled'] == '1' && !empty($appSettings['announcement_banner']))
+        <div class="bg-gradient-to-r from-[var(--brand-primary)] to-[var(--brand-accent)] text-white text-xs font-semibold py-2.5 px-4 text-center shadow-sm relative z-50">
+            <div class="max-w-7xl mx-auto flex items-center justify-center space-x-2">
+                <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white/20 text-white shrink-0">
+                    <i class="fa-solid fa-bullhorn text-[10px]"></i>
+                </span>
+                <span>{{ $appSettings['announcement_banner'] }}</span>
+            </div>
+        </div>
+    @endif
+
     <!-- Clean White Navigation Header matching user image -->
-    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100 transition-all">
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-100 transition-all">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
             
             <!-- Brand Logo matching user screenshot -->
             <a href="/" class="flex items-center space-x-3 group min-w-0">
                 <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#0077b6] to-[#00b4d8] p-0.5 shadow-md shadow-[#0077b6]/20 flex items-center justify-center shrink-0">
-                    <img src="/icons/logo.svg" alt="AquaFlow Logo" class="w-full h-full object-contain p-1">
+                    <img src="{{ $appSettings['custom_logo_url'] ?? '/icons/logo.svg' }}" alt="{{ $appSettings['business_name'] ?? 'AquaFlow' }} Logo" class="w-full h-full object-contain p-1">
                 </div>
                 <div class="min-w-0">
-                    <span class="text-lg font-black text-slate-900 tracking-tight block leading-none">
-                        AquaFlow
+                    <span class="text-lg font-black text-slate-900 tracking-tight block leading-none truncate">
+                        {{ $appSettings['business_name'] ?? 'AquaFlow' }}
                     </span>
-                    <span class="text-[9px] font-extrabold text-[#0077b6] tracking-wider uppercase block mt-1">
-                        WATER LOGISTICS
+                    <span class="text-[9px] font-extrabold text-[#0077b6] tracking-wider uppercase block mt-1 truncate">
+                        {{ $appSettings['business_tagline'] ?? 'WATER LOGISTICS' }}
                     </span>
                 </div>
             </a>
@@ -234,11 +246,8 @@
             <!-- Desktop Nav Links matching screenshot: Home, Products, How It Works, Service Areas, FAQ, Contact -->
             <nav class="hidden md:flex items-center space-x-7 text-xs font-bold text-slate-600">
                 <a href="/" class="text-[#0077b6] hover:text-[#005f94] transition">Home</a>
-                <a href="#services" class="hover:text-[#0077b6] transition">Our Services</a>
-                <a href="#products" class="hover:text-[#0077b6] transition">Products & Pricing</a>
-                <a href="#how-it-works" class="hover:text-[#0077b6] transition">How It Works</a>
-                <a href="#check-pincode" class="hover:text-[#0077b6] transition">Service Areas</a>
-                <a href="#faq" class="hover:text-[#0077b6] transition">FAQ</a>
+                <a href="#services" class="hover:text-[#0077b6] transition">Services</a>
+                <a href="#products" class="hover:text-[#0077b6] transition">Products</a>
                 <a href="#corporate" class="hover:text-[#0077b6] transition">Contact</a>
             </nav>
 
@@ -283,41 +292,64 @@
     </header>
 
     <!-- Hero Section matching user screenshot -->
-    <section class="relative bg-white pt-10 sm:pt-16 pb-16 sm:pb-24 overflow-hidden">
+    <section class="relative bg-white pt-6 sm:pt-8 pb-6 sm:pb-8 overflow-hidden">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
                 
                 <!-- Hero Left: Typography & Buttons matching screenshot -->
                 <div class="lg:col-span-7 space-y-6 text-left">
-                    <!-- Pill badge: 100% Hygienic Packaged Drinking Water -->
-                    <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-sky-50 border border-sky-100 text-xs font-bold text-[#0077b6]">
+                <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-sky-50 border border-sky-100 text-xs font-bold text-[#0077b6]">
                         <span class="w-2.5 h-2.5 rounded-full bg-[#00b4d8]"></span>
                         <span>100% Hygienic Packaged Drinking Water in Chennai</span>
                     </div>
-
                     <!-- Heading matching user reference & SEO -->
                     <h1 class="text-4xl sm:text-6xl font-black text-slate-900 tracking-tight leading-[1.08]">
-                        20 Litre Water Can Supply – <br>
-                        <span class="text-[#0077b6]">Fresh Drinking Water</span> <br>
-                        Delivered to Your Doorstep
+                       20L Water Can – <br>
+                        <span class="text-[#0077b6]">Fresh Water at Your Doorstep</span>
                     </h1>
 
                     <!-- SEO Subtitle matching user request -->
                     <p class="text-sm sm:text-base text-slate-600 max-w-xl font-normal leading-relaxed">
-                        Looking for reliable <strong>20 litre water can delivery near you</strong>? We make drinking water ordering simple and convenient with doorstep delivery for homes, apartments, offices, shops and businesses.
+                        Looking for reliable <strong>20L water can delivery</strong>? We offer fresh drinking water with convenient doorstep delivery for homes, offices, shops and businesses.
                     </p>
 
-                    <p class="text-xs sm:text-sm text-slate-500 max-w-xl font-normal leading-relaxed">
-                        Order your 20-litre drinking water cans online and choose your preferred delivery date and time. Whether you need a single water can or regular monthly water supply, our service makes it easy to manage your drinking water requirements.
-                    </p>
+                    <!-- Check Service In Your Area Widget (Placed after description) -->
+                    <div id="check-pincode" class="max-w-xl">
+                        <div class="bg-sky-50/70 rounded-2xl p-4 sm:p-5 border border-sky-100 shadow-xs">
+                            <span class="text-xs font-black uppercase tracking-wider text-slate-800 block mb-3">
+                                CHECK SERVICE IN YOUR AREA
+                            </span>
+                            <form id="pincodeCheckForm" onsubmit="event.preventDefault(); checkServicePincode();" class="flex flex-col sm:flex-row items-stretch gap-2.5">
+                                <input 
+                                    type="text" 
+                                    id="pincodeInput" 
+                                    name="pincode" 
+                                    value="" 
+                                    maxlength="6" 
+                                    placeholder="Enter 6-digit Pincode (e.g. 600040)" 
+                                    class="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 text-sm font-semibold tracking-wide placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0077b6]/20 focus:border-[#0077b6] transition"
+                                >
+                                <button 
+                                    type="submit" 
+                                    class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#0077b6] hover:bg-[#006499] active:scale-95 text-white font-extrabold text-xs transition shrink-0 shadow-sm text-center"
+                                >
+                                    Check Pincode
+                                </button>
+                            </form>
+
+                            <!-- Feedback Alert Box (Hidden until customer types and clicks Check) -->
+                            <div id="pincodeResult" class="hidden mt-3 p-3 rounded-xl text-xs font-medium border bg-white">
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- CTAs matching user screenshot: Order Water Now -> & Explore How It Works -->
                     <div class="pt-2 flex flex-col sm:flex-row items-center gap-3.5">
                         <a href="{{ route('customer.book') }}" class="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-[#0077b6] hover:bg-[#006499] active:scale-95 text-white font-extrabold text-sm transition shadow-lg shadow-[#0077b6]/30 text-center flex items-center justify-center space-x-2">
-                            <span>Order Water Can Online &rarr;</span>
+                            <span>Order Now</span>
                         </a>
                         <a href="#services" class="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm transition border border-slate-200 text-center">
-                            Explore Services & Pricing
+                            Explore Services
                         </a>
                     </div>
                 </div>
@@ -353,7 +385,7 @@
     </section>
 
     <!-- SEO Highlights Banner: Why Choose Our Water Can Supply Service? -->
-    <section class="py-10 bg-sky-50/60 border-y border-sky-100">
+    <!-- <section class="py-10 bg-sky-50/60 border-y border-sky-100">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 text-center">
                 <div class="bg-white p-3.5 rounded-2xl border border-sky-100 shadow-xs">
@@ -388,45 +420,10 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section>    -->
 
-    <!-- Trusted By / Marquee Logotypes -->
-    <section class="py-7 bg-slate-50 border-y border-slate-100">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <p class="text-center text-[11px] font-extrabold uppercase tracking-widest text-slate-400 mb-5">
-                Supplying Clean Drinking Water To Homes, Apartments, Offices & Corporates
-            </p>
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6 items-center justify-center opacity-70">
-                <div class="flex items-center justify-center space-x-2 text-xs font-black text-slate-600">
-                    <i class="fa-solid fa-building text-[#0077b6] text-sm"></i>
-                    <span>TECHPARK HQ</span>
-                </div>
-                <div class="flex items-center justify-center space-x-2 text-xs font-black text-slate-600">
-                    <i class="fa-solid fa-hospital text-[#0077b6] text-sm"></i>
-                    <span>HEALTHCARE+</span>
-                </div>
-                <div class="flex items-center justify-center space-x-2 text-xs font-black text-slate-600">
-                    <i class="fa-solid fa-industry text-[#0077b6] text-sm"></i>
-                    <span>IND-ZONE MFG</span>
-                </div>
-                <div class="flex items-center justify-center space-x-2 text-xs font-black text-slate-600">
-                    <i class="fa-solid fa-graduation-cap text-[#0077b6] text-sm"></i>
-                    <span>APEX CAMPUS</span>
-                </div>
-                <div class="flex items-center justify-center space-x-2 text-xs font-black text-slate-600">
-                    <i class="fa-solid fa-city text-[#0077b6] text-sm"></i>
-                    <span>URBAN LIVING</span>
-                </div>
-                <div class="flex items-center justify-center space-x-2 text-xs font-black text-slate-600">
-                    <i class="fa-solid fa-hotel text-[#0077b6] text-sm"></i>
-                    <span>ROYAL SUITES</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- How AquaFlow Works in 4 Steps Section (Matching user reference) -->
-    <section id="how-it-works" class="py-16 sm:py-24 bg-white text-slate-900 relative">
+    <!-- How It Works Section (Matching user reference) -->
+    <section id="how-it-works" class="pt-6 sm:pt-8 pb-14 sm:pb-20 bg-white text-slate-900 relative">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
             <!-- Section Header -->
@@ -435,7 +432,7 @@
                     Simple & Seamless
                 </span>
                 <h2 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-                    How AquaFlow Works in 4 Steps
+                    How {{ $appSettings['business_name'] ?? 'AquaFlow' }} Works in 4 Steps
                 </h2>
                 <p class="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">
                     Pure drinking water at your doorstep without complicated contracts or unexpected delays.
@@ -507,36 +504,6 @@
 
             </div>
 
-            <!-- Check Service In Your Area Widget (Matching Reference) -->
-            <div id="check-pincode" class="mt-12 sm:mt-16 max-w-xl mx-auto">
-                <div class="bg-white rounded-3xl p-5 sm:p-7 border border-slate-200 shadow-sm transition hover:shadow-md">
-                    <span class="text-xs font-black uppercase tracking-wider text-slate-800 block mb-4">
-                        CHECK SERVICE IN YOUR AREA
-                    </span>
-                    <form id="pincodeCheckForm" onsubmit="event.preventDefault(); checkServicePincode();" class="flex flex-col sm:flex-row items-stretch gap-2.5 sm:gap-3">
-                        <input 
-                            type="text" 
-                            id="pincodeInput" 
-                            name="pincode" 
-                            value="" 
-                            maxlength="6" 
-                            placeholder="Enter 6-digit Pincode (e.g. 600040)"
-                            class="flex-1 px-4 py-3 rounded-2xl border border-slate-200 text-slate-900 text-sm font-semibold tracking-wide placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0077b6]/20 focus:border-[#0077b6] transition"
-                        >
-                        <button 
-                            type="submit" 
-                            class="w-full sm:w-auto px-6 py-3 rounded-2xl bg-[#0077b6] hover:bg-[#006499] active:scale-95 text-white font-extrabold text-xs transition shrink-0 shadow-sm text-center"
-                        >
-                            Check Pincode
-                        </button>
-                    </form>
-
-                    <!-- Feedback Alert Box (Hidden until customer types and clicks Check) -->
-                    <div id="pincodeResult" class="hidden mt-4 p-3.5 rounded-2xl text-xs font-medium border">
-                    </div>
-                </div>
-            </div>
-
         </div>
     </section>
 
@@ -555,101 +522,101 @@
                 </p>
             </div>
 
-            <!-- 3 Core Customer Group Pillars matching SEO recommendations -->
+            <!-- Core Customer Group Pillars matching SEO recommendations -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 
-                <!-- Pillar 1: Home Customers -->
+                <!-- Pillar 1: Water Can Supply (Homes, Offices & Apartments) -->
                 <div class="service-card bg-slate-50/80 rounded-3xl p-7 sm:p-8 border border-slate-200/90 shadow-sm hover:shadow-md hover:border-[#0077b6]/40 transition flex flex-col justify-between group">
                     <div class="space-y-4">
                         <div class="service-icon-box w-14 h-14 rounded-2xl flex items-center justify-center text-2xl transition shadow-sm">
-                            <i class="fa-solid fa-house-chimney-water"></i>
+                            <i class="fa-solid fa-bottle-water"></i>
                         </div>
-                        <h3 class="text-lg font-black text-slate-900">20 Litre Water Can Home Delivery</h3>
+                        <h3 class="text-lg font-black text-slate-900">20L Water Can Supply</h3>
                         <p class="text-xs text-slate-600 leading-relaxed">
-                            Daily and weekly clean drinking water requirements for families. Enjoy reliable same-day delivery, 1:1 empty can exchange, and Cash on Delivery (COD) or UPI at your doorstep.
+                            Pure, sanitized 20-litre packaged drinking water cans for homes, apartments, corporate offices, and businesses with reliable doorstep delivery.
                         </p>
                         <ul class="text-xs text-slate-700 space-y-2 pt-2 border-t border-slate-200/60">
                             <li class="flex items-center space-x-2">
                                 <i class="fa-solid fa-circle-check text-[#0077b6] text-[11px]"></i>
-                                <span>Morning & evening time slot selection</span>
+                                <span>10-stage RO + UV purified 20L cans</span>
                             </li>
                             <li class="flex items-center space-x-2">
                                 <i class="fa-solid fa-circle-check text-[#0077b6] text-[11px]"></i>
-                                <span>Sanitized food-grade 20L refill cans</span>
+                                <span>Morning & evening doorstep slots</span>
                             </li>
                             <li class="flex items-center space-x-2">
                                 <i class="fa-solid fa-circle-check text-[#0077b6] text-[11px]"></i>
-                                <span>No contracts or minimum lock-ins</span>
+                                <span>1:1 empty can exchange & COD / UPI</span>
                             </li>
                         </ul>
                     </div>
                     <div class="pt-6">
                         <a href="{{ route('customer.book') }}" class="block w-full py-3 rounded-xl bg-white border border-slate-200 text-slate-800 font-extrabold text-xs text-center hover:bg-[#0077b6] hover:text-white hover:border-[#0077b6] transition">
-                            Order for Home &rarr;
+                            Order Water Can &rarr;
                         </a>
                     </div>
                 </div>
 
-                <!-- Pillar 2: Offices & Companies -->
+                <!-- Pillar 2: Car Wash Doorstep -->
                 <div class="service-card bg-slate-50/80 rounded-3xl p-7 sm:p-8 border border-slate-200/90 shadow-sm hover:shadow-md hover:border-[#0077b6]/40 transition flex flex-col justify-between group">
                     <div class="space-y-4">
                         <div class="service-icon-box w-14 h-14 rounded-2xl flex items-center justify-center text-2xl transition shadow-sm">
-                            <i class="fa-solid fa-briefcase"></i>
+                            <i class="fa-solid fa-car-wash"></i>
                         </div>
-                        <h3 class="text-lg font-black text-slate-900">Office & Commercial Water Supply</h3>
+                        <h3 class="text-lg font-black text-slate-900">Car Wash Doorstep Supply</h3>
                         <p class="text-xs text-slate-600 leading-relaxed">
-                            Continuous bulk water supply for workplaces, IT parks, retail showrooms, clinics, and commercial pantries with dedicated fleet dispatch and monthly GST invoicing.
+                            Continuous, high-grade water supply delivered directly to car wash garages, vehicle detailing workshops, and doorstep mobile car wash professionals.
                         </p>
                         <ul class="text-xs text-slate-700 space-y-2 pt-2 border-t border-slate-200/60">
                             <li class="flex items-center space-x-2">
                                 <i class="fa-solid fa-circle-check text-[#0077b6] text-[11px]"></i>
-                                <span>Fixed recurring deliveries (daily / alternate)</span>
+                                <span>Dedicated bulk delivery for auto detailing</span>
                             </li>
                             <li class="flex items-center space-x-2">
                                 <i class="fa-solid fa-circle-check text-[#0077b6] text-[11px]"></i>
-                                <span>Bulk volume discounted pricing tiers</span>
+                                <span>Express replenishment on peak days</span>
                             </li>
                             <li class="flex items-center space-x-2">
                                 <i class="fa-solid fa-circle-check text-[#0077b6] text-[11px]"></i>
-                                <span>Consolidated 30-day monthly statement</span>
+                                <span>Discounted commercial bulk pricing tiers</span>
                             </li>
                         </ul>
                     </div>
                     <div class="pt-6">
-                        <a href="#corporate" class="block w-full py-3 rounded-xl bg-white border border-slate-200 text-slate-800 font-extrabold text-xs text-center hover:bg-[#0077b6] hover:text-white hover:border-[#0077b6] transition">
-                            Request Office Quote &rarr;
+                        <a href="{{ route('customer.book') }}" class="block w-full py-3 rounded-xl bg-white border border-slate-200 text-slate-800 font-extrabold text-xs text-center hover:bg-[#0077b6] hover:text-white hover:border-[#0077b6] transition">
+                            Book Car Wash Supply &rarr;
                         </a>
                     </div>
                 </div>
 
-                <!-- Pillar 3: Apartments & Subscriptions -->
+                <!-- Pillar 3: Rental & Lease House Water Supply -->
                 <div class="service-card bg-slate-50/80 rounded-3xl p-7 sm:p-8 border border-slate-200/90 shadow-sm hover:shadow-md hover:border-[#0077b6]/40 transition flex flex-col justify-between group">
                     <div class="space-y-4">
                         <div class="service-icon-box w-14 h-14 rounded-2xl flex items-center justify-center text-2xl transition shadow-sm">
-                            <i class="fa-solid fa-building-user"></i>
+                            <i class="fa-solid fa-house-user"></i>
                         </div>
-                        <h3 class="text-lg font-black text-slate-900">Apartment & Society Subscriptions</h3>
+                        <h3 class="text-lg font-black text-slate-900">Rental & Lease House Supply</h3>
                         <p class="text-xs text-slate-600 leading-relaxed">
-                            Centralized monthly water can delivery for gated communities, residential blocks, and hostels. Never run out of clean drinking water with automated delivery schedules.
+                            Flexible, zero-hassle drinking water can supply designed specifically for tenants, rental homes, leased flats, bachelor rooms, and PG accommodations.
                         </p>
                         <ul class="text-xs text-slate-700 space-y-2 pt-2 border-t border-slate-200/60">
                             <li class="flex items-center space-x-2">
                                 <i class="fa-solid fa-circle-check text-[#0077b6] text-[11px]"></i>
-                                <span>Scheduled multi-flat community delivery</span>
+                                <span>No heavy deposit or lock-in contracts</span>
                             </li>
                             <li class="flex items-center space-x-2">
                                 <i class="fa-solid fa-circle-check text-[#0077b6] text-[11px]"></i>
-                                <span>Pause anytime during travel or vacation</span>
+                                <span>Direct delivery right to your floor & doorstep</span>
                             </li>
                             <li class="flex items-center space-x-2">
                                 <i class="fa-solid fa-circle-check text-[#0077b6] text-[11px]"></i>
-                                <span>Direct delivery right to your floor</span>
+                                <span>Pause or reschedule anytime when traveling</span>
                             </li>
                         </ul>
                     </div>
                     <div class="pt-6">
-                        <a href="{{ route('register') }}" class="block w-full py-3 rounded-xl bg-white border border-slate-200 text-slate-800 font-extrabold text-xs text-center hover:bg-[#0077b6] hover:text-white hover:border-[#0077b6] transition">
-                            Start Monthly Subscription &rarr;
+                        <a href="{{ route('customer.book') }}" class="block w-full py-3 rounded-xl bg-white border border-slate-200 text-slate-800 font-extrabold text-xs text-center hover:bg-[#0077b6] hover:text-white hover:border-[#0077b6] transition">
+                            Order for Rental Home &rarr;
                         </a>
                     </div>
                 </div>
@@ -691,6 +658,14 @@
                     <div class="flex items-center space-x-2">
                         <i class="fa-solid fa-check text-[#0077b6]"></i>
                         <span>Emergency Same-Day Water Can Delivery</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <i class="fa-solid fa-check text-[#0077b6]"></i>
+                        <span>Car Wash & Detailing Water Supply</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <i class="fa-solid fa-check text-[#0077b6]"></i>
+                        <span>Rental House & Tenant Can Delivery</span>
                     </div>
                 </div>
             </div>
@@ -751,12 +726,12 @@
         </div>
     </section>
 
-    <!-- Infrastructure & Purity Protocol -->
+    <!-- Infrastructure & Purity Protocol
     <section id="features" class="py-20 bg-white border-t border-slate-100">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 
-                <!-- Left: Purification Process Visuals -->
+               
                 <div class="space-y-6">
                     <span class="text-xs font-extrabold uppercase tracking-widest text-[#0077b6] bg-sky-50 px-3 py-1 rounded-full border border-sky-100">
                         Purity Protocol
@@ -765,7 +740,7 @@
                         Certified 10-Stage Micro-Filtration Standard
                     </h2>
                     <p class="text-sm text-slate-600 leading-relaxed">
-                        Every batch of water processed under the AquaFlow brand passes rigorous continuous sensor checks for dissolved solids, mineral balance, and microbiological safety.
+                        Every batch of water processed under the {{ $appSettings['business_name'] ?? 'AquaFlow' }} brand passes rigorous continuous sensor checks for dissolved solids, mineral balance, and microbiological safety.
                     </p>
 
                     <div class="space-y-4 pt-2">
@@ -801,7 +776,7 @@
                     </div>
                 </div>
 
-                <!-- Right: Route Dispatch & SLA Card -->
+             
                 <div class="bg-gradient-to-br from-sky-50 to-blue-50 p-8 rounded-3xl border border-sky-100 relative space-y-6">
                     <div class="flex items-center justify-between border-b border-sky-200/60 pb-4">
                         <span class="text-xs font-black text-slate-800 uppercase tracking-wider">Fleet Telemetry</span>
@@ -847,7 +822,7 @@
 
             </div>
         </div>
-    </section>
+    </section> -->
 
     <!-- Corporate Bulk Volume Inquiries Section (Blue Accent Banner) -->
     <section id="corporate" class="py-16 sm:py-20 bg-slate-50 border-t border-slate-100">
@@ -869,9 +844,9 @@
                         <a href="{{ route('register') }}" class="px-7 py-3.5 rounded-xl bg-white text-[#0077b6] font-black text-xs uppercase tracking-wider hover:bg-slate-50 transition shadow-md text-center">
                             Open Corporate Account &rarr;
                         </a>
-                        <a href="tel:+919876543210" class="px-7 py-3.5 rounded-xl bg-sky-900/60 hover:bg-sky-900/80 text-white font-extrabold text-xs transition border border-white/20 text-center flex items-center justify-center space-x-2">
+                        <a href="tel:{{ preg_replace('/[^0-9+]/', '', $appSettings['business_phone'] ?? '+919876543210') }}" class="px-7 py-3.5 rounded-xl bg-sky-900/60 hover:bg-sky-900/80 text-white font-extrabold text-xs transition border border-white/20 text-center flex items-center justify-center space-x-2">
                             <i class="fa-solid fa-phone text-xs"></i>
-                            <span>Call Enterprise Desk</span>
+                            <span>Call Enterprise Desk ({{ $appSettings['business_phone'] ?? '+91 98765 43210' }})</span>
                         </a>
                     </div>
                 </div>
@@ -890,7 +865,7 @@
                     Frequently Asked Questions & Water Delivery Guide
                 </h2>
                 <p class="text-xs sm:text-sm text-slate-500 max-w-xl mx-auto">
-                    Everything you need to know about 20-litre water can supply, delivery timings, pricing, subscriptions, and hygiene standards.
+                    Find answers about water can orders, delivery, pricing and subscriptions.
                 </p>
             </div>
 
@@ -962,75 +937,6 @@
                     </p>
                 </details>
             </div>
-
-            <!-- SEO 20 Topic Quick Directory Links (Indexable keyword cards for Indian search queries) -->
-            <div class="mt-14 pt-10 border-t border-slate-100">
-                <h4 class="text-xs font-black uppercase tracking-wider text-slate-800 mb-4 text-center">
-                    Popular Water Can Search Queries in Chennai & Tamil Nadu
-                </h4>
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 text-[11px]">
-                    <a href="#check-pincode" class="p-2.5 rounded-xl bg-slate-50 hover:bg-sky-50 text-slate-700 hover:text-[#0077b6] font-semibold transition border border-slate-100">
-                        1. 20 Litre Water Can Delivery Near Me
-                    </a>
-                    <a href="#services" class="p-2.5 rounded-xl bg-slate-50 hover:bg-sky-50 text-slate-700 hover:text-[#0077b6] font-semibold transition border border-slate-100">
-                        2. Drinking Water Home Delivery
-                    </a>
-                    <a href="#check-pincode" class="p-2.5 rounded-xl bg-slate-50 hover:bg-sky-50 text-slate-700 hover:text-[#0077b6] font-semibold transition border border-slate-100">
-                        3. Water Can Suppliers in Chennai
-                    </a>
-                    <a href="{{ route('customer.book') }}" class="p-2.5 rounded-xl bg-slate-50 hover:bg-sky-50 text-slate-700 hover:text-[#0077b6] font-semibold transition border border-slate-100">
-                        4. Order Water Can Online
-                    </a>
-                    <a href="#products" class="p-2.5 rounded-xl bg-slate-50 hover:bg-sky-50 text-slate-700 hover:text-[#0077b6] font-semibold transition border border-slate-100">
-                        5. 20 Litre Water Can Price
-                    </a>
-                    <a href="#features" class="p-2.5 rounded-xl bg-slate-50 hover:bg-sky-50 text-slate-700 hover:text-[#0077b6] font-semibold transition border border-slate-100">
-                        6. Pure Drinking Water Service
-                    </a>
-                    <a href="#how-it-works" class="p-2.5 rounded-xl bg-slate-50 hover:bg-sky-50 text-slate-700 hover:text-[#0077b6] font-semibold transition border border-slate-100">
-                        7. Book Water Can Online
-                    </a>
-                    <a href="#services" class="p-2.5 rounded-xl bg-slate-50 hover:bg-sky-50 text-slate-700 hover:text-[#0077b6] font-semibold transition border border-slate-100">
-                        8. Monthly Water Can Subscription
-                    </a>
-                    <a href="#corporate" class="p-2.5 rounded-xl bg-slate-50 hover:bg-sky-50 text-slate-700 hover:text-[#0077b6] font-semibold transition border border-slate-100">
-                        9. Office Water Can Supply
-                    </a>
-                    <a href="#features" class="p-2.5 rounded-xl bg-slate-50 hover:bg-sky-50 text-slate-700 hover:text-[#0077b6] font-semibold transition border border-slate-100">
-                        10. Same-Day Water Delivery
-                    </a>
-                    <a href="#features" class="p-2.5 rounded-xl bg-slate-50 hover:bg-sky-50 text-slate-700 hover:text-[#0077b6] font-semibold transition border border-slate-100">
-                        11. 20 Litre Drinking Water Benefits
-                    </a>
-                    <a href="#how-it-works" class="p-2.5 rounded-xl bg-slate-50 hover:bg-sky-50 text-slate-700 hover:text-[#0077b6] font-semibold transition border border-slate-100">
-                        12. Best Water Can Supplier
-                    </a>
-                    <a href="#services" class="p-2.5 rounded-xl bg-slate-50 hover:bg-sky-50 text-slate-700 hover:text-[#0077b6] font-semibold transition border border-slate-100">
-                        13. Apartment Water Delivery
-                    </a>
-                    <a href="#corporate" class="p-2.5 rounded-xl bg-slate-50 hover:bg-sky-50 text-slate-700 hover:text-[#0077b6] font-semibold transition border border-slate-100">
-                        14. Bulk Water Can Supply
-                    </a>
-                    <a href="#services" class="p-2.5 rounded-xl bg-slate-50 hover:bg-sky-50 text-slate-700 hover:text-[#0077b6] font-semibold transition border border-slate-100">
-                        15. Doorstep Water Delivery
-                    </a>
-                    <a href="#check-pincode" class="p-2.5 rounded-xl bg-slate-50 hover:bg-sky-50 text-slate-700 hover:text-[#0077b6] font-semibold transition border border-slate-100">
-                        16. Emergency Water Can Delivery
-                    </a>
-                    <a href="#products" class="p-2.5 rounded-xl bg-slate-50 hover:bg-sky-50 text-slate-700 hover:text-[#0077b6] font-semibold transition border border-slate-100">
-                        17. Water Can COD Delivery
-                    </a>
-                    <a href="{{ route('customer.book') }}" class="p-2.5 rounded-xl bg-slate-50 hover:bg-sky-50 text-slate-700 hover:text-[#0077b6] font-semibold transition border border-slate-100">
-                        18. Water Can Booking App
-                    </a>
-                    <a href="#how-it-works" class="p-2.5 rounded-xl bg-slate-50 hover:bg-sky-50 text-slate-700 hover:text-[#0077b6] font-semibold transition border border-slate-100">
-                        19. Scheduled Water Can Delivery
-                    </a>
-                    <a href="#check-pincode" class="p-2.5 rounded-xl bg-slate-50 hover:bg-sky-50 text-slate-700 hover:text-[#0077b6] font-semibold transition border border-slate-100">
-                        20. Water Delivery Service Near Me
-                    </a>
-                </div>
-            </div>
         </div>
     </section>
 
@@ -1042,9 +948,9 @@
                 <div class="space-y-4 md:col-span-2">
                     <div class="flex items-center space-x-3">
                         <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#0077b6] to-[#00b4d8] p-0.5 flex items-center justify-center">
-                            <img src="/icons/logo.svg" alt="Logo" class="w-full h-full object-contain p-1">
+                            <img src="{{ $appSettings['custom_logo_url'] ?? '/icons/logo.svg' }}" alt="Logo" class="w-full h-full object-contain p-1">
                         </div>
-                        <span class="text-base font-black text-white tracking-tight">AquaFlow Water Logistics</span>
+                        <span class="text-base font-black text-white tracking-tight">{{ $appSettings['business_name'] ?? 'AquaFlow' }}</span>
                     </div>
                     <p class="text-xs text-slate-400 max-w-sm leading-relaxed">
                         {{ $appSettings['business_tagline'] ?? 'Pure Hydration & Smart Doorstep Delivery' }}. High-purity potable drinking water logistics for homes, apartments, and corporate facilities.
@@ -1086,7 +992,7 @@
             </div>
 
             <div class="pt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500">
-                <p>&copy; {{ date('Y') }} AquaFlow Water Logistics. All rights reserved.</p>
+                <p>&copy; {{ date('Y') }} {{ $appSettings['business_name'] ?? 'AquaFlow' }}. All rights reserved.</p>
                 <div class="flex items-center space-x-6">
                     <a href="#" class="hover:text-white transition">Privacy Policy</a>
                     <a href="#" class="hover:text-white transition">Terms of Service</a>
