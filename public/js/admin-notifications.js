@@ -99,17 +99,29 @@
                 'Accept': 'application/json'
             }
         })
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) {
+                throw new Error('HTTP status ' + res.status);
+            }
+            return res.json();
+        })
         .then(data => {
-            if (data.success) {
+            if (data && data.success) {
                 updateBadges(data.unread_count);
-                renderNotificationList(data.notifications);
+                renderNotificationList(data.notifications || []);
+            } else {
+                renderNotificationList([]);
             }
         })
         .catch(err => {
+            console.error('Failed to load admin notifications:', err);
             listEl.innerHTML = `
                 <div class="p-6 text-center text-slate-400">
-                    <p class="text-xs">Failed to load notifications.</p>
+                    <p class="text-xs font-semibold text-slate-600 mb-1">Could not load notifications</p>
+                    <p class="text-[11px] text-slate-400 mb-3">Please check your internet connection or login session.</p>
+                    <button type="button" onclick="window.AdminNotifications ? window.AdminNotifications.reload() : location.reload()" class="px-3 py-1 bg-indigo-600 text-white rounded-lg text-xs font-bold hover:bg-indigo-700">
+                        Retry
+                    </button>
                 </div>
             `;
         });
@@ -511,5 +523,10 @@
                 checkRealtimeUpdates();
             }
         });
+        // Expose helper on window for manual retry
+        window.AdminNotifications = {
+            reload: loadNotifications,
+            check: checkRealtimeUpdates
+        };
     });
 })();

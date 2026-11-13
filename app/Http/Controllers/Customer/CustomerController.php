@@ -253,21 +253,13 @@ class CustomerController extends Controller
             return $order;
         });
 
-        // Send Email notification to Admin
-        try {
-            $adminEmail = config('mail.admin_notification_email') ?? env('ADMIN_NOTIFICATION_EMAIL', 'admin@aquaflowdelivery.test');
-            Mail::to($adminEmail)->send(new NewOrderAdminNotification($order));
-        } catch (\Throwable $e) {
-            Log::error("Failed sending admin order alert: " . $e->getMessage());
-        }
-
-        // Send In-App & PWA Real-Time Notification to all Admin Users
+        // 1. Immediately send In-App & PWA Real-Time Notification to all Admin Users (Instant database write)
         try {
             $adminUsers = User::where('role', 'admin')->get();
             foreach ($adminUsers as $admin) {
                 // Prevent duplicate notification for same order if already exists
                 $hasExisting = $admin->notifications()
-                    ->where('data->order_id', $order->id)
+                    ->where('data', 'like', '%"order_id":' . $order->id . '%')
                     ->exists();
 
                 if (!$hasExisting) {
@@ -276,6 +268,18 @@ class CustomerController extends Controller
             }
         } catch (\Throwable $e) {
             Log::error("Failed sending database order notification to admin users: " . $e->getMessage());
+        }
+
+        // 2. Send Email notification asynchronously or non-blocking to prevent UI delay
+        try {
+            $adminEmail = config('mail.admin_notification_email') ?? env('ADMIN_NOTIFICATION_EMAIL', 'admin@aquaflowdelivery.test');
+            if (config('queue.default') !== 'sync') {
+                Mail::to($adminEmail)->queue(new NewOrderAdminNotification($order));
+            } else {
+                Mail::to($adminEmail)->send(new NewOrderAdminNotification($order));
+            }
+        } catch (\Throwable $e) {
+            Log::error("Failed sending admin order alert: " . $e->getMessage());
         }
 
         return response()->json([

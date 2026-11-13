@@ -32,13 +32,18 @@ class AdminNotificationController extends Controller
             ->limit($limit)
             ->get()
             ->map(function ($n) {
+                $data = is_array($n->data) ? $n->data : json_decode($n->data, true);
+                if (!is_array($data)) {
+                    $data = [];
+                }
+
                 return [
                     'id' => $n->id,
                     'read' => $n->read_at !== null,
                     'read_at' => $n->read_at ? $n->read_at->toIso8601String() : null,
                     'created_at' => $n->created_at ? $n->created_at->diffForHumans() : '',
                     'created_at_exact' => $n->created_at ? $n->created_at->format('d M Y, h:i A') : '',
-                    'data' => $n->data,
+                    'data' => $data,
                 ];
             });
 
@@ -72,11 +77,16 @@ class AdminNotificationController extends Controller
         }
 
         $latest = $query->limit(5)->get()->map(function ($n) {
+            $data = is_array($n->data) ? $n->data : json_decode($n->data, true);
+            if (!is_array($data)) {
+                $data = [];
+            }
+
             return [
                 'id' => $n->id,
                 'created_at' => $n->created_at ? $n->created_at->diffForHumans() : '',
                 'created_at_raw' => $n->created_at ? $n->created_at->toIso8601String() : '',
-                'data' => $n->data,
+                'data' => $data,
             ];
         });
 
