@@ -234,11 +234,8 @@
                     <img src="{{ $appSettings['custom_logo_url'] ?? '/icons/logo.svg' }}" alt="{{ $appSettings['business_name'] ?? 'AquaFlow' }} Logo" class="w-full h-full object-contain p-1">
                 </div>
                 <div class="min-w-0">
-                    <span class="text-lg font-black text-slate-900 tracking-tight block leading-none truncate">
+                    <span class="text-lg font-black text-slate-900 tracking-tight block leading-tight truncate">
                         {{ $appSettings['business_name'] ?? 'AquaFlow' }}
-                    </span>
-                    <span class="text-[9px] font-extrabold text-[#0077b6] tracking-wider uppercase block mt-1 truncate">
-                        {{ $appSettings['business_tagline'] ?? 'WATER LOGISTICS' }}
                     </span>
                 </div>
             </a>
@@ -252,42 +249,40 @@
             </nav>
 
             <!-- Actions: Sign In only -->
-            <div class="flex items-center space-x-3 sm:space-x-5 shrink-0">
+            <div class="flex items-center space-x-2 sm:space-x-5 shrink-0">
                 @auth
                     @if(auth()->user()->isAdmin())
-                        <a href="{{ route('admin.dashboard') }}" class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs transition">
+                        <a href="{{ route('admin.dashboard') }}" class="px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs transition">
                             Admin Console &rarr;
                         </a>
                     @elseif(auth()->user()->isDriver())
-                        <a href="{{ route('driver.dashboard') }}" class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs transition">
+                        <a href="{{ route('driver.dashboard') }}" class="px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs transition">
                             Driver Portal &rarr;
                         </a>
                     @else
-                        <a href="{{ route('customer.home') }}" class="px-4 py-2.5 rounded-xl bg-[#0077b6] hover:bg-[#005f94] text-white font-bold text-xs transition shadow-sm">
+                        <a href="{{ route('customer.home') }}" class="px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-[#0077b6] hover:bg-[#005f94] text-white font-bold text-xs transition shadow-sm">
                             Dashboard &rarr;
                         </a>
                     @endif
                 @else
-                    <a href="{{ route('login') }}" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-[#0077b6] hover:bg-slate-50 transition">
+                    <a href="{{ route('login') }}" class="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-bold text-[#0077b6] md:text-slate-700 hover:text-[#0077b6] hover:bg-slate-50 transition">
                         Sign In
                     </a>
                 @endauth
 
                 <!-- Mobile Hamburger Button -->
-                <button type="button" id="mobileMenuBtn" onclick="toggleMobileNav()" class="md:hidden w-10 h-10 rounded-xl bg-slate-100 text-slate-700 hover:text-slate-900 flex items-center justify-center transition">
+                <button type="button" id="mobileMenuBtn" onclick="toggleMobileNav()" class="md:hidden w-10 h-10 rounded-2xl bg-slate-100 text-slate-700 hover:text-slate-900 flex items-center justify-center transition" aria-label="Toggle navigation">
                     <i id="mobileMenuIcon" class="fa-solid fa-bars text-sm"></i>
                 </button>
             </div>
         </div>
 
-        <!-- Mobile Slide-down Navigation -->
-        <div id="mobileNavMenu" class="hidden md:hidden bg-white border-b border-slate-100 px-4 py-4 space-y-2 shadow-lg">
-            <a href="/" onclick="toggleMobileNav()" class="block px-3 py-2 rounded-xl text-xs font-bold text-slate-800 hover:bg-sky-50 hover:text-[#0077b6] transition">Home</a>
-            <a href="#products" onclick="toggleMobileNav()" class="block px-3 py-2 rounded-xl text-xs font-bold text-slate-800 hover:bg-sky-50 hover:text-[#0077b6] transition">Products</a>
-            <a href="#how-it-works" onclick="toggleMobileNav()" class="block px-3 py-2 rounded-xl text-xs font-bold text-slate-800 hover:bg-sky-50 hover:text-[#0077b6] transition">How It Works</a>
-            <a href="#check-pincode" onclick="toggleMobileNav()" class="block px-3 py-2 rounded-xl text-xs font-bold text-slate-800 hover:bg-sky-50 hover:text-[#0077b6] transition">Service Areas</a>
-            <a href="#faq" onclick="toggleMobileNav()" class="block px-3 py-2 rounded-xl text-xs font-bold text-slate-800 hover:bg-sky-50 hover:text-[#0077b6] transition">FAQ</a>
-            <a href="#corporate" onclick="toggleMobileNav()" class="block px-3 py-2 rounded-xl text-xs font-bold text-slate-800 hover:bg-sky-50 hover:text-[#0077b6] transition">Contact</a>
+        <!-- Mobile Slide-down Navigation (Matching Desktop Links and Styling) -->
+        <div id="mobileNavMenu" class="hidden md:hidden bg-white border-b border-slate-100 px-4 py-3 space-y-1 shadow-lg">
+            <a href="/" onclick="toggleMobileNav()" class="block px-3 py-2.5 rounded-xl text-xs font-bold text-[#0077b6] hover:bg-sky-50 transition">Home</a>
+            <a href="#services" onclick="toggleMobileNav()" class="block px-3 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:text-[#0077b6] hover:bg-sky-50 transition">Services</a>
+            <a href="#products" onclick="toggleMobileNav()" class="block px-3 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:text-[#0077b6] hover:bg-sky-50 transition">Products</a>
+            <a href="#corporate" onclick="toggleMobileNav()" class="block px-3 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:text-[#0077b6] hover:bg-sky-50 transition">Contact</a>
         </div>
     </header>
 

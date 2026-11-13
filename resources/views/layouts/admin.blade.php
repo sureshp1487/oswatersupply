@@ -10,6 +10,8 @@
     <link rel="icon" type="image/svg+xml" href="/icons/logo.svg">
     <link rel="shortcut icon" href="/favicon.ico">
     <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="{{ $appSettings['primary_color'] ?? '#0077b6' }}">
 
     <!-- Tailwind CSS with dynamic Theme Tokens based on Customization Settings -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -181,7 +183,58 @@
                 <h1 class="text-sm sm:text-base font-extrabold text-slate-900 truncate">@yield('page_title', 'Dashboard')</h1>
             </div>
 
-            <div class="flex items-center space-x-3">
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <!-- Real-Time Order Notifications Bell Icon & Dropdown -->
+                <div class="relative" id="adminNotificationWrapper">
+                    <button type="button" id="adminNotificationBellBtn" class="relative p-2 text-slate-600 hover:text-indigo-600 rounded-xl hover:bg-slate-100 transition focus:outline-none" title="Order Notifications" aria-label="Notifications" aria-expanded="false">
+                        <i class="fa-solid fa-bell text-lg"></i>
+                        <span id="adminNotificationBadge" class="hidden absolute -top-0.5 -right-0.5 min-w-[20px] h-5 px-1 bg-rose-600 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white shadow-sm animate-pulse">
+                            0
+                        </span>
+                    </button>
+
+                    <!-- Notifications Dropdown Box -->
+                    <div id="adminNotificationDropdown" class="hidden absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 z-50 overflow-hidden transform transition-all origin-top-right">
+                        <!-- Dropdown Header -->
+                        <div class="px-4 py-3 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
+                            <div class="flex items-center space-x-2">
+                                <i class="fa-solid fa-bell text-xs text-indigo-400"></i>
+                                <span class="text-xs font-black uppercase tracking-wider">Order Alerts</span>
+                                <span id="adminNotificationUnreadCountText" class="text-[10px] font-extrabold bg-indigo-500/40 text-indigo-200 px-2 py-0.5 rounded-full">0 new</span>
+                            </div>
+                            <button type="button" id="adminMarkAllReadBtn" class="text-[11px] font-bold text-indigo-300 hover:text-white transition">
+                                Mark all as read
+                            </button>
+                        </div>
+
+                        <!-- Push Permission Prompt Banner (if not yet granted) -->
+                        <div id="adminPushPermissionPrompt" class="hidden bg-sky-50 border-b border-sky-100 p-2.5 flex items-center justify-between gap-2 text-xs">
+                            <div class="flex items-center space-x-2 text-slate-700 min-w-0">
+                                <i class="fa-solid fa-tower-broadcast text-sky-600 shrink-0"></i>
+                                <span class="text-[11px] font-medium leading-tight truncate">Enable instant desktop/PWA alerts</span>
+                            </div>
+                            <button type="button" id="adminEnablePushBtn" class="px-2.5 py-1 bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-[10px] rounded-lg shrink-0 transition">
+                                Enable
+                            </button>
+                        </div>
+
+                        <!-- Notification Items List -->
+                        <div id="adminNotificationList" class="max-h-80 overflow-y-auto divide-y divide-slate-100 text-xs">
+                            <div class="p-6 text-center text-slate-400">
+                                <i class="fa-solid fa-spinner fa-spin text-lg mb-2"></i>
+                                <p class="text-xs">Loading notifications...</p>
+                            </div>
+                        </div>
+
+                        <!-- Dropdown Footer -->
+                        <div class="p-2.5 bg-slate-50 border-t border-slate-100 text-center">
+                            <a href="{{ route('admin.orders.index') }}" class="text-xs font-extrabold text-indigo-600 hover:text-indigo-800 transition block py-1">
+                                View All Customer Orders &rarr;
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
                 <a href="{{ route('customer.home') }}" target="_blank" class="text-xs font-bold text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3.5 py-1.5 rounded-xl border border-indigo-100 flex items-center space-x-1.5 transition">
                     <span>View Customer App</span>
                     <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
@@ -275,6 +328,7 @@
             });
         });
     </script>
+    <script src="/js/admin-notifications.js"></script>
     @stack('scripts')
 </body>
 </html>

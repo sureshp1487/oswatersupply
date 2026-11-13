@@ -85,6 +85,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // App & Dashboard Customization (Brand, Theme, Banner, Colors)
     Route::get('/customization', [AdminController::class, 'customization'])->name('customization.index');
     Route::post('/customization', [AdminController::class, 'updateCustomization'])->name('customization.update');
+
+    // Admin Real-Time Order Notifications & PWA Sync APIs
+    Route::get('/notifications', [\App\Http\Controllers\Admin\AdminNotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/unread-count', [\App\Http\Controllers\Admin\AdminNotificationController::class, 'unreadCount'])->name('notifications.unread_count');
+    Route::post('/notifications/{id}/read', [\App\Http\Controllers\Admin\AdminNotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/mark-all-read', [\App\Http\Controllers\Admin\AdminNotificationController::class, 'markAllAsRead'])->name('notifications.mark_all_read');
+    Route::post('/notifications/push/subscribe', [\App\Http\Controllers\Admin\AdminNotificationController::class, 'subscribePush'])->name('notifications.push.subscribe');
+    Route::post('/notifications/push/unsubscribe', [\App\Http\Controllers\Admin\AdminNotificationController::class, 'unsubscribePush'])->name('notifications.push.unsubscribe');
 });
 
 // Driver Mobile Application Routes

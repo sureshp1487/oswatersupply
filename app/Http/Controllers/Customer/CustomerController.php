@@ -14,6 +14,8 @@ use App\Models\CustomerProfile;
 use App\Models\CustomerPaymentLedger;
 use App\Services\PaymentService;
 use App\Mail\NewOrderAdminNotification;
+use App\Notifications\NewCustomerOrderAdminNotification;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -257,6 +259,23 @@ class CustomerController extends Controller
             Mail::to($adminEmail)->send(new NewOrderAdminNotification($order));
         } catch (\Throwable $e) {
             Log::error("Failed sending admin order alert: " . $e->getMessage());
+        }
+
+        // Send In-App & PWA Real-Time Notification to all Admin Users
+        try {
+            $adminUsers = User::where('role', 'admin')->get();
+            foreach ($adminUsers as $admin) {
+                // Prevent duplicate notification for same order if already exists
+                $hasExisting = $admin->notifications()
+                    ->where('data->order_id', $order->id)
+                    ->exists();
+
+                if (!$hasExisting) {
+                    $admin->notify(new NewCustomerOrderAdminNotification($order));
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::error("Failed sending database order notification to admin users: " . $e->getMessage());
         }
 
         return response()->json([
