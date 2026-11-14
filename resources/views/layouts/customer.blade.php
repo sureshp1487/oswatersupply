@@ -66,6 +66,8 @@
 
     <!-- SweetAlert2 for Toast & Alerts -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Canvas Confetti Celebration Animation -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
     <style>
         body {
@@ -198,7 +200,7 @@
     </header>
 
     <!-- Main Content Canvas (Fluid with mobile, tablet, and wide desktop support) -->
-    <main class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 pb-safe md:pb-8">
+    <main class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 pb-20 md:pb-8">
         <!-- Announcement Banner if Enabled -->
         @if(!empty($appSettings['banner_enabled']) && $appSettings['banner_enabled'] == '1' && !empty($appSettings['announcement_banner']))
             <div class="mb-4 p-3.5 bg-gradient-to-r from-indigo-900 to-indigo-800 text-white rounded-2xl flex items-center justify-between text-xs font-semibold shadow-md border border-indigo-700/50">

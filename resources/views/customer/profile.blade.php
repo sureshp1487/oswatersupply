@@ -120,16 +120,16 @@
 </div>
 
 <!-- Modal: Add Address -->
-<div id="addAddressModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95">
-        <div class="flex items-center justify-between border-b pb-3">
+<div id="addAddressModal" class="fixed inset-0 z-[60] bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white w-full max-w-md rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 max-h-[90vh] flex flex-col my-auto">
+        <div class="flex items-center justify-between border-b pb-3 shrink-0">
             <h3 class="text-base font-bold text-slate-900">Add Delivery Address</h3>
             <button type="button" id="closeAddressModal" class="text-slate-400 hover:text-slate-700 p-1">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
         </div>
 
-        <form id="newAddressForm" class="space-y-3">
+        <form id="newAddressForm" class="space-y-3 overflow-y-auto pr-1">
             @csrf
             <div>
                 <label class="block text-xs font-semibold text-slate-700 mb-1">Address Label</label>
@@ -172,9 +172,11 @@
                 <label class="block text-xs font-semibold text-slate-700 mb-1">Delivery Instructions (Optional)</label>
                 <input type="text" name="delivery_instructions" placeholder="e.g. Leave with security" class="w-full px-3 py-2 border rounded-xl text-xs">
             </div>
-            <button type="submit" id="btnSaveAddress" class="w-full py-3 bg-ocean-600 text-white rounded-xl text-xs font-bold hover:bg-ocean-700 shadow transition flex items-center justify-center space-x-1.5">
-                <span>Save Address</span>
-            </button>
+            <div class="pt-1 pb-1">
+                <button type="submit" id="btnSaveAddress" class="w-full py-3 bg-ocean-600 text-white rounded-xl text-xs font-bold hover:bg-ocean-700 shadow transition flex items-center justify-center space-x-1.5">
+                    <span>Save Address</span>
+                </button>
+            </div>
         </form>
     </div>
 </div>

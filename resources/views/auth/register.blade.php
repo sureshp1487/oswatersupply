@@ -403,14 +403,56 @@
                     return;
                 }
 
-                // Switch to Step 2
-                $('#step1Container').addClass('hidden');
-                $('#step2Container').removeClass('hidden');
+                // Check server-side unique availability (Phone and Email) before advancing to Step 2
+                const btn = $('#btnNextStep');
+                const originalBtnHtml = btn.html();
+                btn.attr('disabled', 'disabled').html('<i class="fa-solid fa-spinner fa-spin mr-1"></i> Checking Account Details...');
 
-                // Update Stepper Progress
-                $('#stepProgressBar').removeClass('w-1/2').addClass('w-full');
-                $('#stepBadge2').removeClass('text-slate-400').addClass('text-sky-600 font-bold');
-                $('#stepBadge2 span:first').removeClass('bg-slate-200 text-slate-600').addClass('bg-sky-600 text-white');
+                $.ajax({
+                    url: "{{ route('register.check_account') }}",
+                    type: "POST",
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        phone: phone,
+                        email: email
+                    },
+                    success: function(response) {
+                        btn.removeAttr('disabled').html(originalBtnHtml);
+                        clearFormAlert();
+
+                        // Switch to Step 2
+                        $('#step1Container').addClass('hidden');
+                        $('#step2Container').removeClass('hidden');
+
+                        // Update Stepper Progress
+                        $('#stepProgressBar').removeClass('w-1/2').addClass('w-full');
+                        $('#stepBadge2').removeClass('text-slate-400').addClass('text-sky-600 font-bold');
+                        $('#stepBadge2 span:first').removeClass('bg-slate-200 text-slate-600').addClass('bg-sky-600 text-white');
+                    },
+                    error: function(xhr) {
+                        btn.removeAttr('disabled').html(originalBtnHtml);
+                        const errors = xhr.responseJSON?.errors;
+                        let firstField = null;
+
+                        if (errors) {
+                            if (errors.phone) {
+                                showFieldError('phone', errors.phone[0]);
+                                if (!firstField) firstField = $('#phone');
+                            }
+                            if (errors.email) {
+                                showFieldError('email', errors.email[0]);
+                                if (!firstField) firstField = $('#email');
+                            }
+                            showFormAlert(errors.phone ? errors.phone[0] : (errors.email ? errors.email[0] : 'Validation failed.'));
+                        } else {
+                            showFormAlert(xhr.responseJSON?.message || 'Unable to verify account details. Please try again.');
+                        }
+
+                        if (firstField) {
+                            firstField.focus();
+                        }
+                    }
+                });
             });
 
             // Back button click from Step 2 -> Step 1

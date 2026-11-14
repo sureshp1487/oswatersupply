@@ -58,6 +58,36 @@ class AuthController extends Controller
         return view('auth.register');
     }
 
+    public function checkAccountAvailability(Request $request)
+    {
+        $request->validate([
+            'phone' => ['required', 'string', 'regex:/^[6-9]\d{9}$/'],
+            'email' => ['required', 'email', 'max:255'],
+        ]);
+
+        $phoneExists = User::where('phone', $request->phone)->exists();
+        $emailExists = User::where('email', $request->email)->exists();
+
+        if ($phoneExists || $emailExists) {
+            $errors = [];
+            if ($phoneExists) {
+                $errors['phone'] = ['This mobile number is already registered. Please sign in or use another number.'];
+            }
+            if ($emailExists) {
+                $errors['email'] = ['This email address is already in use.'];
+            }
+            return response()->json([
+                'available' => false,
+                'errors' => $errors
+            ], 422);
+        }
+
+        return response()->json([
+            'available' => true,
+            'message' => 'Credentials available.'
+        ]);
+    }
+
     public function register(Request $request)
     {
         $validated = $request->validate([

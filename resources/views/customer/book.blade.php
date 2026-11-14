@@ -291,16 +291,16 @@
 </div>
 
 <!-- Modal: Add Address -->
-<div id="addAddressModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl space-y-4">
-        <div class="flex items-center justify-between border-b pb-3">
+<div id="addAddressModal" class="fixed inset-0 z-[60] bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white w-full max-w-md rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col my-auto">
+        <div class="flex items-center justify-between border-b pb-3 shrink-0">
             <h3 class="text-base font-bold text-slate-900">Add Delivery Address</h3>
-            <button type="button" id="closeAddressModal" class="text-slate-400 hover:text-slate-700">
+            <button type="button" id="closeAddressModal" class="text-slate-400 hover:text-slate-700 p-1">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
         </div>
 
-        <form id="newAddressForm" class="space-y-3">
+        <form id="newAddressForm" class="space-y-3 overflow-y-auto pr-1">
             @csrf
             <div>
                 <label class="block text-xs font-semibold text-slate-700 mb-1">Address Label</label>
@@ -314,32 +314,34 @@
             <div class="grid grid-cols-2 gap-2">
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">Door / Flat No.</label>
-                    <input type="text" name="door_number" required placeholder="Flat 4B" class="w-full px-3 py-2 border rounded-xl text-xs">
+                    <input type="text" name="door_number" required placeholder="Flat 4B" class="w-full px-3 py-2 border rounded-xl text-xs font-medium">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">Building Name</label>
-                    <input type="text" name="house_or_building" required placeholder="Skyline Towers" class="w-full px-3 py-2 border rounded-xl text-xs">
+                    <input type="text" name="house_or_building" required placeholder="Skyline Towers" class="w-full px-3 py-2 border rounded-xl text-xs font-medium">
                 </div>
             </div>
             <div>
                 <label class="block text-xs font-semibold text-slate-700 mb-1">Street / Road</label>
-                <input type="text" name="street" required placeholder="2nd Cross Street" class="w-full px-3 py-2 border rounded-xl text-xs">
+                <input type="text" name="street" required placeholder="2nd Cross Street" class="w-full px-3 py-2 border rounded-xl text-xs font-medium">
             </div>
             <div class="grid grid-cols-2 gap-2">
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">Locality / Area</label>
-                    <input type="text" name="area_locality" required placeholder="Indiranagar" class="w-full px-3 py-2 border rounded-xl text-xs">
+                    <input type="text" name="area_locality" required placeholder="Indiranagar" class="w-full px-3 py-2 border rounded-xl text-xs font-medium">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">Pincode</label>
-                    <input type="text" name="pincode" required placeholder="600040" maxlength="6" class="w-full px-3 py-2 border rounded-xl text-xs">
+                    <input type="text" name="pincode" required placeholder="600040" maxlength="6" class="w-full px-3 py-2 border rounded-xl text-xs font-medium">
                 </div>
             </div>
             <div>
                 <label class="block text-xs font-semibold text-slate-700 mb-1">City</label>
-                <input type="text" name="city" value="Chennai" required class="w-full px-3 py-2 border rounded-xl text-xs">
+                <input type="text" name="city" value="Chennai" required class="w-full px-3 py-2 border rounded-xl text-xs font-medium">
             </div>
-            <button type="submit" class="w-full py-3 bg-ocean-600 text-white rounded-xl text-xs font-bold hover:bg-ocean-700 shadow">Save Address</button>
+            <div class="pt-1 pb-1">
+                <button type="submit" class="w-full py-3 bg-ocean-600 text-white rounded-xl text-xs font-bold hover:bg-ocean-700 shadow">Save Address</button>
+            </div>
         </form>
     </div>
 </div>
@@ -572,11 +574,53 @@ $(document).ready(function() {
             contentType: "application/json",
             dataType: "json",
             success: function(res) {
+                // Fire celebratory confetti crackers
+                if (typeof confetti === 'function') {
+                    // Left and right cracker blast
+                    confetti({
+                        particleCount: 80,
+                        spread: 70,
+                        origin: { y: 0.6, x: 0.3 }
+                    });
+                    confetti({
+                        particleCount: 80,
+                        spread: 70,
+                        origin: { y: 0.6, x: 0.7 }
+                    });
+                    setTimeout(function() {
+                        confetti({
+                            particleCount: 100,
+                            spread: 100,
+                            origin: { y: 0.5 }
+                        });
+                    }, 300);
+                }
+
+                const isMobile = window.innerWidth < 640;
                 Swal.fire({
                     icon: 'success',
                     title: 'Booking Confirmed!',
-                    text: res.message,
-                    confirmButtonColor: '#0284c7'
+                    width: isMobile ? '92%' : '440px',
+                    padding: isMobile ? '1.25rem 1rem' : '1.75rem',
+                    html: `
+                        <div class="space-y-2 mt-1 sm:mt-2 text-center">
+                            <p class="text-xs sm:text-sm font-semibold text-slate-700 leading-snug">${res.message || 'Your order has been booked successfully!'}</p>
+                            ${res.order_number ? `<p class="text-[11px] sm:text-xs text-slate-500">Order ID: <span class="font-mono font-bold text-sky-600">#${res.order_number}</span></p>` : ''}
+                            <div class="p-2.5 sm:p-3 bg-sky-50 rounded-xl sm:rounded-2xl border border-sky-100 text-[11px] sm:text-xs text-sky-800 font-medium text-left">
+                                <div class="flex items-start space-x-2">
+                                    <i class="fa-solid fa-truck-fast text-sky-600 mt-0.5 shrink-0"></i>
+                                    <span>Thank you for choosing us! We are preparing your fresh water cans for prompt doorstep delivery.</span>
+                                </div>
+                            </div>
+                        </div>
+                    `,
+                    confirmButtonText: '<i class="fa-solid fa-receipt mr-1"></i> View Order Details',
+                    confirmButtonColor: '#0284c7',
+                    customClass: {
+                        popup: 'rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-100',
+                        title: 'text-base sm:text-xl font-black text-slate-900 pb-0',
+                        confirmButton: 'w-full sm:w-auto rounded-xl px-5 py-2.5 font-bold text-xs shadow-md mt-2'
+                    }
                 }).then(() => {
                     if (window.CartManager) {
                         window.CartManager.saveCart({});

@@ -344,17 +344,53 @@ $(document).ready(function() {
             btn.removeClass('bg-emerald-50 text-emerald-700 border-emerald-300').html(originalContent);
         }, 1200);
 
-        // Optional small Swal toast
+        // Modern Interactive Cart Toast Popup with Action Button (Responsive for Mobile & Desktop)
+        const prodName = card.find('h4').text().trim() || 'Water Can';
+        const prodImg = card.find('img').attr('src');
+        const prodPrice = parseFloat(card.data('price')) || 0;
+        const totalItemsInCart = Object.values(window.CartManager.getCart()).reduce((a, b) => a + b, 0);
+        const isMobile = window.innerWidth < 640;
+
         Swal.fire({
             toast: true,
-            position: 'top-end',
-            icon: 'success',
-            title: `Added ${qty} item(s) to Cart!`,
+            position: isMobile ? 'top' : 'top-end',
+            width: isMobile ? '94%' : '380px',
             showConfirmButton: false,
-            timer: 1800,
-            timerProgressBar: true
+            timer: 3500,
+            timerProgressBar: true,
+            customClass: {
+                container: 'p-2 sm:p-4',
+                popup: 'rounded-2xl shadow-2xl border border-sky-100 p-2.5 sm:p-3 bg-white/95 backdrop-blur-md',
+                timerProgressBar: 'bg-sky-500'
+            },
+            html: `
+                <div class="flex items-center space-x-2.5 sm:space-x-3 text-left w-full">
+                    <div class="relative shrink-0">
+                        <img src="${prodImg}" alt="" class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl object-cover border border-slate-100 shadow-xs">
+                        <span class="absolute -top-1 -right-1 bg-emerald-500 text-white w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-black shadow-xs">
+                            <i class="fa-solid fa-check"></i>
+                        </span>
+                    </div>
+                    <div class="flex-1 min-w-0 pr-1">
+                        <p class="text-[11px] sm:text-xs font-black text-slate-900 leading-tight truncate">${escapeHtml(prodName)}</p>
+                        <p class="text-[10px] sm:text-[11px] text-slate-500 font-semibold mt-0.5">
+                            <span class="text-sky-600 font-bold">+${qty} Added</span> &bull; ₹${(prodPrice * qty).toFixed(2)}
+                        </p>
+                    </div>
+                    <a href="{{ route('customer.cart') }}" class="shrink-0 px-2 sm:px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-sky-600 to-ocean-700 text-white font-extrabold text-[10px] sm:text-[11px] hover:shadow-md hover:scale-105 active:scale-95 transition flex items-center space-x-1">
+                        <span>Cart (${totalItemsInCart})</span>
+                        <i class="fa-solid fa-arrow-right text-[8px]"></i>
+                    </a>
+                </div>
+            `
         });
     });
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+        return String(text).replace(/[&<>"']/g, m => map[m]);
+    }
 
     // Buy Now button handler
     $('.btn-buy-now').on('click', function() {
