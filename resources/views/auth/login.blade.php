@@ -159,8 +159,8 @@
 
                     <div class="flex items-center justify-between text-xs pt-1">
                         <label class="flex items-center space-x-2 text-slate-600 cursor-pointer select-none">
-                            <input type="checkbox" name="remember" class="w-4 h-4 rounded text-sky-600 focus:ring-sky-500 border-slate-300">
-                            <span>Remember me</span>
+                            <input type="checkbox" name="remember" value="1" checked class="w-4 h-4 rounded text-sky-600 focus:ring-sky-500 border-slate-300">
+                            <span class="font-semibold">Keep me signed in</span>
                         </label>
                         <a href="#" class="text-sky-600 font-bold hover:underline">Forgot password?</a>
                     </div>

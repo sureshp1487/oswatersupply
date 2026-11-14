@@ -148,10 +148,20 @@
                     <i class="fa-solid fa-sliders w-5 text-sm"></i>
                     <span>System Settings</span>
                 </a>
+
+                <div class="pt-2 my-2 border-t border-slate-800/60">
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-rose-400 hover:bg-rose-950/40 hover:text-rose-300 font-bold transition">
+                            <i class="fa-solid fa-arrow-right-from-bracket w-5 text-sm"></i>
+                            <span>Logout</span>
+                        </button>
+                    </form>
+                </div>
             </nav>
         </div>
 
-        <!-- User / Logout (Fixed at Bottom) -->
+        <!-- User / Logout (Fixed at Bottom of Sidebar) -->
         <div class="flex-shrink-0 p-4 border-t border-indigo-950/80 bg-slate-950">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-2 truncate">
@@ -164,8 +174,9 @@
 
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
-                    <button type="submit" class="p-2 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-900 transition" title="Logout">
+                    <button type="submit" class="flex items-center space-x-1.5 px-2.5 py-1.5 text-xs font-bold text-rose-400 hover:text-white rounded-lg bg-rose-950/40 hover:bg-rose-600 transition" title="Logout">
                         <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                        <span>Logout</span>
                     </button>
                 </form>
             </div>
@@ -239,6 +250,22 @@
                     <span>View Customer App</span>
                     <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
                 </a>
+
+                <!-- Admin Profile & Direct Header Logout Option -->
+                <div class="flex items-center space-x-2 pl-2 border-l border-slate-200">
+                    <div class="hidden sm:flex items-center space-x-2">
+                        <div class="w-8 h-8 rounded-full bg-indigo-700 text-white flex items-center justify-center font-bold text-xs shadow-sm">A</div>
+                        <span class="text-xs font-bold text-slate-700 max-w-[120px] truncate">{{ auth()->user()->name }}</span>
+                    </div>
+
+                    <form action="{{ route('logout') }}" method="POST" class="inline">
+                        @csrf
+                        <button type="submit" class="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold rounded-xl border border-rose-200 transition" title="Logout from Admin">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                            <span class="hidden sm:inline">Logout</span>
+                        </button>
+                    </form>
+                </div>
             </div>
         </header>
 

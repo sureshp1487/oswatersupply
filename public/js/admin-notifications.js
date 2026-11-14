@@ -298,41 +298,10 @@
         .catch(() => {});
     }
 
-    // In-App Toast Alert (Top right)
+    // In-App Toast Alert (Top right) - Disabled per user request
     function showInAppToast(data) {
-        if (!window.Swal) return;
-
-        const Toast = Swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: true,
-            confirmButtonText: 'View Order',
-            confirmButtonColor: '#0077b6',
-            showCancelButton: true,
-            cancelButtonText: 'Dismiss',
-            timer: 8000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-                toast.addEventListener('mouseenter', Swal.stopTimer);
-                toast.addEventListener('mouseleave', Swal.resumeTimer);
-            }
-        });
-
-        Toast.fire({
-            icon: 'info',
-            title: data.title || 'New Customer Order Received',
-            html: `
-                <div class="text-xs text-left">
-                    <p class="font-bold text-slate-800">Order #${escapeHtml(data.order_number || data.order_id)}</p>
-                    <p class="text-slate-600">Customer: ${escapeHtml(data.customer_name || 'Customer')}</p>
-                    <p class="text-slate-600">Amount: ₹${parseFloat(data.order_amount || 0).toFixed(2)}</p>
-                </div>
-            `
-        }).then((result) => {
-            if (result.isConfirmed && data.target_url) {
-                window.location.href = data.target_url;
-            }
-        });
+        // Notification popup disabled
+        return;
     }
 
     // Native Desktop / System Push Notification
