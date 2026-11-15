@@ -93,7 +93,7 @@
         const listEl = document.getElementById('adminNotificationList');
         if (!listEl) return;
 
-        fetch('/admin/notifications?limit=15', {
+        fetch('/admin/notifications?limit=15&unread_only=1', {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
                 'Accept': 'application/json'
@@ -136,8 +136,8 @@
             listEl.innerHTML = `
                 <div class="p-8 text-center text-slate-400 space-y-1">
                     <i class="fa-regular fa-bell text-2xl text-slate-300 block mb-1"></i>
-                    <p class="text-xs font-semibold text-slate-600">No notifications yet</p>
-                    <p class="text-[11px] text-slate-400">Customer order alerts will appear here in real-time.</p>
+                    <p class="text-xs font-semibold text-slate-600">No unread notifications</p>
+                    <p class="text-[11px] text-slate-400">All alerts have been read. New customer orders will show here.</p>
                 </div>
             `;
             return;

@@ -79,6 +79,18 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // Deliveries
     Route::get('/deliveries', [AdminController::class, 'deliveries'])->name('deliveries.index');
 
+    // System Staff Users (Admin & Delivery Drivers)
+    Route::get('/users', [AdminController::class, 'users'])->name('users.index');
+    Route::post('/users', [AdminController::class, 'storeUser'])->name('users.store');
+    Route::post('/users/{id}', [AdminController::class, 'updateUser'])->name('users.update');
+    Route::delete('/users/{id}', [AdminController::class, 'destroyUser'])->name('users.destroy');
+
+    // Delivery Time Slots
+    Route::get('/slots', [AdminController::class, 'slots'])->name('slots.index');
+    Route::post('/slots', [AdminController::class, 'storeSlot'])->name('slots.store');
+    Route::post('/slots/{id}', [AdminController::class, 'updateSlot'])->name('slots.update');
+    Route::delete('/slots/{id}', [AdminController::class, 'destroySlot'])->name('slots.destroy');
+
     // System Settings
     Route::get('/settings', [AdminController::class, 'settings'])->name('settings.index');
     Route::post('/settings', [AdminController::class, 'updateSettings'])->name('settings.update');

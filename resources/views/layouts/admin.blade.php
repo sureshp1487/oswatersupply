@@ -130,9 +130,24 @@
                     <span>Customers</span>
                 </a>
 
+                <!-- Staff & Delivery Drivers Menu -->
+                <a href="{{ route('admin.users.index') }}" class="flex items-center space-x-3 px-3 py-2.5 rounded-xl transition {{ request()->routeIs('admin.users*') ? 'bg-indigo-600 text-white font-bold shadow-lg shadow-indigo-600/30' : 'hover:bg-slate-900 hover:text-white' }}">
+                    <i class="fa-solid fa-user-shield w-5 text-sm text-indigo-400"></i>
+                    <div class="flex items-center justify-between flex-1">
+                        <span>Staff Users</span>
+                        <span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-indigo-500/30 text-indigo-300 uppercase tracking-tighter">Admin & Delivery</span>
+                    </div>
+                </a>
+
                 <a href="{{ route('admin.deliveries.index') }}" class="flex items-center space-x-3 px-3 py-2.5 rounded-xl transition {{ request()->routeIs('admin.deliveries*') ? 'bg-indigo-600 text-white font-bold shadow-lg shadow-indigo-600/30' : 'hover:bg-slate-900 hover:text-white' }}">
                     <i class="fa-solid fa-truck-fast w-5 text-sm"></i>
                     <span>Delivery Schedule</span>
+                </a>
+
+                <!-- Delivery Time Slots Management Menu -->
+                <a href="{{ route('admin.slots.index') }}" class="flex items-center space-x-3 px-3 py-2.5 rounded-xl transition {{ request()->routeIs('admin.slots*') ? 'bg-indigo-600 text-white font-bold shadow-lg shadow-indigo-600/30' : 'hover:bg-slate-900 hover:text-white' }}">
+                    <i class="fa-regular fa-clock w-5 text-sm text-indigo-400"></i>
+                    <span>Delivery Time Slots</span>
                 </a>
 
                 <!-- Brand & Dashboard Customization Menu -->

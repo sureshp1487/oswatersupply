@@ -453,4 +453,162 @@ class AdminController extends Controller
 
         return back()->with('success', 'Dashboard & Brand Customization successfully saved!');
     }
+
+    // Delivery Time Slots Management
+    public function slots()
+    {
+        $slots = DeliverySlot::withCount(['orders'])->orderBy('start_time', 'asc')->get();
+        return view('admin.slots.index', compact('slots'));
+    }
+
+    public function storeSlot(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:150'],
+            'start_time' => ['required', 'string'],
+            'end_time' => ['required', 'string'],
+            'max_daily_capacity' => ['required', 'integer', 'min:1', 'max:1000'],
+            'is_active' => ['nullable', 'boolean'],
+        ]);
+
+        $validated['is_active'] = $request->has('is_active');
+
+        DeliverySlot::create($validated);
+
+        return back()->with('success', 'New delivery time slot added successfully!');
+    }
+
+    public function updateSlot(Request $request, $id)
+    {
+        $slot = DeliverySlot::findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:150'],
+            'start_time' => ['required', 'string'],
+            'end_time' => ['required', 'string'],
+            'max_daily_capacity' => ['required', 'integer', 'min:1', 'max:1000'],
+            'is_active' => ['nullable', 'boolean'],
+        ]);
+
+        $validated['is_active'] = $request->has('is_active');
+
+        $slot->update($validated);
+
+        return back()->with('success', "Delivery slot '{$slot->name}' updated successfully!");
+    }
+
+    public function destroySlot($id)
+    {
+        $slot = DeliverySlot::withCount('orders')->findOrFail($id);
+
+        if ($slot->orders_count > 0) {
+            // If slot is linked to existing orders, soft disable it instead of hard deleting to prevent foreign key errors
+            $slot->update(['is_active' => false]);
+            return back()->with('success', "Delivery slot has existing order history. It has been marked inactive instead of deleted.");
+        }
+
+        $slot->delete();
+        return back()->with('success', 'Delivery time slot deleted successfully.');
+    }
+
+    // System Staff Users (Admins & Delivery Drivers) Management
+    public function users(Request $request)
+    {
+        $roleFilter = $request->get('role', 'all');
+
+        $query = User::whereIn('role', ['admin', 'driver'])
+            ->withCount([
+                'deliveryAssignments as active_deliveries_count' => function ($q) {
+                    $q->whereIn('status', ['assigned', 'out_for_delivery']);
+                },
+                'deliveryAssignments as completed_deliveries_count' => function ($q) {
+                    $q->where('status', 'completed');
+                }
+            ]);
+
+        if (in_array($roleFilter, ['admin', 'driver'])) {
+            $query->where('role', $roleFilter);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        $users = $query->latest()->paginate(15)->withQueryString();
+
+        $adminCount = User::where('role', 'admin')->count();
+        $driverCount = User::where('role', 'driver')->count();
+
+        return view('admin.users.index', compact('users', 'adminCount', 'driverCount', 'roleFilter'));
+    }
+
+    public function storeUser(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'phone' => ['required', 'string', 'regex:/^[6-9]\d{9}$/', 'unique:users,phone'],
+            'password' => ['required', 'string', 'min:6'],
+            'role' => ['required', 'string', 'in:admin,driver'],
+            'status' => ['required', 'string', 'in:active,blocked'],
+        ]);
+
+        $validated['password'] = \Illuminate\Support\Facades\Hash::make($validated['password']);
+
+        User::create($validated);
+
+        return back()->with('success', ucfirst($validated['role']) . " account created successfully!");
+    }
+
+    public function updateUser(Request $request, $id)
+    {
+        $user = User::whereIn('role', ['admin', 'driver'])->findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            'phone' => ['required', 'string', 'regex:/^[6-9]\d{9}$/', 'unique:users,phone,' . $user->id],
+            'password' => ['nullable', 'string', 'min:6'],
+            'role' => ['required', 'string', 'in:admin,driver'],
+            'status' => ['required', 'string', 'in:active,blocked'],
+        ]);
+
+        if (!empty($validated['password'])) {
+            $validated['password'] = \Illuminate\Support\Facades\Hash::make($validated['password']);
+        } else {
+            unset($validated['password']);
+        }
+
+        // Prevent admin from blocking themselves
+        if ($user->id === auth()->id() && $validated['status'] === 'blocked') {
+            return back()->with('error', 'You cannot block your own active administrator account.');
+        }
+
+        $user->update($validated);
+
+        return back()->with('success', "User '{$user->name}' updated successfully!");
+    }
+
+    public function destroyUser($id)
+    {
+        $user = User::whereIn('role', ['admin', 'driver'])->findOrFail($id);
+
+        if ($user->id === auth()->id()) {
+            return back()->with('error', 'You cannot delete your own active administrator account.');
+        }
+
+        // Check if driver has active delivery assignments
+        if ($user->role === 'driver' && $user->deliveryAssignments()->whereIn('status', ['assigned', 'out_for_delivery'])->exists()) {
+            return back()->with('error', 'Cannot delete driver with active pending deliveries. Reassign their deliveries first.');
+        }
+
+        $user->delete();
+
+        return back()->with('success', 'Staff user deleted successfully.');
+    }
 }

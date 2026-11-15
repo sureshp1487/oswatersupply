@@ -26,8 +26,11 @@ class AdminNotificationController extends Controller
 
         $unreadCount = $user->unreadNotifications()->count();
         $limit = (int) $request->get('limit', 15);
+        $onlyUnread = $request->boolean('unread_only', true);
 
-        $notifications = $user->notifications()
+        $query = $onlyUnread ? $user->unreadNotifications() : $user->notifications();
+
+        $notifications = $query
             ->latest()
             ->limit($limit)
             ->get()
