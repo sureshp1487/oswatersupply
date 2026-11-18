@@ -306,7 +306,7 @@
         @endif
 
         <!-- Scrollable Main Container -->
-        <main class="flex-1 p-6 space-y-6 overflow-y-auto">
+        <main class="flex-1 p-4 sm:p-6 pb-24 sm:pb-12 space-y-6 overflow-y-auto">
             @yield('content')
         </main>
     </div>

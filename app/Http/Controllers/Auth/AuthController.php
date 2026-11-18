@@ -104,6 +104,8 @@ class AuthController extends Controller
             'pincode' => ['required', 'string', 'regex:/^\d{6}$/'],
             'delivery_instructions' => ['nullable', 'string', 'max:500'],
             'preferred_slot_id' => ['nullable', 'exists:delivery_slots,id'],
+            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
         ]);
 
         $user = User::create([
@@ -135,6 +137,8 @@ class AuthController extends Controller
             'city' => $validated['city'],
             'pincode' => $validated['pincode'],
             'delivery_instructions' => $validated['delivery_instructions'] ?? null,
+            'latitude' => $validated['latitude'] ?? null,
+            'longitude' => $validated['longitude'] ?? null,
             'is_default' => true,
         ]);
 

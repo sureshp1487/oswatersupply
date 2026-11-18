@@ -73,4 +73,22 @@ class Order extends Model
     {
         return $this->hasOne(DeliveryAssignment::class)->latestOfMany();
     }
+
+    public function getGoogleMapsUrlAttribute(): string
+    {
+        $snap = $this->address_snapshot ?? [];
+        if (!empty($snap['latitude']) && !empty($snap['longitude'])) {
+            return "https://www.google.com/maps/dir/?api=1&destination={$snap['latitude']},{$snap['longitude']}";
+        }
+        $addrParts = array_filter([
+            $snap['door_number'] ?? '',
+            $snap['house_or_building'] ?? '',
+            $snap['street'] ?? '',
+            $snap['area_locality'] ?? '',
+            $snap['city'] ?? '',
+            $snap['pincode'] ?? ''
+        ]);
+        $query = urlencode(implode(', ', $addrParts));
+        return "https://www.google.com/maps/dir/?api=1&destination={$query}";
+    }
 }

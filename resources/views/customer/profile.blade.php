@@ -131,6 +131,27 @@
 
         <form id="newAddressForm" class="space-y-3 overflow-y-auto pr-1">
             @csrf
+            <!-- Hidden GPS Lat / Long -->
+            <input type="hidden" name="latitude" id="profile_address_lat">
+            <input type="hidden" name="longitude" id="profile_address_lng">
+
+            <!-- Interactive GPS Map Picker Button & Box -->
+            <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                    <label class="block text-xs font-bold text-slate-700">Pinpoint Delivery Gate on Map</label>
+                    <button type="button" id="btnProfileGpsDetect" class="text-[11px] font-bold text-ocean-600 hover:text-ocean-700 flex items-center space-x-1">
+                        <i class="fa-solid fa-crosshairs text-xs"></i>
+                        <span>Use My GPS</span>
+                    </button>
+                </div>
+                <!-- Leaflet Map Container -->
+                <div id="profileAddressMap" class="w-full h-44 rounded-2xl border border-slate-200 overflow-hidden relative shadow-inner z-0"></div>
+                <div class="flex items-center justify-between text-[11px] text-slate-500 px-1">
+                    <span id="profileMapStatusText"><i class="fa-solid fa-hand-pointer text-slate-400 mr-1"></i>Drag marker to pinpoint your exact gate.</span>
+                    <span id="profileCoordinatesBadge" class="font-mono text-[10px] text-emerald-600 font-bold hidden"></span>
+                </div>
+            </div>
+
             <div>
                 <label class="block text-xs font-semibold text-slate-700 mb-1">Address Label</label>
                 <select name="label" class="w-full px-3 py-2 border rounded-xl text-xs">
@@ -232,9 +253,80 @@
         }
     });
 
+    let profileLeafletMap = null;
+    let profileMarker = null;
+
+    function initProfileMap(defaultLat = 13.0827, defaultLng = 80.2707) {
+        if (!document.getElementById('profileAddressMap')) return;
+
+        if (!profileLeafletMap) {
+            profileLeafletMap = L.map('profileAddressMap').setView([defaultLat, defaultLng], 14);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(profileLeafletMap);
+
+            profileMarker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(profileLeafletMap);
+
+            profileMarker.on('dragend', function(e) {
+                const pos = profileMarker.getLatLng();
+                updateProfileCoordinates(pos.lat, pos.lng);
+            });
+
+            profileLeafletMap.on('click', function(e) {
+                profileMarker.setLatLng(e.latlng);
+                updateProfileCoordinates(e.latlng.lat, e.latlng.lng);
+            });
+        } else {
+            profileLeafletMap.invalidateSize();
+            profileLeafletMap.setView([defaultLat, defaultLng], 14);
+            profileMarker.setLatLng([defaultLat, defaultLng]);
+        }
+
+        updateProfileCoordinates(defaultLat, defaultLng);
+    }
+
+    function updateProfileCoordinates(lat, lng) {
+        $('#profile_address_lat').val(lat.toFixed(7));
+        $('#profile_address_lng').val(lng.toFixed(7));
+        $('#profileCoordinatesBadge').text(`GPS: ${lat.toFixed(4)}, ${lng.toFixed(4)}`).removeClass('hidden');
+        $('#profileMapStatusText').html('<i class="fa-solid fa-circle-check text-emerald-500 mr-1"></i>Location pinned for driver navigation.');
+    }
+
     // Add Address Modal controls
     $('#btnProfileAddAddress').on('click', function() {
         $('#addAddressModal').removeClass('hidden').addClass('flex');
+        setTimeout(() => {
+            initProfileMap();
+        }, 200);
+    });
+
+    // Detect GPS Button click inside profile modal
+    $('#btnProfileGpsDetect').on('click', function() {
+        if (!navigator.geolocation) {
+            alert('Geolocation is not supported by your browser.');
+            return;
+        }
+
+        const btn = $(this);
+        const originalHtml = btn.html();
+        btn.html('<i class="fa-solid fa-spinner fa-spin text-xs"></i> Detecting...');
+
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+                initProfileMap(lat, lng);
+                btn.html('<i class="fa-solid fa-check text-emerald-500 text-xs"></i> Detected');
+                setTimeout(() => btn.html(originalHtml), 2000);
+            },
+            (err) => {
+                btn.html(originalHtml);
+                alert('Could not retrieve your GPS location. Please check browser permissions or drag the map marker.');
+            },
+            { enableHighAccuracy: true, timeout: 10000 }
+        );
     });
 
     $('#closeAddressModal').on('click', function() {

@@ -178,11 +178,25 @@
                     </div>
                 </div>
 
-                <div class="pt-3 border-t space-y-1 text-xs">
+                <div class="pt-3 border-t space-y-2 text-xs">
                     <span class="text-slate-400 block text-[10px] uppercase font-bold">Destination Address</span>
                     <p class="text-slate-800 font-medium leading-relaxed">
                         {{ $order->address_snapshot['door_number'] ?? '' }}, {{ $order->address_snapshot['house_or_building'] ?? '' }}, {{ $order->address_snapshot['street'] ?? '' }}, {{ $order->address_snapshot['area_locality'] ?? '' }}, {{ $order->address_snapshot['city'] ?? '' }} - {{ $order->address_snapshot['pincode'] ?? '' }}
                     </p>
+
+                    <!-- Google Maps Link for Admin -->
+                    <div class="pt-1">
+                        <a href="{{ $order->google_maps_url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-sky-50 hover:bg-sky-100 text-sky-800 rounded-xl text-xs font-bold border border-sky-200 transition">
+                            <i class="fa-solid fa-map-location-dot text-sky-600"></i>
+                            <span>Open in Google Maps &rarr;</span>
+                        </a>
+                        @if(!empty($order->address_snapshot['latitude']) && !empty($order->address_snapshot['longitude']))
+                            <span class="text-[10px] font-mono text-slate-400 block mt-1">
+                                GPS: {{ $order->address_snapshot['latitude'] }}, {{ $order->address_snapshot['longitude'] }}
+                            </span>
+                        @endif
+                    </div>
+
                     @if($order->delivery_instructions)
                     <div class="mt-2 p-2 bg-amber-50 text-amber-800 rounded-lg text-[11px]">
                         <strong>Notes:</strong> {{ $order->delivery_instructions }}
@@ -217,8 +231,9 @@
                             @endforeach
                         </select>
                     </div>
-                    <button type="submit" class="w-full py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold shadow">
-                        {{ $order->deliveryAssignment ? 'Reassign Driver' : 'Assign to Route' }}
+                    <button type="submit" class="w-full py-2.5 px-4 bg-slate-900 hover:bg-slate-800 active:scale-[0.99] text-white rounded-xl text-xs font-black shadow-md transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-truck-ramp-box"></i>
+                        <span>{{ $order->deliveryAssignment ? 'Reassign Driver' : 'Assign to Route' }}</span>
                     </button>
                 </form>
             </div>

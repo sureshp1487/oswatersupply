@@ -189,6 +189,8 @@ class CustomerController extends Controller
                     'city' => $address->city,
                     'pincode' => $address->pincode,
                     'delivery_instructions' => $address->delivery_instructions,
+                    'latitude' => $address->latitude,
+                    'longitude' => $address->longitude,
                 ],
                 'expected_delivery_date' => $validated['expected_delivery_date'],
                 'delivery_slot_id' => $slot->id,
@@ -463,6 +465,8 @@ class CustomerController extends Controller
             'city' => ['required', 'string', 'max:100'],
             'pincode' => ['required', 'string', 'regex:/^\d{6}$/'],
             'delivery_instructions' => ['nullable', 'string', 'max:500'],
+            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
             'is_default' => ['nullable', 'boolean'],
         ]);
 
