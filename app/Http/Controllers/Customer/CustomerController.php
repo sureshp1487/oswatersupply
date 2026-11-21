@@ -16,6 +16,7 @@ use App\Services\PaymentService;
 use App\Mail\NewOrderAdminNotification;
 use App\Notifications\NewCustomerOrderAdminNotification;
 use App\Models\User;
+use App\Models\Banner;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -54,7 +55,9 @@ class CustomerController extends Controller
 
         $defaultAddress = $user->defaultAddress ?: $user->addresses()->first();
 
-        return view('customer.home', compact('user', 'profile', 'categories', 'featuredProducts', 'upcomingDeliveries', 'recentOrders', 'defaultAddress'));
+        $banners = Banner::where('is_active', true)->orderBy('display_order', 'asc')->get();
+
+        return view('customer.home', compact('user', 'profile', 'categories', 'featuredProducts', 'upcomingDeliveries', 'recentOrders', 'defaultAddress', 'banners'));
     }
 
     public function services()
@@ -274,11 +277,18 @@ class CustomerController extends Controller
 
         // 2. Send Email notification asynchronously or non-blocking to prevent UI delay
         try {
-            $adminEmail = config('mail.admin_notification_email') ?? env('ADMIN_NOTIFICATION_EMAIL', 'admin@aquaflowdelivery.test');
+            $adminEmail = env('MAIL_ADMIN') ?: (config('mail.admin_notification_email') ?? env('ADMIN_NOTIFICATION_EMAIL', 'admin@aquaflowdelivery.test'));
+            $bccEmail = env('MAIL_BCC');
+
+            $mailable = new NewOrderAdminNotification($order);
+            if (!empty($bccEmail)) {
+                $mailable->bcc($bccEmail);
+            }
+
             if (config('queue.default') !== 'sync') {
-                Mail::to($adminEmail)->queue(new NewOrderAdminNotification($order));
+                Mail::to($adminEmail)->queue($mailable);
             } else {
-                Mail::to($adminEmail)->send(new NewOrderAdminNotification($order));
+                Mail::to($adminEmail)->send($mailable);
             }
         } catch (\Throwable $e) {
             Log::error("Failed sending admin order alert: " . $e->getMessage());
@@ -430,17 +440,22 @@ class CustomerController extends Controller
         $user = Auth::user();
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['nullable', 'email', 'max:255', "unique:users,email,{$user->id}"],
+            'email' => ['nullable', 'email:rfc,filter', 'max:255', "unique:users,email,{$user->id}"],
             'preferred_slot_id' => ['nullable', 'exists:delivery_slots,id'],
             'new_password' => ['nullable', 'string', 'min:6'],
+        ], [
+            'name.required' => 'Full name is required.',
+            'email.email' => 'Please enter a valid email address.',
+            'email.unique' => 'This email address is already in use by another account.',
+            'new_password.min' => 'Password must be at least 6 characters.',
         ]);
 
-        $user->name = $validated['name'];
+        $user->name = trim($validated['name']);
         if (isset($validated['email'])) {
-            $user->email = $validated['email'];
+            $user->email = !empty($validated['email']) ? strtolower(trim($validated['email'])) : null;
         }
         if (!empty($validated['new_password'])) {
-            $user->password = bcrypt($validated['new_password']);
+            $user->password = $validated['new_password']; // Handled by hashed cast
         }
         $user->save();
 
@@ -486,10 +501,41 @@ class CustomerController extends Controller
         return back()->with('success', 'Address added successfully.');
     }
 
+    public function setDefaultAddress($id)
+    {
+        $user = Auth::user();
+        $address = Address::where('user_id', $user->id)->findOrFail($id);
+
+        Address::where('user_id', $user->id)->update(['is_default' => false]);
+        $address->is_default = true;
+        $address->save();
+
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Default address updated to {$address->label}.",
+                'address' => $address,
+            ]);
+        }
+
+        return back()->with('success', "Default address updated to {$address->label}.");
+    }
+
     public function deleteAddress($id)
     {
-        $address = Address::where('user_id', Auth::id())->findOrFail($id);
+        $user = Auth::user();
+        $address = Address::where('user_id', $user->id)->findOrFail($id);
+        $wasDefault = $address->is_default;
         $address->delete();
+
+        // If the deleted address was default, make the next existing address default
+        if ($wasDefault) {
+            $next = Address::where('user_id', $user->id)->first();
+            if ($next) {
+                $next->is_default = true;
+                $next->save();
+            }
+        }
 
         return back()->with('success', 'Address removed.');
     }

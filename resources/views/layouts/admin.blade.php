@@ -150,6 +150,15 @@
                     <span>Delivery Time Slots</span>
                 </a>
 
+                <!-- Hero Carousel Banners Menu -->
+                <a href="{{ route('admin.banners.index') }}" class="flex items-center space-x-3 px-3 py-2.5 rounded-xl transition {{ request()->routeIs('admin.banners*') ? 'bg-indigo-600 text-white font-bold shadow-lg shadow-indigo-600/30' : 'hover:bg-slate-900 hover:text-white' }}">
+                    <i class="fa-solid fa-images w-5 text-sm text-indigo-400"></i>
+                    <div class="flex items-center justify-between flex-1">
+                        <span>Hero Banners</span>
+                        <span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-indigo-500/30 text-indigo-300 uppercase tracking-tighter">Carousel</span>
+                    </div>
+                </a>
+
                 <!-- Brand & Dashboard Customization Menu -->
                 <a href="{{ route('admin.customization.index') }}" class="flex items-center space-x-3 px-3 py-2.5 rounded-xl transition {{ request()->routeIs('admin.customization*') ? 'bg-indigo-600 text-white font-bold shadow-lg shadow-indigo-600/30' : 'hover:bg-slate-900 hover:text-white' }}">
                     <i class="fa-solid fa-wand-magic-sparkles w-5 text-sm text-indigo-400"></i>
@@ -162,6 +171,15 @@
                 <a href="{{ route('admin.settings.index') }}" class="flex items-center space-x-3 px-3 py-2.5 rounded-xl transition {{ request()->routeIs('admin.settings*') ? 'bg-indigo-600 text-white font-bold shadow-lg shadow-indigo-600/30' : 'hover:bg-slate-900 hover:text-white' }}">
                     <i class="fa-solid fa-sliders w-5 text-sm"></i>
                     <span>System Settings</span>
+                </a>
+
+                <!-- System Cache & Log Tools Menu -->
+                <a href="{{ route('admin.system.index') }}" class="flex items-center space-x-3 px-3 py-2.5 rounded-xl transition {{ request()->routeIs('admin.system*') ? 'bg-indigo-600 text-white font-bold shadow-lg shadow-indigo-600/30' : 'hover:bg-slate-900 hover:text-white' }}">
+                    <i class="fa-solid fa-terminal w-5 text-sm text-emerald-400"></i>
+                    <div class="flex items-center justify-between flex-1">
+                        <span>Cache & Logs</span>
+                        <span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-500/30 text-emerald-300 uppercase tracking-tighter">Tools</span>
+                    </div>
                 </a>
 
                 <div class="pt-2 my-2 border-t border-slate-800/60">

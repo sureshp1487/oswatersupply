@@ -205,6 +205,21 @@
             </div>
         </div>
 
+        <!-- 5. Hero Carousel Banners (Auto-Scrolling Slider) -->
+        <div class="bg-gradient-to-r from-sky-50 via-indigo-50/50 to-blue-50 rounded-3xl p-6 sm:p-7 border border-indigo-100 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="space-y-1">
+                <div class="flex items-center space-x-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-600 animate-pulse"></span>
+                    <h3 class="text-sm font-extrabold text-slate-900">Hero Section Banners (Auto-Scrolling Carousel)</h3>
+                </div>
+                <p class="text-xs text-slate-600">Upload promotional graphics, product images, and offers that rotate automatically on the Customer Home page.</p>
+            </div>
+            <a href="{{ route('admin.banners.index') }}" class="px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl text-xs font-bold shadow-md shadow-indigo-600/20 flex items-center justify-center space-x-2 transition shrink-0">
+                <i class="fa-solid fa-images"></i>
+                <span>Manage Hero Banners &rarr;</span>
+            </a>
+        </div>
+
         <!-- Submit Button -->
         <div class="flex items-center space-x-3">
             <button type="submit" class="px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl text-xs font-black shadow-lg shadow-indigo-600/30 flex items-center space-x-2 transition hover:scale-[1.01] active:scale-[0.99]">

@@ -5,186 +5,101 @@
 @section('content')
 <div class="space-y-6">
 
-    <!-- Top Grid for Tablets & Desktops -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-        <!-- Welcome & Profile Summary Card (Spans 2 cols on md/lg) -->
-        <div class="md:col-span-2 bg-gradient-to-br from-ocean-700 via-ocean-600 to-sky-500 rounded-3xl p-6 text-white shadow-xl shadow-sky-600/20 relative overflow-hidden flex flex-col justify-between">
-            <div class="relative z-10">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <span class="text-xs uppercase tracking-wider text-sky-200 font-semibold">Delivering Pure Water</span>
-                        <h2 class="text-2xl font-black mt-0.5">Hi, {{ explode(' ', $user->name)[0] }} 👋</h2>
-                    </div>
-                    <div class="bg-white/15 backdrop-blur-md rounded-2xl px-3.5 py-2 border border-white/20 text-right">
-                        <span class="text-[10px] text-sky-200 block uppercase font-bold">Cans Held</span>
-                        <span class="text-xl font-extrabold flex items-center justify-end space-x-1">
-                            <i class="fa-solid fa-bottle-water text-xs text-sky-300"></i>
-                            <span>{{ $profile->total_empty_cans_held }}</span>
-                        </span>
-                    </div>
-                </div>
-
-                <!-- Current Address Indicator -->
-                <div class="mt-6 pt-3 border-t border-white/15 flex items-center justify-between text-xs">
-                    <div class="flex items-center space-x-2 truncate max-w-[80%]">
-                        <i class="fa-solid fa-location-dot text-sky-300"></i>
-                        <span class="truncate text-sky-100 font-medium">
-                            {{ $defaultAddress ? $defaultAddress->formatted_address : 'Set delivery location' }}
-                        </span>
-                    </div>
-                    <a href="{{ route('customer.profile') }}" class="text-white underline font-semibold text-xs shrink-0 hover:text-sky-200">Change</a>
-                </div>
+    <!-- Compact Customer Details Bar (Reduced Space) -->
+    <div class="bg-gradient-to-r from-ocean-700 via-ocean-600 to-sky-600 rounded-2xl px-4 py-3 sm:px-5 sm:py-3.5 text-white shadow-md relative overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+        <div class="flex items-center space-x-3 min-w-0">
+            <div class="w-10 h-10 rounded-xl bg-white/15 backdrop-blur border border-white/20 flex items-center justify-center text-lg text-sky-200 shrink-0 shadow-inner">
+                <i class="fa-solid fa-user"></i>
             </div>
-
-            <!-- Decorative background water circle -->
-            <div class="absolute -right-8 -bottom-8 w-36 h-36 rounded-full bg-white/10 pointer-events-none"></div>
-        </div>
-
-        <!-- Outstanding Balance Card or Quick Action (Spans 1 col on md/lg) -->
-        <div class="flex flex-col justify-between space-y-3">
-            @if($profile->total_due_balance > 0)
-            <div class="bg-gradient-to-r from-amber-500 to-rose-500 rounded-3xl p-5 text-white shadow-md flex flex-col justify-between h-full">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center text-lg">
-                        <i class="fa-solid fa-file-invoice-dollar"></i>
-                    </div>
-                    <div>
-                        <span class="text-[11px] text-amber-100 uppercase font-bold tracking-wider block">Outstanding Balance</span>
-                        <span class="text-2xl font-black">₹{{ number_format($profile->total_due_balance, 2) }}</span>
-                    </div>
-                </div>
-                <div class="mt-4">
-                    <a href="{{ route('customer.payments') }}" class="block text-center bg-white text-rose-600 px-4 py-2.5 rounded-xl text-xs font-bold shadow hover:bg-slate-50 transition active:scale-95">
-                        Pay Outstanding Balance &rarr;
+            <div class="min-w-0">
+                <div class="flex items-center space-x-2">
+                    <h2 class="text-base sm:text-lg font-black truncate leading-tight">Hi, {{ explode(' ', $user->name)[0] }} 👋</h2>
+                    @if($profile->total_due_balance > 0)
+                    <a href="{{ route('customer.payments') }}" class="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-500 text-white shadow-sm shrink-0 hover:bg-rose-600 transition">
+                        Due: ₹{{ number_format($profile->total_due_balance, 2) }}
                     </a>
+                    @endif
+                </div>
+                <div class="flex items-center space-x-1.5 text-[11px] text-sky-100 font-medium truncate mt-0.5">
+                    <i class="fa-solid fa-location-dot text-sky-300 text-[10px] shrink-0"></i>
+                    <span class="truncate">{{ $defaultAddress ? $defaultAddress->formatted_address : 'Set delivery location' }}</span>
+                    <a href="{{ route('customer.profile') }}" class="text-white underline font-bold hover:text-sky-200 shrink-0 ml-1">Change</a>
                 </div>
             </div>
-            @else
-            <div class="bg-gradient-to-br from-emerald-600 to-teal-500 rounded-3xl p-5 text-white shadow-md flex flex-col justify-between h-full">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center text-lg">
-                        <i class="fa-solid fa-circle-check"></i>
-                    </div>
-                    <div>
-                        <span class="text-[11px] text-emerald-100 uppercase font-bold tracking-wider block">Account Status</span>
-                        <span class="text-xl font-black">All Dues Cleared</span>
-                    </div>
+        </div>
+
+        <div class="flex items-center space-x-2 self-end sm:self-auto shrink-0">
+            <div class="bg-white/15 backdrop-blur-md rounded-xl px-3 py-1.5 border border-white/20 flex items-center space-x-2">
+                <i class="fa-solid fa-bottle-water text-xs text-sky-300"></i>
+                <div class="text-right">
+                    <span class="text-[9px] text-sky-200 block uppercase font-bold leading-none">Cans Held</span>
+                    <span class="text-sm font-black leading-tight">{{ $profile->total_empty_cans_held }}</span>
                 </div>
-                <p class="text-xs text-emerald-100 mt-2">Zero pending payments on your account. Order your refill anytime.</p>
             </div>
-            @endif
-        </div>
-
-    </div>
-
-    <!-- Our 3 Core Services Preview (Water Can Supply, Car Wash, Rental/Lease/Sales) -->
-    <div class="space-y-3">
-        <div class="flex items-center justify-between">
-            <h3 class="text-sm font-extrabold text-slate-900 tracking-tight flex items-center space-x-2">
-                <i class="fa-solid fa-bell-concierge text-ocean-600"></i>
-                <span>Our Services</span>
-            </h3>
-            <a href="{{ route('customer.services') }}" class="text-xs text-ocean-600 font-bold hover:underline">View All &rarr;</a>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <!-- 1. Water Can Supply -->
-            <a href="{{ route('customer.cart') }}" class="card-interactive bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex items-center space-x-3.5 group">
-                <div class="w-12 h-12 rounded-2xl bg-sky-50 text-ocean-600 flex items-center justify-center text-lg shadow-sm group-hover:bg-ocean-600 group-hover:text-white transition-all shrink-0">
-                    <i class="fa-solid fa-bottle-water"></i>
-                </div>
-                <div class="min-w-0">
-                    <span class="text-xs font-black text-slate-900 block truncate group-hover:text-ocean-600">Water Can Supply</span>
-                    <span class="text-[11px] text-slate-400 block truncate">20L & 10L Doorstep Delivery</span>
-                </div>
-            </a>
-            <!-- 2. Car Wash -->
-            <a href="{{ route('customer.services') }}" class="card-interactive bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex items-center space-x-3.5 group">
-                <div class="w-12 h-12 rounded-2xl bg-cyan-50 text-cyan-600 flex items-center justify-center text-lg shadow-sm group-hover:bg-cyan-600 group-hover:text-white transition-all shrink-0">
-                    <i class="fa-solid fa-car-wash"></i>
-                </div>
-                <div class="min-w-0">
-                    <span class="text-xs font-black text-slate-900 block truncate group-hover:text-cyan-600">Car Wash</span>
-                    <span class="text-[11px] text-slate-400 block truncate">Pressure Foam & Vacuum</span>
-                </div>
-            </a>
-            <!-- 3. Rental House, Lease, Buy & Sales -->
-            <a href="{{ route('customer.services') }}" class="card-interactive bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex items-center space-x-3.5 group">
-                <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg shadow-sm group-hover:bg-indigo-600 group-hover:text-white transition-all shrink-0">
-                    <i class="fa-solid fa-building-circle-check"></i>
-                </div>
-                <div class="min-w-0">
-                    <span class="text-xs font-black text-slate-900 block truncate group-hover:text-indigo-600">Rental, Lease & Sales</span>
-                    <span class="text-[11px] text-slate-400 block truncate">Flats, Villas & Plots</span>
-                </div>
-            </a>
         </div>
     </div>
 
-    <!-- Quick Action Reorder & Schedule Buttons (Responsive Grid) -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-        <a href="{{ route('customer.cart') }}" class="card-interactive bg-white p-4 sm:p-5 rounded-3xl border border-slate-100 shadow-sm flex items-center space-x-4 group">
-            <div class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-sky-500 to-cyan-400 text-white flex items-center justify-center text-xl shadow-md shadow-sky-500/25 group-hover:scale-110 transition-transform">
-                <i class="fa-solid fa-cart-shopping"></i>
-            </div>
-            <div>
-                <span class="text-sm sm:text-base font-extrabold text-slate-900 block group-hover:text-ocean-600 transition-colors">My Cart & Checkout</span>
-                <span class="text-xs text-slate-400">View added water cans, choose date & order</span>
-            </div>
-        </a>
-
-        <a href="{{ route('customer.orders') }}" class="card-interactive bg-white p-4 sm:p-5 rounded-3xl border border-slate-100 shadow-sm flex items-center space-x-4 group">
-            <div class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-white flex items-center justify-center text-xl shadow-md shadow-emerald-500/25 group-hover:scale-110 transition-transform">
-                <i class="fa-solid fa-rotate-right"></i>
-            </div>
-            <div>
-                <span class="text-sm sm:text-base font-extrabold text-slate-900 block group-hover:text-emerald-600 transition-colors">Quick Reorder</span>
-                <span class="text-xs text-slate-400">Repeat your previous water can orders</span>
-            </div>
-        </a>
-    </div>
-
-    <!-- Active / Upcoming Delivery Tracker -->
-    @if($upcomingDeliveries->count() > 0)
-    <div class="space-y-3">
-        <div class="flex items-center justify-between">
-            <h3 class="text-sm font-extrabold text-slate-900 tracking-tight flex items-center space-x-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>Active & Upcoming Scheduled Deliveries</span>
-            </h3>
-            <a href="{{ route('customer.orders') }}" class="text-xs text-ocean-600 font-semibold hover:underline">View all orders</a>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            @foreach($upcomingDeliveries as $order)
-            <a href="{{ route('customer.order.show', $order->id) }}" class="block bg-white rounded-2xl p-4 border border-slate-100 shadow-sm hover:shadow-md transition">
-                <div class="flex items-center justify-between text-xs mb-2">
-                    <span class="font-bold text-slate-900">#{{ $order->order_number }}</span>
-                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider
-                        {{ $order->order_status === 'out_for_delivery' ? 'bg-amber-100 text-amber-800' : 'bg-sky-100 text-ocean-800' }}">
-                        {{ str_replace('_', ' ', $order->order_status) }}
-                    </span>
-                </div>
-
-                <div class="flex items-center space-x-3 my-2 text-xs text-slate-600">
-                    <div class="flex items-center space-x-1">
-                        <i class="fa-regular fa-calendar text-ocean-600"></i>
-                        <span>{{ \Carbon\Carbon::parse($order->expected_delivery_date)->format('M d, Y') }}</span>
+    <!-- Hero Banner Carousel (Auto-Scrolling Slider) -->
+    @if(isset($banners) && $banners->count() > 0)
+    <div class="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg border border-slate-100 group" id="heroBannerCarousel">
+        <!-- Slides Track -->
+        <div class="relative w-full h-44 sm:h-56 md:h-64 lg:h-72 overflow-hidden bg-slate-900">
+            @foreach($banners as $index => $banner)
+            <div class="hero-slide absolute inset-0 transition-opacity duration-700 ease-in-out {{ $index === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none' }}" data-index="{{ $index }}">
+                @if($banner->link_url)
+                <a href="{{ $banner->link_url }}" class="block w-full h-full relative group/item">
+                @else
+                <div class="block w-full h-full relative">
+                @endif
+                    <!-- Image -->
+                    <img src="{{ $banner->image_path }}" alt="{{ $banner->title ?? 'Hero Banner' }}" class="w-full h-full object-cover">
+                    
+                    <!-- Gradient Overlay with Title and Subtitle -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/30 to-transparent flex flex-col justify-end p-5 sm:p-7 md:p-8 text-white">
+                        @if($banner->title)
+                        <h3 class="text-lg sm:text-2xl md:text-3xl font-black tracking-tight leading-tight drop-shadow-md">
+                            {{ $banner->title }}
+                        </h3>
+                        @endif
+                        @if($banner->subtitle)
+                        <p class="text-xs sm:text-sm md:text-base text-sky-100 mt-1 max-w-xl font-medium drop-shadow line-clamp-2">
+                            {{ $banner->subtitle }}
+                        </p>
+                        @endif
+                        @if($banner->link_url)
+                        <div class="mt-3">
+                            <span class="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl bg-white text-ocean-700 font-extrabold text-xs shadow-md group-hover/item:bg-sky-50 transition">
+                                <span>Order Now</span>
+                                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                            </span>
+                        </div>
+                        @endif
                     </div>
-                    <span>•</span>
-                    <div class="flex items-center space-x-1 truncate">
-                        <i class="fa-regular fa-clock text-ocean-600"></i>
-                        <span class="truncate">{{ $order->slot?->name ?? 'Standard slot' }}</span>
-                    </div>
+                @if($banner->link_url)
+                </a>
+                @else
                 </div>
-
-                <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
-                    <span class="text-slate-500">{{ $order->items->sum('quantity') }} Cans</span>
-                    <span class="font-extrabold text-slate-900">₹{{ number_format($order->total_amount, 2) }}</span>
-                </div>
-            </a>
+                @endif
+            </div>
             @endforeach
         </div>
+
+        <!-- Carousel Navigation Controls (< & >) -->
+        @if($banners->count() > 1)
+        <button type="button" id="heroPrevBtn" class="absolute left-2.5 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur flex items-center justify-center opacity-0 group-hover:opacity-100 transition shadow-md">
+            <i class="fa-solid fa-chevron-left text-xs sm:text-sm"></i>
+        </button>
+        <button type="button" id="heroNextBtn" class="absolute right-2.5 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur flex items-center justify-center opacity-0 group-hover:opacity-100 transition shadow-md">
+            <i class="fa-solid fa-chevron-right text-xs sm:text-sm"></i>
+        </button>
+
+        <!-- Carousel Dots Indicator -->
+        <div class="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex items-center space-x-1.5 bg-black/30 backdrop-blur-sm px-2.5 py-1 rounded-full">
+            @foreach($banners as $index => $banner)
+            <button type="button" class="hero-dot h-2 rounded-full transition-all duration-300 {{ $index === 0 ? 'bg-white w-5' : 'bg-white/50 hover:bg-white/80 w-2' }}" data-index="{{ $index }}"></button>
+            @endforeach
+        </div>
+        @endif
     </div>
     @endif
 
@@ -307,6 +222,102 @@
 @push('scripts')
 <script>
 $(document).ready(function() {
+    // Hero Banner Auto-Scrolling Carousel
+    const heroSlides = $('.hero-slide');
+    const heroDots = $('.hero-dot');
+    const totalHeroSlides = heroSlides.length;
+    let currentHeroIndex = 0;
+    let heroAutoTimer = null;
+
+    function renderHeroSlide(index) {
+        if (totalHeroSlides <= 1) return;
+        if (index >= totalHeroSlides) index = 0;
+        if (index < 0) index = totalHeroSlides - 1;
+        currentHeroIndex = index;
+
+        heroSlides.each(function(i) {
+            if (i === currentHeroIndex) {
+                $(this).removeClass('opacity-0 z-0 pointer-events-none').addClass('opacity-100 z-10 pointer-events-auto');
+            } else {
+                $(this).removeClass('opacity-100 z-10 pointer-events-auto').addClass('opacity-0 z-0 pointer-events-none');
+            }
+        });
+
+        heroDots.each(function(i) {
+            if (i === currentHeroIndex) {
+                $(this).removeClass('bg-white/50 w-2').addClass('bg-white w-5');
+            } else {
+                $(this).removeClass('bg-white w-5').addClass('bg-white/50 w-2');
+            }
+        });
+    }
+
+    function startHeroTimer() {
+        if (totalHeroSlides > 1 && !heroAutoTimer) {
+            heroAutoTimer = setInterval(function() {
+                renderHeroSlide(currentHeroIndex + 1);
+            }, 4000); // Automatically rotates every 4 seconds
+        }
+    }
+
+    function stopHeroTimer() {
+        if (heroAutoTimer) {
+            clearInterval(heroAutoTimer);
+            heroAutoTimer = null;
+        }
+    }
+
+    if (totalHeroSlides > 1) {
+        startHeroTimer();
+
+        // Pause on hover
+        $('#heroBannerCarousel').on('mouseenter', stopHeroTimer).on('mouseleave', startHeroTimer);
+
+        // Previous button
+        $('#heroPrevBtn').on('click', function(e) {
+            e.preventDefault();
+            stopHeroTimer();
+            renderHeroSlide(currentHeroIndex - 1);
+            startHeroTimer();
+        });
+
+        // Next button
+        $('#heroNextBtn').on('click', function(e) {
+            e.preventDefault();
+            stopHeroTimer();
+            renderHeroSlide(currentHeroIndex + 1);
+            startHeroTimer();
+        });
+
+        // Click on dots
+        heroDots.on('click', function() {
+            const idx = parseInt($(this).data('index'));
+            stopHeroTimer();
+            renderHeroSlide(idx);
+            startHeroTimer();
+        });
+
+        // Touch swipe support for mobile devices
+        let startX = 0;
+        const carouselEl = document.getElementById('heroBannerCarousel');
+        if (carouselEl) {
+            carouselEl.addEventListener('touchstart', function(e) {
+                startX = e.changedTouches[0].screenX;
+                stopHeroTimer();
+            }, { passive: true });
+
+            carouselEl.addEventListener('touchend', function(e) {
+                const endX = e.changedTouches[0].screenX;
+                if (startX - endX > 45) {
+                    renderHeroSlide(currentHeroIndex + 1);
+                } else if (endX - startX > 45) {
+                    renderHeroSlide(currentHeroIndex - 1);
+                }
+                startHeroTimer();
+            }, { passive: true });
+        }
+    }
+
     // Quantity increment
     $('.btn-home-qty-plus').on('click', function() {
         const span = $(this).siblings('.home-qty-display');
@@ -344,47 +355,48 @@ $(document).ready(function() {
             btn.removeClass('bg-emerald-50 text-emerald-700 border-emerald-300').html(originalContent);
         }, 1200);
 
-        // Modern Interactive Cart Toast Popup with Action Button (Responsive for Mobile & Desktop)
+        // Modern Interactive Cart Toast Popup with Action Button (Responsive for Mobile & Desktop with Fade In/Out)
         const prodName = card.find('h4').text().trim() || 'Water Can';
         const prodImg = card.find('img').attr('src');
         const prodPrice = parseFloat(card.data('price')) || 0;
-        const totalItemsInCart = Object.values(window.CartManager.getCart()).reduce((a, b) => a + b, 0);
-        const isMobile = window.innerWidth < 640;
 
-        Swal.fire({
-            toast: true,
-            position: isMobile ? 'top' : 'top-end',
-            width: isMobile ? '94%' : '380px',
-            showConfirmButton: false,
-            timer: 3500,
-            timerProgressBar: true,
-            customClass: {
-                container: 'p-2 sm:p-4',
-                popup: 'rounded-2xl shadow-2xl border border-sky-100 p-2.5 sm:p-3 bg-white/95 backdrop-blur-md',
-                timerProgressBar: 'bg-sky-500'
-            },
-            html: `
-                <div class="flex items-center space-x-2.5 sm:space-x-3 text-left w-full">
-                    <div class="relative shrink-0">
-                        <img src="${prodImg}" alt="" class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl object-cover border border-slate-100 shadow-xs">
-                        <span class="absolute -top-1 -right-1 bg-emerald-500 text-white w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-black shadow-xs">
-                            <i class="fa-solid fa-check"></i>
-                        </span>
-                    </div>
-                    <div class="flex-1 min-w-0 pr-1">
-                        <p class="text-[11px] sm:text-xs font-black text-slate-900 leading-tight truncate">${escapeHtml(prodName)}</p>
-                        <p class="text-[10px] sm:text-[11px] text-slate-500 font-semibold mt-0.5">
-                            <span class="text-sky-600 font-bold">+${qty} Added</span> &bull; ₹${(prodPrice * qty).toFixed(2)}
-                        </p>
-                    </div>
-                    <a href="{{ route('customer.cart') }}" class="shrink-0 px-2 sm:px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-sky-600 to-ocean-700 text-white font-extrabold text-[10px] sm:text-[11px] hover:shadow-md hover:scale-105 active:scale-95 transition flex items-center space-x-1">
-                        <span>Cart (${totalItemsInCart})</span>
-                        <i class="fa-solid fa-arrow-right text-[8px]"></i>
-                    </a>
-                </div>
-            `
-        });
+        if (window.CartManager && window.CartManager.showCartPopup) {
+            window.CartManager.showCartPopup({
+                name: prodName,
+                img: prodImg,
+                subtitle: `<span class="text-sky-600 font-bold">+${qty} Added</span> &bull; ₹${(prodPrice * qty).toFixed(2)}`,
+                escape: escapeHtml,
+                timer: 3500
+            });
+        }
     });
+
+    // Auto load cart popup on page load if items exist in cart (Desktop & Mobile)
+    if (window.CartManager && window.CartManager.getTotalCount() > 0) {
+        setTimeout(() => {
+            const cart = window.CartManager.getCart();
+            const firstProdId = Object.keys(cart)[0];
+            let popupImg = '/icons/logo.svg';
+            let popupName = 'Items in Cart';
+
+            if (firstProdId) {
+                const matchedCard = $(`.product-card[data-id="${firstProdId}"]`);
+                if (matchedCard.length) {
+                    popupImg = matchedCard.find('img').attr('src') || popupImg;
+                    popupName = matchedCard.find('h4').text().trim() || popupName;
+                }
+            }
+
+            const total = window.CartManager.getTotalCount();
+            window.CartManager.showCartPopup({
+                name: popupName,
+                img: popupImg,
+                subtitle: `<span class="text-sky-600 font-bold">${total} Can${total > 1 ? 's' : ''} saved</span> &bull; Ready to checkout`,
+                escape: escapeHtml,
+                timer: 4500
+            });
+        }, 1200);
+    }
 
     function escapeHtml(text) {
         if (!text) return '';

@@ -16,10 +16,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- Leaflet Map CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         .step-transition {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #registrationMap {
+            min-height: 230px;
+            z-index: 1;
+        }
+        .leaflet-container {
+            border-radius: 1rem;
+            font-family: inherit;
         }
     </style>
 </head>
@@ -40,16 +53,16 @@
                     <img src="/icons/logo.svg" alt="Logo" class="w-9 h-9 rounded-xl bg-white p-1 object-contain shadow-sm">
                     <div>
                         <h2 class="text-base font-extrabold tracking-tight leading-none text-white">{{ $appSettings['business_name'] ?? 'HydroPro Delivery' }}</h2>
-                        <span class="text-[10px] text-cyan-200 uppercase tracking-widest font-semibold">Customer Onboarding</span>
+                        <span class="text-[10px] text-cyan-200 uppercase tracking-widest font-semibold">Fast Onboarding</span>
                     </div>
                 </div>
 
                 <div class="pt-2">
                     <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight leading-snug">
-                        Join in 2 Simple Steps.
+                        Register in 2 Simple Steps.
                     </h1>
                     <p class="text-xs text-sky-100 mt-2 leading-relaxed">
-                        Create your account and save your doorstep address for fast 1-click water can orders and scheduled deliveries.
+                        Create your account and pinpoint your delivery location on the map. Full address details can easily be filled or changed later.
                     </p>
                 </div>
             </div>
@@ -58,11 +71,11 @@
             <div class="relative z-10 my-6 space-y-3.5">
                 <div class="flex items-center space-x-3 bg-white/10 backdrop-blur-sm p-3 rounded-2xl border border-white/10">
                     <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-white shrink-0">
-                        <i class="fa-solid fa-location-crosshairs text-sm"></i>
+                        <i class="fa-solid fa-map-location-dot text-sm"></i>
                     </div>
                     <div>
-                        <h4 class="text-xs font-bold text-white">Smart GPS Pinpointing</h4>
-                        <p class="text-[11px] text-sky-100">Auto-fill street, locality, and pincode with one click</p>
+                        <h4 class="text-xs font-bold text-white">Interactive Map Pinpoint</h4>
+                        <p class="text-[11px] text-sky-100">Drag pin to correct your exact doorstep location</p>
                     </div>
                 </div>
 
@@ -71,8 +84,8 @@
                         <i class="fa-solid fa-repeat text-sm"></i>
                     </div>
                     <div>
-                        <h4 class="text-xs font-bold text-white">Effortless Can Reorders</h4>
-                        <p class="text-[11px] text-sky-100">Repeat your previous orders instantly anytime</p>
+                        <h4 class="text-xs font-bold text-white">Fast 1-Click Ordering</h4>
+                        <p class="text-[11px] text-sky-100">Repeat previous water can orders in seconds</p>
                     </div>
                 </div>
 
@@ -81,8 +94,8 @@
                         <i class="fa-solid fa-wallet text-sm"></i>
                     </div>
                     <div>
-                        <h4 class="text-xs font-bold text-white">Flexible Payment Options</h4>
-                        <p class="text-[11px] text-sky-100">Pay on delivery or maintain a customer credit balance</p>
+                        <h4 class="text-xs font-bold text-white">Flexible Payments</h4>
+                        <p class="text-[11px] text-sky-100">Cash on delivery, Razorpay UPI, or monthly balance</p>
                     </div>
                 </div>
             </div>
@@ -121,7 +134,7 @@
                         <span class="text-slate-300">&bull;&bull;&bull;</span>
                         <span id="stepBadge2" class="text-slate-400 flex items-center space-x-1.5">
                             <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px]">2</span>
-                            <span>Delivery Address</span>
+                            <span>Pin Location</span>
                         </span>
                     </div>
                     <div class="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
@@ -129,7 +142,7 @@
                     </div>
                 </div>
 
-                <!-- Step Inline Error Alert Box (No popups) -->
+                <!-- Step Inline Error Alert Box -->
                 <div id="formAlertBox" class="hidden p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center space-x-2.5 transition-all">
                     <i class="fa-solid fa-circle-exclamation text-rose-500 text-sm shrink-0"></i>
                     <span id="formAlertText" class="font-medium"></span>
@@ -201,80 +214,104 @@
 
                         <!-- Step 1 Next Button -->
                         <button type="button" id="btnNextStep" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-sky-600 to-cyan-600 hover:from-sky-700 hover:to-cyan-700 text-white font-extrabold text-xs shadow-lg shadow-sky-600/30 transition flex items-center justify-center space-x-2 active:scale-[0.99]">
-                            <span>Continue to Step 2: Delivery Address</span>
+                            <span>Continue to Step 2: Set Location on Map</span>
                             <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </button>
+
+                        <!-- Google Auth Option Slot -->
+                        <div class="relative flex py-1 items-center">
+                            <div class="flex-grow border-t border-slate-200"></div>
+                            <span class="flex-shrink mx-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Or register with</span>
+                            <div class="flex-grow border-t border-slate-200"></div>
+                        </div>
+
+                        <button type="button" onclick="alert('Google Sign-In integration is in progress and will be available soon. Please use email & password for now.');" class="w-full py-2.5 px-4 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition flex items-center justify-center space-x-2.5 shadow-sm active:scale-[0.99]">
+                            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                            </svg>
+                            <span>Continue with Google</span>
                         </button>
                     </div>
 
-                    <!-- STEP 2: Delivery Address -->
+                    <!-- STEP 2: Location Map Pinpoint (Simple steps: address filled later) -->
                     <div id="step2Container" class="step-transition space-y-3.5 hidden">
                         <div class="flex items-center justify-between border-b pb-2">
                             <div>
-                                <span class="text-xs font-black uppercase tracking-wider text-sky-600 block">Step 2: Delivery Address</span>
-                                <p class="text-[11px] text-slate-400">Where should we deliver your water cans?</p>
+                                <span class="text-xs font-black uppercase tracking-wider text-sky-600 block">Step 2: Confirm Location on Map</span>
+                                <p class="text-[11px] text-slate-400">Drag the pin or tap the map to correct location</p>
                             </div>
-                            <button type="button" id="btnBackToStep1" class="text-xs text-slate-400 hover:text-slate-700 font-bold flex items-center space-x-1 py-1 px-2 rounded-lg hover:bg-slate-100 transition">
+                            <button type="button" id="btnBackToStep1" class="text-xs text-slate-500 hover:text-slate-800 font-bold flex items-center space-x-1 py-1 px-2.5 rounded-lg hover:bg-slate-100 transition">
                                 <i class="fa-solid fa-arrow-left text-[10px]"></i>
                                 <span>Back</span>
                             </button>
                         </div>
 
-                        <!-- Fetch Current Location GPS Button -->
+                        <!-- Fetch Current GPS Location Button -->
                         <button type="button" id="btnDetectLocation" class="w-full py-2.5 px-3 rounded-2xl bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 text-xs font-bold transition flex items-center justify-center space-x-2 active:scale-95 shadow-sm">
                             <i class="fa-solid fa-location-crosshairs text-sm text-sky-600 animate-pulse"></i>
-                            <span id="detectLocationText">Use Current GPS Location (Auto-fill)</span>
+                            <span id="detectLocationText">Auto-Detect My GPS Location</span>
                         </button>
                         <div id="gpsStatusMessage" class="text-[11px] text-center hidden"></div>
 
+                        <!-- Interactive Leaflet Map Container -->
+                        <div class="relative">
+                            <div id="registrationMap" class="w-full h-56 rounded-2xl border border-slate-200 shadow-inner bg-slate-100"></div>
+                            <div class="absolute bottom-2 left-2 right-2 z-[500] pointer-events-none">
+                                <div class="bg-slate-900/80 backdrop-blur-sm text-white px-3 py-1.5 rounded-xl text-[10px] flex items-center justify-between shadow-md">
+                                    <span class="flex items-center space-x-1.5">
+                                        <i class="fa-solid fa-hand-pointer text-cyan-300"></i>
+                                        <span>Tap map or drag pin to correct location</span>
+                                    </span>
+                                    <span id="coordsBadge" class="font-mono text-cyan-300 font-semibold">13.0827, 80.2707</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Detected Address Card Preview -->
+                        <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 flex items-center space-x-1.5">
+                                    <i class="fa-solid fa-location-dot text-rose-500"></i>
+                                    <span>Pinned Delivery Location</span>
+                                </span>
+                                <span id="reverseGeocodeBadge" class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold">Location Set</span>
+                            </div>
+                            <p id="detectedAddressPreview" class="text-xs font-bold text-slate-800 leading-snug">
+                                Chennai, Tamil Nadu, India
+                            </p>
+                        </div>
+
+                        <!-- Optional Door/Flat No. & Instructions -->
                         <div class="grid grid-cols-2 gap-2">
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Door / Flat No. <span class="text-rose-500 font-black">*</span></label>
-                                <input type="text" name="door_number" id="door_number" value="{{ old('door_number') }}" placeholder="Flat 204"
-                                       class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500 bg-slate-50/50 hover:bg-white focus:bg-white transition">
-                                <p id="error-door_number" class="text-[11px] text-rose-600 font-semibold mt-1 hidden"></p>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Door / Flat No. <span class="text-slate-400 font-normal">(Optional)</span></label>
+                                <input type="text" name="door_number" id="door_number" value="{{ old('door_number') }}" placeholder="e.g. Flat 204 / No. 12"
+                                       class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500 bg-slate-50/50 hover:bg-white focus:bg-white transition">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Building / House <span class="text-rose-500 font-black">*</span></label>
-                                <input type="text" name="house_or_building" id="house_or_building" value="{{ old('house_or_building') }}" placeholder="Green Meadows"
-                                       class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500 bg-slate-50/50 hover:bg-white focus:bg-white transition">
-                                <p id="error-house_or_building" class="text-[11px] text-rose-600 font-semibold mt-1 hidden"></p>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Delivery Instructions <span class="text-slate-400 font-normal">(Optional)</span></label>
+                                <input type="text" name="delivery_instructions" id="delivery_instructions" value="{{ old('delivery_instructions') }}" placeholder="e.g. Leave at gate"
+                                       class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500 bg-slate-50/50 hover:bg-white focus:bg-white transition">
                             </div>
                         </div>
 
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Street / Road Name <span class="text-rose-500 font-black">*</span></label>
-                            <input type="text" name="street" id="street" value="{{ old('street') }}" placeholder="4th Cross Avenue"
-                                   class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500 bg-slate-50/50 hover:bg-white focus:bg-white transition">
-                            <p id="error-street" class="text-[11px] text-rose-600 font-semibold mt-1 hidden"></p>
+                        <!-- Friendly Address Note -->
+                        <div class="p-2.5 rounded-xl bg-sky-50 border border-sky-100 text-[11px] text-sky-800 flex items-center space-x-2">
+                            <i class="fa-solid fa-circle-check text-sky-600 text-xs shrink-0"></i>
+                            <span>You can review or change your address anytime later in your <strong>Profile</strong>.</span>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Area / Locality <span class="text-rose-500 font-black">*</span></label>
-                                <input type="text" name="area_locality" id="area_locality" value="{{ old('area_locality') }}" placeholder="Anna Nagar"
-                                       class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500 bg-slate-50/50 hover:bg-white focus:bg-white transition">
-                                <p id="error-area_locality" class="text-[11px] text-rose-600 font-semibold mt-1 hidden"></p>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Pincode <span class="text-rose-500 font-black">*</span></label>
-                                <input type="text" name="pincode" id="pincode" value="{{ old('pincode') }}" placeholder="600040" maxlength="6"
-                                       class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500 bg-slate-50/50 hover:bg-white focus:bg-white transition">
-                                <p id="error-pincode" class="text-[11px] text-rose-600 font-semibold mt-1 hidden"></p>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">City <span class="text-rose-500 font-black">*</span></label>
-                            <input type="text" name="city" id="city" value="{{ old('city', 'Chennai') }}"
-                                   class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500 bg-slate-50/50 hover:bg-white focus:bg-white transition">
-                            <p id="error-city" class="text-[11px] text-rose-600 font-semibold mt-1 hidden"></p>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Delivery Instructions <span class="text-slate-400 font-normal">(Optional)</span></label>
-                            <input type="text" name="delivery_instructions" id="delivery_instructions" value="{{ old('delivery_instructions') }}" placeholder="e.g. Ring bell, leave outside if not home"
-                                   class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500 bg-slate-50/50 hover:bg-white focus:bg-white transition">
-                        </div>
+                        <!-- Hidden Address & Coordinates Fields -->
+                        <input type="hidden" name="latitude" id="latitude" value="{{ old('latitude', '13.0827') }}">
+                        <input type="hidden" name="longitude" id="longitude" value="{{ old('longitude', '80.2707') }}">
+                        <input type="hidden" name="house_or_building" id="house_or_building" value="{{ old('house_or_building', 'My Pinned Location') }}">
+                        <input type="hidden" name="street" id="street" value="{{ old('street', 'Near Pinned Location') }}">
+                        <input type="hidden" name="area_locality" id="area_locality" value="{{ old('area_locality', 'Chennai Area') }}">
+                        <input type="hidden" name="city" id="city" value="{{ old('city', 'Chennai') }}">
+                        <input type="hidden" name="pincode" id="pincode" value="{{ old('pincode', '600001') }}">
 
                         <!-- Step 2 Final Submit -->
                         <button type="submit" id="btnSubmitForm" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-sky-600 to-cyan-600 hover:from-sky-700 hover:to-cyan-700 text-white font-extrabold text-xs shadow-lg shadow-sky-600/30 transition flex items-center justify-center space-x-2 active:scale-[0.99]">
@@ -295,27 +332,131 @@
     </div>
 
     <script>
+        // Global Map Variables
+        let regMap = null;
+        let regMarker = null;
+        let currentLat = parseFloat($('#latitude').val()) || 13.0827;
+        let currentLng = parseFloat($('#longitude').val()) || 80.2707;
+
+        function showFieldError(fieldId, message) {
+            $('#' + fieldId).addClass('border-rose-400 ring-2 ring-rose-200');
+            $('#error-' + fieldId).text(message).removeClass('hidden');
+        }
+
+        function clearFieldError(fieldId) {
+            $('#' + fieldId).removeClass('border-rose-400 ring-2 ring-rose-200');
+            $('#error-' + fieldId).addClass('hidden').text('');
+        }
+
+        function showFormAlert(message) {
+            $('#formAlertText').text(message);
+            $('#formAlertBox').removeClass('hidden');
+        }
+
+        function clearFormAlert() {
+            $('#formAlertBox').addClass('hidden');
+            $('#formAlertText').text('');
+        }
+
+        // Custom Leaflet Pin Icon
+        function getCustomMapPin() {
+            return L.divIcon({
+                className: 'custom-reg-pin',
+                html: `<div style="transform: translate(-50%, -100%);">
+                         <div style="background: linear-gradient(135deg, #0284c7, #06b6d4); color: white; width: 34px; height: 34px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.35); border: 2.5px solid white;">
+                             <i class="fa-solid fa-droplet" style="transform: rotate(45deg); font-size: 14px;"></i>
+                         </div>
+                       </div>`,
+                iconSize: [34, 34],
+                iconAnchor: [17, 34]
+            });
+        }
+
+        // Initialize Map when Step 2 opens
+        function initRegistrationMap() {
+            if (regMap) {
+                setTimeout(function() {
+                    regMap.invalidateSize();
+                }, 200);
+                return;
+            }
+
+            regMap = L.map('registrationMap', {
+                center: [currentLat, currentLng],
+                zoom: 15,
+                zoomControl: true
+            });
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap'
+            }).addTo(regMap);
+
+            regMarker = L.marker([currentLat, currentLng], {
+                draggable: true,
+                icon: getCustomMapPin()
+            }).addTo(regMap);
+
+            // Dragend event on marker
+            regMarker.on('dragend', function() {
+                const position = regMarker.getLatLng();
+                updateLocationFromCoords(position.lat, position.lng);
+            });
+
+            // Map click to reposition marker
+            regMap.on('click', function(e) {
+                regMarker.setLatLng(e.latlng);
+                updateLocationFromCoords(e.latlng.lat, e.latlng.lng);
+            });
+
+            setTimeout(function() {
+                regMap.invalidateSize();
+            }, 250);
+
+            // Trigger initial reverse geocoding
+            updateLocationFromCoords(currentLat, currentLng);
+        }
+
+        // Reverse Geocode & Update Form Hidden Fields & UI
+        function updateLocationFromCoords(lat, lng) {
+            currentLat = lat;
+            currentLng = lng;
+            $('#latitude').val(lat.toFixed(7));
+            $('#longitude').val(lng.toFixed(7));
+            $('#coordsBadge').text(`${lat.toFixed(4)}, ${lng.toFixed(4)}`);
+
+            $('#reverseGeocodeBadge').text('Resolving address...').removeClass('bg-emerald-100 text-emerald-800').addClass('bg-amber-100 text-amber-800');
+
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`)
+                .then(res => res.json())
+                .then(data => {
+                    $('#reverseGeocodeBadge').text('Location Set').removeClass('bg-amber-100 text-amber-800').addClass('bg-emerald-100 text-emerald-800');
+
+                    if (data && data.address) {
+                        const addr = data.address;
+                        const road = addr.road || addr.street || addr.residential || addr.suburb || 'Near Pinned Location';
+                        const locality = addr.suburb || addr.neighbourhood || addr.city_district || addr.locality || 'Chennai Area';
+                        const cityVal = addr.city || addr.town || addr.state_district || 'Chennai';
+                        const postcode = addr.postcode ? addr.postcode.replace(/\D/g, '').slice(0, 6) : '600001';
+
+                        $('#street').val(road);
+                        $('#area_locality').val(locality);
+                        $('#city').val(cityVal);
+                        $('#pincode').val(postcode);
+
+                        const formatted = data.display_name ? data.display_name.split(',').slice(0, 4).join(', ') : `${road}, ${locality}, ${cityVal} - ${postcode}`;
+                        $('#detectedAddressPreview').text(formatted);
+                    } else {
+                        $('#detectedAddressPreview').text(`Pinned Location (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
+                    }
+                })
+                .catch(() => {
+                    $('#reverseGeocodeBadge').text('Location Pinned').removeClass('bg-amber-100 text-amber-800').addClass('bg-emerald-100 text-emerald-800');
+                    $('#detectedAddressPreview').text(`Pinned Location (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
+                });
+        }
+
         $(document).ready(function() {
-            function showFieldError(fieldId, message) {
-                $('#' + fieldId).addClass('border-rose-400 ring-2 ring-rose-200');
-                $('#error-' + fieldId).text(message).removeClass('hidden');
-            }
-
-            function clearFieldError(fieldId) {
-                $('#' + fieldId).removeClass('border-rose-400 ring-2 ring-rose-200');
-                $('#error-' + fieldId).addClass('hidden').text('');
-            }
-
-            function showFormAlert(message) {
-                $('#formAlertText').text(message);
-                $('#formAlertBox').removeClass('hidden');
-            }
-
-            function clearFormAlert() {
-                $('#formAlertBox').addClass('hidden');
-                $('#formAlertText').text('');
-            }
-
             // Real-time input listener to clear errors
             $('input').on('input', function() {
                 const id = $(this).attr('id');
@@ -327,7 +468,7 @@
                 }
             });
 
-            // Validate Step 1 and proceed to Step 2
+            // Step 1: Validate & Advance to Step 2
             $('#btnNextStep').on('click', function() {
                 clearFormAlert();
                 let hasError = false;
@@ -351,8 +492,8 @@
                     showFieldError('phone', 'Please enter your mobile number.');
                     hasError = true;
                     if (!firstErrorElement) firstErrorElement = $('#phone');
-                } else if (phone.length < 10 || !/^\d{10}$/.test(phone)) {
-                    showFieldError('phone', 'Please enter a valid 10-digit mobile number.');
+                } else if (!/^[6-9]\d{9}$/.test(phone)) {
+                    showFieldError('phone', 'Please enter a valid 10-digit mobile number starting with 6-9.');
                     hasError = true;
                     if (!firstErrorElement) firstErrorElement = $('#phone');
                 } else {
@@ -363,7 +504,7 @@
                     showFieldError('email', 'Please enter your email address.');
                     hasError = true;
                     if (!firstErrorElement) firstErrorElement = $('#email');
-                } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
                     showFieldError('email', 'Please enter a valid email address.');
                     hasError = true;
                     if (!firstErrorElement) firstErrorElement = $('#email');
@@ -428,6 +569,9 @@
                         $('#stepProgressBar').removeClass('w-1/2').addClass('w-full');
                         $('#stepBadge2').removeClass('text-slate-400').addClass('text-sky-600 font-bold');
                         $('#stepBadge2 span:first').removeClass('bg-slate-200 text-slate-600').addClass('bg-sky-600 text-white');
+
+                        // Initialize Map
+                        initRegistrationMap();
                     },
                     error: function(xhr) {
                         btn.removeAttr('disabled').html(originalBtnHtml);
@@ -466,133 +610,82 @@
                 $('#stepBadge2 span:first').removeClass('bg-sky-600 text-white').addClass('bg-slate-200 text-slate-600');
             });
 
-            // Validate Step 2 on Form Submission
-            $('#onboardingForm').on('submit', function(e) {
-                clearFormAlert();
-                let hasError = false;
-                let firstErrorElement = null;
-
-                const door = $('#door_number').val().trim();
-                const building = $('#house_or_building').val().trim();
-                const street = $('#street').val().trim();
-                const area = $('#area_locality').val().trim();
-                const pincode = $('#pincode').val().trim();
-                const city = $('#city').val().trim();
-
-                if (!door) {
-                    showFieldError('door_number', 'Door / Flat No. is required.');
-                    hasError = true;
-                    if (!firstErrorElement) firstErrorElement = $('#door_number');
-                }
-                if (!building) {
-                    showFieldError('house_or_building', 'Building / House name is required.');
-                    hasError = true;
-                    if (!firstErrorElement) firstErrorElement = $('#house_or_building');
-                }
-                if (!street) {
-                    showFieldError('street', 'Street / Road name is required.');
-                    hasError = true;
-                    if (!firstErrorElement) firstErrorElement = $('#street');
-                }
-                if (!area) {
-                    showFieldError('area_locality', 'Area / Locality is required.');
-                    hasError = true;
-                    if (!firstErrorElement) firstErrorElement = $('#area_locality');
-                }
-                if (!pincode) {
-                    showFieldError('pincode', 'Pincode is required.');
-                    hasError = true;
-                    if (!firstErrorElement) firstErrorElement = $('#pincode');
-                } else if (pincode.length < 6 || !/^\d{6}$/.test(pincode)) {
-                    showFieldError('pincode', 'Please enter a valid 6-digit pincode.');
-                    hasError = true;
-                    if (!firstErrorElement) firstErrorElement = $('#pincode');
-                }
-                if (!city) {
-                    showFieldError('city', 'City is required.');
-                    hasError = true;
-                    if (!firstErrorElement) firstErrorElement = $('#city');
-                }
-
-                if (hasError) {
-                    e.preventDefault();
-                    showFormAlert('Please fill in all mandatory address details.');
-                    if (firstErrorElement) {
-                        firstErrorElement.focus();
-                    }
-                }
-            });
-
             // Geolocation Auto-Detection
             $('#btnDetectLocation').on('click', function() {
                 const btnText = $('#detectLocationText');
                 const statusMsg = $('#gpsStatusMessage');
 
                 if (!navigator.geolocation) {
-                    statusMsg.removeClass('hidden text-emerald-600').addClass('text-rose-500').text('Geolocation is not supported by your browser.');
+                    statusMsg.removeClass('hidden text-emerald-600 text-sky-600').addClass('text-rose-500 font-bold').text('Geolocation is not supported by your browser.');
                     return;
                 }
 
-                btnText.text('Detecting your location...');
-                statusMsg.removeClass('hidden text-rose-500 text-emerald-600').addClass('text-sky-600').text('Getting GPS coordinates and fetching address details...');
+                btnText.text('Detecting GPS location...');
+                statusMsg.removeClass('hidden text-rose-500 text-emerald-600').addClass('text-sky-600 font-bold').text('Fetching your GPS coordinates...');
 
                 navigator.geolocation.getCurrentPosition(
                     function(position) {
                         const lat = position.coords.latitude;
                         const lon = position.coords.longitude;
+                        btnText.text('Auto-Detect My GPS Location');
+                        statusMsg.removeClass('text-sky-600 text-rose-500').addClass('text-emerald-600 font-bold').text('GPS location detected! Adjust pin on the map if needed.');
 
-                        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1`)
-                            .then(response => response.json())
-                            .then(data => {
-                                btnText.text('Use Current GPS Location (Auto-fill)');
-
-                                if (data && data.address) {
-                                    const addr = data.address;
-                                    const road = addr.road || addr.street || addr.residential || addr.suburb || '';
-                                    const locality = addr.suburb || addr.neighbourhood || addr.city_district || addr.locality || '';
-                                    const cityVal = addr.city || addr.town || addr.state_district || 'Chennai';
-                                    const postcode = addr.postcode ? addr.postcode.replace(/\D/g, '').slice(0, 6) : '';
-
-                                    if (road) {
-                                        $('#street').val(road);
-                                        clearFieldError('street');
-                                    }
-                                    if (locality) {
-                                        $('#area_locality').val(locality);
-                                        clearFieldError('area_locality');
-                                    }
-                                    if (cityVal) {
-                                        $('#city').val(cityVal);
-                                        clearFieldError('city');
-                                    }
-                                    if (postcode) {
-                                        $('#pincode').val(postcode);
-                                        clearFieldError('pincode');
-                                    }
-
-                                    statusMsg.removeClass('text-sky-600 text-rose-500').addClass('text-emerald-600 font-bold').text('Location detected and address fields filled!');
-                                } else {
-                                    statusMsg.removeClass('text-sky-600 text-emerald-600').addClass('text-amber-600').text('Coordinates retrieved. Please verify street and door number.');
-                                }
-                            })
-                            .catch(err => {
-                                btnText.text('Use Current GPS Location (Auto-fill)');
-                                statusMsg.removeClass('text-sky-600 text-emerald-600').addClass('text-amber-600').text('GPS detected. Please type remaining address details.');
-                            });
+                        if (regMap && regMarker) {
+                            regMap.setView([lat, lon], 16);
+                            regMarker.setLatLng([lat, lon]);
+                        }
+                        updateLocationFromCoords(lat, lon);
                     },
                     function(error) {
-                        btnText.text('Use Current GPS Location (Auto-fill)');
-                        let msg = 'Unable to retrieve location.';
+                        btnText.text('Auto-Detect My GPS Location');
+                        let msg = 'Unable to detect GPS.';
                         if (error.code === error.PERMISSION_DENIED) {
-                            msg = 'Location permission was denied. Please fill in your address manually.';
+                            msg = 'Location permission was denied. You can drag the pin on the map manually.';
                         }
-                        statusMsg.removeClass('hidden text-emerald-600 text-sky-600').addClass('text-rose-500 font-bold').text(msg);
+                        statusMsg.removeClass('hidden text-emerald-600 text-sky-600').addClass('text-amber-600 font-bold').text(msg);
                     },
                     { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
                 );
             });
 
-            // Toggle Password Visibility for Password & Confirm Password
+            // Form Submit Listener (Step 2 Submission)
+            $('#onboardingForm').on('submit', function(e) {
+                clearFormAlert();
+
+                // Validate Step 1 fields again in case user tampered
+                const name = $('#name').val().trim();
+                const phone = $('#phone').val().trim();
+                const email = $('#email').val().trim();
+                const password = $('#password').val();
+                const passwordConfirmation = $('#password_confirmation').val();
+
+                if (!name || !phone || !email || !password || password !== passwordConfirmation) {
+                    e.preventDefault();
+                    $('#step2Container').addClass('hidden');
+                    $('#step1Container').removeClass('hidden');
+                    $('#stepProgressBar').removeClass('w-full').addClass('w-1/2');
+                    $('#stepBadge2').removeClass('text-sky-600 font-bold').addClass('text-slate-400');
+                    $('#stepBadge2 span:first').removeClass('bg-sky-600 text-white').addClass('bg-slate-200 text-slate-600');
+                    showFormAlert('Please complete all required fields in Step 1.');
+                    return;
+                }
+
+                // Ensure lat / lng are present
+                if (!$('#latitude').val() || !$('#longitude').val()) {
+                    $('#latitude').val('13.0827');
+                    $('#longitude').val('80.2707');
+                }
+
+                const doorVal = $('#door_number').val().trim();
+                if (doorVal) {
+                    $('#house_or_building').val(doorVal);
+                }
+
+                // Show spinner on submit button
+                $('#btnSubmitForm').attr('disabled', 'disabled').html('<i class="fa-solid fa-spinner fa-spin mr-1"></i> Creating Account & Loading Home...');
+            });
+
+            // Toggle Password Visibility
             $(document).on('click', '.toggle-password-field', function() {
                 const targetSelector = $(this).data('target');
                 const targetInput = $(targetSelector);

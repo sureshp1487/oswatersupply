@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Customer\CustomerController;
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\AdminNotificationController;
+use App\Http\Controllers\Admin\SystemToolsController;
 use App\Http\Controllers\Driver\DriverController;
 
 // Public & Guest Routes
@@ -47,6 +49,7 @@ Route::middleware(['auth', 'role:customer'])->prefix('app')->name('customer.')->
     Route::get('/profile', [CustomerController::class, 'profile'])->name('profile');
     Route::post('/profile', [CustomerController::class, 'updateProfile'])->name('profile.update');
     Route::post('/address', [CustomerController::class, 'saveAddress'])->name('address.save');
+    Route::post('/address/{id}/default', [CustomerController::class, 'setDefaultAddress'])->name('address.default');
     Route::delete('/address/{id}', [CustomerController::class, 'deleteAddress'])->name('address.delete');
 });
 
@@ -95,9 +98,21 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/settings', [AdminController::class, 'settings'])->name('settings.index');
     Route::post('/settings', [AdminController::class, 'updateSettings'])->name('settings.update');
 
+    // System Cache, Maintenance & Log Management
+    Route::get('/system-tools', [SystemToolsController::class, 'index'])->name('system.index');
+    Route::post('/system-tools/clear-cache', [SystemToolsController::class, 'clearCache'])->name('system.clear_cache');
+    Route::post('/system-tools/read-log', [SystemToolsController::class, 'readLog'])->name('system.read_log');
+    Route::post('/system-tools/rename-log', [SystemToolsController::class, 'renameLog'])->name('system.rename_log');
+
     // App & Dashboard Customization (Brand, Theme, Banner, Colors)
     Route::get('/customization', [AdminController::class, 'customization'])->name('customization.index');
     Route::post('/customization', [AdminController::class, 'updateCustomization'])->name('customization.update');
+
+    // Hero Banners & Promotional Carousel Management
+    Route::get('/banners', [\App\Http\Controllers\Admin\BannerController::class, 'index'])->name('banners.index');
+    Route::post('/banners', [\App\Http\Controllers\Admin\BannerController::class, 'store'])->name('banners.store');
+    Route::post('/banners/{id}', [\App\Http\Controllers\Admin\BannerController::class, 'update'])->name('banners.update');
+    Route::delete('/banners/{id}', [\App\Http\Controllers\Admin\BannerController::class, 'destroy'])->name('banners.destroy');
 
     // Admin Real-Time Order Notifications & PWA Sync APIs
     Route::get('/notifications', [\App\Http\Controllers\Admin\AdminNotificationController::class, 'index'])->name('notifications.index');
@@ -112,4 +127,5 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 Route::middleware(['auth', 'role:driver'])->prefix('driver')->name('driver.')->group(function () {
     Route::get('/dashboard', [DriverController::class, 'dashboard'])->name('dashboard');
     Route::post('/delivery/{assignmentId}/status', [DriverController::class, 'updateDeliveryStatus'])->name('delivery.status');
+    Route::post('/delivery/{assignmentId}/razorpay-order', [DriverController::class, 'createRazorpayOrder'])->name('delivery.razorpay_order');
 });

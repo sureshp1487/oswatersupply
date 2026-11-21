@@ -6,9 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\CustomerProfile;
 use App\Models\Address;
+use App\Mail\CustomerWelcomeNotification;
+use App\Mail\AdminCustomerRegisteredNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -26,15 +31,19 @@ class AuthController extends Controller
         $credentials = $request->validate([
             'login' => ['required', 'string'],
             'password' => ['required', 'string'],
+        ], [
+            'login.required' => 'Email ID or mobile number is required.',
+            'password.required' => 'Password is required.',
         ]);
 
-        $loginType = filter_var($credentials['login'], FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
+        $loginVal = trim($credentials['login']);
+        $loginType = filter_var($loginVal, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
 
-        $user = User::where($loginType, $credentials['login'])->first();
+        $user = User::where($loginType, $loginVal)->first();
 
         if (! $user || ! Hash::check($credentials['password'], $user->password)) {
             throw ValidationException::withMessages([
-                'login' => ['The provided credentials do not match our records.'],
+                'login' => ['Invalid email address or password.'],
             ]);
         }
 
@@ -62,11 +71,19 @@ class AuthController extends Controller
     {
         $request->validate([
             'phone' => ['required', 'string', 'regex:/^[6-9]\d{9}$/'],
-            'email' => ['required', 'email', 'max:255'],
+            'email' => ['required', 'email:rfc,filter', 'max:255'],
+        ], [
+            'phone.required' => 'Mobile number is required.',
+            'phone.regex' => 'Please enter a valid 10-digit mobile number starting with 6-9.',
+            'email.required' => 'Email address is required.',
+            'email.email' => 'Please enter a valid email address.',
         ]);
 
-        $phoneExists = User::where('phone', $request->phone)->exists();
-        $emailExists = User::where('email', $request->email)->exists();
+        $phone = trim($request->phone);
+        $email = strtolower(trim($request->email));
+
+        $phoneExists = User::where('phone', $phone)->exists();
+        $emailExists = User::where('email', $email)->exists();
 
         if ($phoneExists || $emailExists) {
             $errors = [];
@@ -93,59 +110,96 @@ class AuthController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'phone' => ['required', 'string', 'regex:/^[6-9]\d{9}$/', 'unique:users,phone'],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'email' => ['required', 'email:rfc,filter', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:6', 'confirmed'],
-            // Quick onboarding address fields
-            'house_or_building' => ['required', 'string', 'max:255'],
-            'door_number' => ['required', 'string', 'max:100'],
-            'street' => ['required', 'string', 'max:255'],
-            'area_locality' => ['required', 'string', 'max:255'],
-            'city' => ['required', 'string', 'max:100'],
-            'pincode' => ['required', 'string', 'regex:/^\d{6}$/'],
+            // Flexible map-pinpoint location onboarding fields
+            'door_number' => ['nullable', 'string', 'max:100'],
+            'house_or_building' => ['nullable', 'string', 'max:255'],
+            'street' => ['nullable', 'string', 'max:255'],
+            'area_locality' => ['nullable', 'string', 'max:255'],
+            'city' => ['nullable', 'string', 'max:100'],
+            'pincode' => ['nullable', 'string', 'max:20'],
             'delivery_instructions' => ['nullable', 'string', 'max:500'],
             'preferred_slot_id' => ['nullable', 'exists:delivery_slots,id'],
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
+        ], [
+            'name.required' => 'Customer full name is required.',
+            'phone.required' => 'Mobile number is required.',
+            'phone.regex' => 'Please enter a valid 10-digit mobile number starting with 6-9.',
+            'phone.unique' => 'This mobile number is already registered. Please sign in or use another number.',
+            'email.required' => 'Email address is required.',
+            'email.email' => 'Please enter a valid email address.',
+            'email.unique' => 'This email address is already in use.',
+            'password.required' => 'Password is required.',
+            'password.min' => 'Password must be at least 6 characters.',
+            'password.confirmed' => 'Password confirmation does not match.',
         ]);
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'phone' => $validated['phone'],
-            'email' => $validated['email'] ?? null,
-            'password' => Hash::make($validated['password']),
-            'role' => 'customer',
-            'status' => 'active',
-        ]);
+        try {
+            [$user, $address] = DB::transaction(function () use ($validated) {
+                $user = User::create([
+                    'name' => trim($validated['name']),
+                    'phone' => trim($validated['phone']),
+                    'email' => strtolower(trim($validated['email'])),
+                    'password' => $validated['password'], // User model casts password => hashed
+                    'role' => 'customer',
+                    'status' => 'active',
+                ]);
 
-        // Create Profile
-        CustomerProfile::create([
-            'user_id' => $user->id,
-            'preferred_delivery_slot_id' => $validated['preferred_slot_id'] ?? 1,
-            'total_due_balance' => 0.00,
-            'total_empty_cans_held' => 0,
-            'onboarding_completed' => true,
-        ]);
+                // Create Profile
+                CustomerProfile::create([
+                    'user_id' => $user->id,
+                    'preferred_delivery_slot_id' => $validated['preferred_slot_id'] ?? 1,
+                    'total_due_balance' => 0.00,
+                    'total_empty_cans_held' => 0,
+                    'onboarding_completed' => true,
+                ]);
 
-        // Create Default Address
-        Address::create([
-            'user_id' => $user->id,
-            'label' => 'Home',
-            'house_or_building' => $validated['house_or_building'],
-            'door_number' => $validated['door_number'],
-            'street' => $validated['street'],
-            'area_locality' => $validated['area_locality'],
-            'city' => $validated['city'],
-            'pincode' => $validated['pincode'],
-            'delivery_instructions' => $validated['delivery_instructions'] ?? null,
-            'latitude' => $validated['latitude'] ?? null,
-            'longitude' => $validated['longitude'] ?? null,
-            'is_default' => true,
-        ]);
+                $door = !empty($validated['door_number']) ? trim($validated['door_number']) : null;
+                $building = !empty($validated['house_or_building']) ? trim($validated['house_or_building']) : ($door ? 'Door ' . $door : 'My Pinned Location');
+                $street = !empty($validated['street']) ? trim($validated['street']) : 'Near Pinned Location';
+                $area = !empty($validated['area_locality']) ? trim($validated['area_locality']) : 'Chennai Area';
+                $city = !empty($validated['city']) ? trim($validated['city']) : 'Chennai';
+                $pincode = !empty($validated['pincode']) ? trim($validated['pincode']) : '600001';
 
-        Auth::login($user);
-        $request->session()->regenerate();
+                // Create Default Address from Map Pinpoint
+                $address = Address::create([
+                    'user_id' => $user->id,
+                    'label' => 'Home',
+                    'house_or_building' => $building,
+                    'door_number' => $door ?: ($building ?: 'Main Entrance'),
+                    'street' => $street,
+                    'area_locality' => $area,
+                    'city' => $city,
+                    'pincode' => $pincode,
+                    'delivery_instructions' => $validated['delivery_instructions'] ?? null,
+                    'latitude' => $validated['latitude'] ?? null,
+                    'longitude' => $validated['longitude'] ?? null,
+                    'is_default' => true,
+                ]);
 
-        return redirect()->route('customer.home')->with('success', 'Welcome to AquaFlow! Your account and primary delivery address are all set.');
+                return [$user, $address];
+            });
+
+            // Dispatch Customer Welcome and Admin Notification emails (non-blocking)
+            $this->sendRegistrationEmails($user, $address);
+
+            Auth::login($user);
+            $request->session()->regenerate();
+
+            return redirect()->route('customer.home')->with('success', 'Welcome to AquaFlow! Your account and primary delivery address are all set.');
+        } catch (\Throwable $e) {
+            Log::error('Customer registration transaction failed: ' . $e->getMessage(), [
+                'exception' => $e,
+                'email' => $validated['email'] ?? null,
+                'phone' => $validated['phone'] ?? null,
+            ]);
+
+            return back()->withInput()->withErrors([
+                'general' => 'An unexpected error occurred while setting up your account. Please try again.',
+            ]);
+        }
     }
 
     public function logout(Request $request)
@@ -165,5 +219,59 @@ class AuthController extends Controller
             return redirect()->route('driver.dashboard');
         }
         return redirect()->route('customer.home');
+    }
+
+    /**
+     * Send Customer Welcome email and Admin + BCC Notification email.
+     * Non-blocking: failures are logged and will not interrupt registration.
+     */
+    protected function sendRegistrationEmails(User $user, ?Address $address = null): void
+    {
+        // 1. Send Customer Welcome Email
+        try {
+            if (!empty($user->email)) {
+                Mail::to($user->email)->send(new CustomerWelcomeNotification($user));
+                Log::info("Customer welcome email successfully dispatched to {$user->email} for Customer ID #{$user->id}");
+            }
+        } catch (\Throwable $e) {
+            Log::error("Failed to send customer welcome email to {$user->email}: " . $e->getMessage(), [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'exception' => $e,
+            ]);
+        }
+
+        // 2. Send Admin + BCC Customer Registration Notification
+        try {
+            $adminEmail = env('ADMIN_EMAIL') ?: env('MAIL_ADMIN') ?: env('ADMIN_NOTIFICATION_EMAIL') ?: config('mail.admin_notification_email');
+
+            // Parse BCC emails dynamically from configuration
+            $rawBccSources = array_filter([env('ADMIN_BCC_EMAILS'), env('MAIL_BCC')]);
+            $bccEmails = [];
+            foreach ($rawBccSources as $rawSource) {
+                $parts = explode(',', (string) $rawSource);
+                foreach ($parts as $part) {
+                    $cleaned = trim($part);
+                    if (filter_var($cleaned, FILTER_VALIDATE_EMAIL)) {
+                        $bccEmails[] = $cleaned;
+                    }
+                }
+            }
+            $bccEmails = array_values(array_unique($bccEmails));
+
+            if (!empty($adminEmail) && filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
+                $mail = Mail::to($adminEmail);
+                if (!empty($bccEmails)) {
+                    $mail->bcc($bccEmails);
+                }
+                $mail->send(new AdminCustomerRegisteredNotification($user, $address));
+                Log::info("Admin registration notification email successfully dispatched to {$adminEmail} (BCC count: " . count($bccEmails) . ") for Customer ID #{$user->id}");
+            }
+        } catch (\Throwable $e) {
+            Log::error("Failed to send admin customer registration notification: " . $e->getMessage(), [
+                'user_id' => $user->id,
+                'exception' => $e,
+            ]);
+        }
     }
 }

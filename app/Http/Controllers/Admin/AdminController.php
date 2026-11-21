@@ -343,14 +343,22 @@ class AdminController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'phone' => ['required', 'string', 'regex:/^[6-9]\d{9}$/', 'unique:users,phone,' . $customer->id],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $customer->id],
+            'email' => ['required', 'email:rfc,filter', 'max:255', 'unique:users,email,' . $customer->id],
             'status' => ['required', 'in:active,blocked'],
+        ], [
+            'name.required' => 'Customer name is required.',
+            'phone.required' => 'Mobile number is required.',
+            'phone.regex' => 'Please enter a valid 10-digit mobile number starting with 6-9.',
+            'phone.unique' => 'This mobile number is already assigned to another account.',
+            'email.required' => 'Email ID is required.',
+            'email.email' => 'Please enter a valid email address.',
+            'email.unique' => 'This email address is already assigned to another account.',
         ]);
 
         $customer->update([
-            'name' => $validated['name'],
-            'phone' => $validated['phone'],
-            'email' => $validated['email'],
+            'name' => trim($validated['name']),
+            'phone' => trim($validated['phone']),
+            'email' => strtolower(trim($validated['email'])),
             'status' => $validated['status'],
         ]);
 

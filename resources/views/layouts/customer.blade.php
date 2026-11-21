@@ -136,6 +136,34 @@
             animation: pulseGlow 2s infinite;
             z-index: -1;
         }
+
+        /* Cart Popup Fade In / Fade Out Animations */
+        @keyframes cartFadeInDown {
+            from {
+                opacity: 0;
+                transform: translate3d(0, -18px, 0) scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: translate3d(0, 0, 0) scale(1);
+            }
+        }
+        @keyframes cartFadeOutUp {
+            from {
+                opacity: 1;
+                transform: translate3d(0, 0, 0) scale(1);
+            }
+            to {
+                opacity: 0;
+                transform: translate3d(0, -16px, 0) scale(0.96);
+            }
+        }
+        .cart-popup-fadein {
+            animation: cartFadeInDown 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+        }
+        .cart-popup-fadeout {
+            animation: cartFadeOutUp 0.3s cubic-bezier(0.7, 0, 0.84, 0) forwards !important;
+        }
     </style>
     @stack('styles')
 </head>
@@ -472,6 +500,56 @@
                         mobileBadge.classList.add('hidden');
                     }
                 }
+            },
+            showCartPopup: function(options = {}) {
+                if (typeof Swal === 'undefined') return;
+
+                const isMobile = window.innerWidth < 640;
+                const totalCount = this.getTotalCount();
+                const name = options.name || (totalCount > 0 ? (totalCount + ' Water Can' + (totalCount > 1 ? 's' : '') + ' in Cart') : 'Your Cart');
+                const subtitle = options.subtitle || (totalCount > 0 ? 'Ready for fast doorstep delivery' : 'Your cart is currently empty');
+                const cartUrl = "{{ route('customer.cart') }}";
+                const img = options.img || '/icons/logo.svg';
+
+                Swal.fire({
+                    toast: true,
+                    position: isMobile ? 'top' : 'top-end',
+                    width: isMobile ? '94%' : '380px',
+                    showConfirmButton: false,
+                    timer: options.timer !== undefined ? options.timer : 3500,
+                    timerProgressBar: true,
+                    showClass: {
+                        popup: 'cart-popup-fadein'
+                    },
+                    hideClass: {
+                        popup: 'cart-popup-fadeout'
+                    },
+                    customClass: {
+                        container: 'p-2 sm:p-4 !z-[9999]',
+                        popup: 'rounded-2xl shadow-2xl border border-sky-100 p-2.5 sm:p-3 bg-white/95 backdrop-blur-md',
+                        timerProgressBar: 'bg-sky-500'
+                    },
+                    html: `
+                        <div class="flex items-center space-x-2.5 sm:space-x-3 text-left w-full">
+                            <div class="relative shrink-0">
+                                <img src="${img}" alt="" onerror="this.onerror=null;this.src='/icons/logo.svg';" class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl object-cover border border-slate-100 shadow-xs">
+                                <span class="absolute -top-1 -right-1 bg-emerald-500 text-white w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-black shadow-xs">
+                                    <i class="fa-solid fa-check"></i>
+                                </span>
+                            </div>
+                            <div class="flex-1 min-w-0 pr-1">
+                                <p class="text-[11px] sm:text-xs font-black text-slate-900 leading-tight truncate">${options.escape ? options.escape(name) : name}</p>
+                                <p class="text-[10px] sm:text-[11px] text-slate-500 font-semibold mt-0.5 truncate">
+                                    ${subtitle}
+                                </p>
+                            </div>
+                            <a href="${cartUrl}" class="shrink-0 px-2 sm:px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-sky-600 to-ocean-700 text-white font-extrabold text-[10px] sm:text-[11px] hover:shadow-md hover:scale-105 active:scale-95 transition flex items-center space-x-1">
+                                <span>Cart (${totalCount})</span>
+                                <i class="fa-solid fa-arrow-right text-[8px]"></i>
+                            </a>
+                        </div>
+                    `
+                });
             }
         };
 

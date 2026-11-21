@@ -84,28 +84,54 @@
 
             <div class="space-y-3">
                 @forelse($user->addresses as $addr)
-                <div class="p-4 rounded-2xl border border-slate-100 bg-slate-50/50 flex items-start justify-between space-x-3 hover:border-slate-200 transition">
-                    <div class="space-y-1 text-xs">
-                        <div class="flex items-center space-x-2 font-extrabold text-slate-900">
-                            <i class="fa-solid fa-location-dot text-ocean-600"></i>
-                            <span>{{ $addr->label }}</span>
+                <div class="p-4 rounded-2xl border transition flex items-start justify-between space-x-3 {{ $addr->is_default ? 'border-ocean-300 bg-sky-50/40 ring-1 ring-ocean-400/20 shadow-2xs' : 'border-slate-100 bg-slate-50/50 hover:border-slate-200' }}">
+                    <div class="flex items-start space-x-3 min-w-0">
+                        <button type="button" 
+                                onclick="{{ $addr->is_default ? '' : 'setDefaultAddress(' . $addr->id . ')' }}" 
+                                class="mt-0.5 shrink-0 focus:outline-none transition {{ $addr->is_default ? 'cursor-default text-ocean-600' : 'cursor-pointer text-slate-300 hover:text-ocean-600 hover:scale-110' }}" 
+                                title="{{ $addr->is_default ? 'Primary Default Address' : 'Click to select as default address' }}">
                             @if($addr->is_default)
-                                <span class="text-[9px] bg-ocean-100 text-ocean-700 px-2 py-0.5 rounded-full font-bold">Default</span>
+                                <i class="fa-solid fa-circle-check text-lg text-ocean-600"></i>
+                            @else
+                                <i class="fa-regular fa-circle text-lg text-slate-300 hover:text-ocean-500"></i>
+                            @endif
+                        </button>
+
+                        <div class="space-y-1 text-xs min-w-0">
+                            <div class="flex items-center space-x-2 font-extrabold text-slate-900">
+                                <span class="text-sm font-black">{{ $addr->label }}</span>
+                                @if($addr->is_default)
+                                    <span class="text-[10px] bg-ocean-600 text-white px-2 py-0.5 rounded-full font-bold shadow-xs flex items-center space-x-1">
+                                        <i class="fa-solid fa-check text-[9px]"></i>
+                                        <span>Default</span>
+                                    </span>
+                                @endif
+                            </div>
+                            <p class="text-slate-600 leading-relaxed font-medium break-words">{{ $addr->formatted_address }}</p>
+                            @if($addr->delivery_instructions)
+                                <p class="text-[11px] text-slate-400"><strong>Note:</strong> {{ $addr->delivery_instructions }}</p>
                             @endif
                         </div>
-                        <p class="text-slate-600 leading-relaxed font-medium">{{ $addr->formatted_address }}</p>
-                        @if($addr->delivery_instructions)
-                            <p class="text-[11px] text-slate-400"><strong>Note:</strong> {{ $addr->delivery_instructions }}</p>
-                        @endif
                     </div>
 
-                    <!-- Custom Confirm Delete Trigger Button -->
-                    <button type="button" 
-                            onclick="confirmDeleteAddress({{ $addr->id }}, '{{ addslashes($addr->label) }}')"
-                            class="text-slate-300 hover:text-rose-600 p-2 rounded-lg hover:bg-rose-50 transition" 
-                            title="Delete address">
-                        <i class="fa-solid fa-trash-can text-xs"></i>
-                    </button>
+                    <div class="flex items-center space-x-2 shrink-0 pt-0.5">
+                        @if(!$addr->is_default)
+                        <button type="button" 
+                                onclick="setDefaultAddress({{ $addr->id }})" 
+                                class="px-2.5 py-1 rounded-xl text-[11px] font-bold bg-white text-ocean-700 hover:bg-ocean-600 hover:text-white border border-slate-200 hover:border-ocean-600 shadow-2xs transition active:scale-95 flex items-center space-x-1">
+                            <i class="fa-solid fa-check text-[10px]"></i>
+                            <span class="hidden sm:inline">Set as</span> Default
+                        </button>
+                        @endif
+
+                        <!-- Custom Confirm Delete Trigger Button -->
+                        <button type="button" 
+                                onclick="confirmDeleteAddress({{ $addr->id }}, '{{ addslashes($addr->label) }}')"
+                                class="text-slate-300 hover:text-rose-600 p-2 rounded-lg hover:bg-rose-50 transition" 
+                                title="Delete address">
+                            <i class="fa-solid fa-trash-can text-xs"></i>
+                        </button>
+                    </div>
                 </div>
                 @empty
                 <div class="p-8 text-center text-slate-400 text-xs">
@@ -233,6 +259,43 @@
 
 @push('scripts')
 <script>
+    // Set Default Address via Ajax
+    function setDefaultAddress(addressId) {
+        Swal.fire({
+            title: 'Updating default address...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        $.ajax({
+            url: "/app/address/" + addressId + "/default",
+            type: "POST",
+            data: {
+                _token: "{{ csrf_token() }}"
+            },
+            success: function(response) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Default Address Updated',
+                    text: response.message || 'Your default delivery address has been changed.',
+                    timer: 1200,
+                    showConfirmButton: false
+                }).then(() => {
+                    location.reload();
+                });
+            },
+            error: function(xhr) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Update Failed',
+                    text: xhr.responseJSON?.message || 'Could not update default address. Please try again.'
+                });
+            }
+        });
+    }
+
     // Open Delete Address Modal
     function confirmDeleteAddress(addressId, label) {
         $('#deleteAddressLabel').text(label || 'address');
