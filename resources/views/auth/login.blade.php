@@ -121,6 +121,13 @@
                     </div>
                 @endif
 
+                @if(session('status'))
+                    <div class="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center space-x-2">
+                        <i class="fa-solid fa-circle-check text-sm shrink-0"></i>
+                        <span>{{ session('status') }}</span>
+                    </div>
+                @endif
+
                 @if(session('info'))
                     <div class="p-3.5 rounded-2xl bg-sky-50 border border-sky-200 text-sky-800 text-xs flex items-center space-x-2">
                         <i class="fa-solid fa-circle-info text-sm shrink-0"></i>
@@ -162,7 +169,7 @@
                             <input type="checkbox" name="remember" value="1" checked class="w-4 h-4 rounded text-sky-600 focus:ring-sky-500 border-slate-300">
                             <span class="font-semibold">Keep me signed in</span>
                         </label>
-                        <a href="#" class="text-sky-600 font-bold hover:underline">Forgot password?</a>
+                        <a href="{{ route('password.request') }}" class="text-sky-600 font-bold hover:underline">Forgot password?</a>
                     </div>
 
                     <button type="submit" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-sky-600 to-cyan-600 hover:from-sky-700 hover:to-cyan-700 text-white font-extrabold text-xs shadow-lg shadow-sky-600/30 active:scale-[0.99] transition flex items-center justify-center space-x-2">
