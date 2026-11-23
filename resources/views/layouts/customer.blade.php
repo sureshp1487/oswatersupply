@@ -189,6 +189,9 @@
                     <a href="{{ route('customer.services') }}" class="px-3 py-2 rounded-xl transition {{ request()->routeIs('customer.services') ? 'bg-sky-50 text-ocean-600' : 'hover:bg-slate-50' }}">
                         <i class="fa-solid fa-bell-concierge mr-1"></i> Services
                     </a>
+                    <a href="{{ route('customer.subscriptions.index') }}" class="px-3 py-2 rounded-xl transition {{ request()->routeIs('customer.subscriptions*') ? 'bg-sky-50 text-ocean-600' : 'hover:bg-slate-50' }}">
+                        <i class="fa-solid fa-repeat mr-1"></i> Subscriptions
+                    </a>
                     <a href="{{ route('customer.orders') }}" class="px-3 py-2 rounded-xl transition {{ request()->routeIs('customer.orders*') ? 'bg-sky-50 text-ocean-600' : 'hover:bg-slate-50' }}">
                         <i class="fa-solid fa-boxes-stacked mr-1"></i> My Orders
                     </a>

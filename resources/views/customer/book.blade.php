@@ -162,16 +162,28 @@
                     <label class="block text-xs font-bold text-slate-700 mb-2">Available Time Slot</label>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                         @foreach($slots as $slot)
-                        <label class="block cursor-pointer">
-                            <input type="radio" name="delivery_slot_id" value="{{ $slot->id }}" class="peer hidden" {{ $loop->first ? 'checked' : '' }}>
-                            <div class="p-3 rounded-2xl border border-slate-200 peer-checked:border-ocean-600 peer-checked:bg-sky-50/50 flex items-center justify-between text-xs transition">
+                        <label class="slot-option-label block cursor-pointer transition select-none"
+                               data-slot-id="{{ $slot->id }}"
+                               data-start-time="{{ $slot->start_time }}"
+                               data-end-time="{{ $slot->end_time }}">
+                            <input type="radio" name="delivery_slot_id" value="{{ $slot->id }}" class="slot-radio peer hidden" {{ $loop->first ? 'checked' : '' }}>
+                            <div class="slot-card p-3 rounded-2xl border border-slate-200 peer-checked:border-ocean-600 peer-checked:bg-sky-50/50 flex items-center justify-between text-xs transition">
                                 <div class="flex items-center space-x-2">
-                                    <i class="fa-regular fa-clock text-ocean-600"></i>
-                                    <span class="font-bold text-slate-800">{{ $slot->name }}</span>
+                                    <i class="fa-regular fa-clock text-ocean-600 slot-icon"></i>
+                                    <span class="font-bold text-slate-800 slot-name">{{ $slot->name }}</span>
                                 </div>
+                                <span class="slot-badge hidden px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-wider bg-slate-200 text-slate-500 shrink-0">
+                                    Closed
+                                </span>
                             </div>
                         </label>
                         @endforeach
+                    </div>
+
+                    <!-- Notice if all slots for selected date are closed -->
+                    <div id="allSlotsClosedNotice" class="hidden mt-3 p-3 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center space-x-2">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-600 shrink-0 text-sm"></i>
+                        <span>All delivery slots for today have closed. Please choose tomorrow (<strong>{{ \Carbon\Carbon::tomorrow()->format('M d, Y') }}</strong>) or a future date.</span>
                     </div>
                 </div>
 
@@ -386,6 +398,67 @@ $(document).ready(function() {
     }
 
     renderCartView();
+
+    // Dynamic Time Slot Disabling based on selected delivery date and current time
+    const todayDateStr = "{{ \Carbon\Carbon::today()->toDateString() }}";
+
+    function updateTimeSlotAvailability() {
+        const selectedDate = $('#expected_delivery_date').val();
+        const now = new Date();
+        const currentHours = String(now.getHours()).padStart(2, '0');
+        const currentMinutes = String(now.getMinutes()).padStart(2, '0');
+        const currentSeconds = String(now.getSeconds()).padStart(2, '0');
+        const currentTimeStr = `${currentHours}:${currentMinutes}:${currentSeconds}`;
+
+        let availableSlotsCount = 0;
+        let checkedSlotIsDisabled = false;
+
+        $('.slot-option-label').each(function() {
+            const label = $(this);
+            const radio = label.find('.slot-radio');
+            const card = label.find('.slot-card');
+            const badge = label.find('.slot-badge');
+            const startTime = String(label.data('start-time') || '');
+
+            if (selectedDate === todayDateStr && startTime && startTime <= currentTimeStr) {
+                // Slot start time has already passed for today
+                radio.prop('disabled', true);
+                label.addClass('pointer-events-none opacity-40 cursor-not-allowed').removeClass('cursor-pointer');
+                card.addClass('bg-slate-100 border-slate-200 text-slate-400').removeClass('peer-checked:border-ocean-600 peer-checked:bg-sky-50/50');
+                badge.removeClass('hidden').text('Closed for Today');
+
+                if (radio.is(':checked')) {
+                    checkedSlotIsDisabled = true;
+                    radio.prop('checked', false);
+                }
+            } else {
+                // Slot is open / upcoming / future date
+                availableSlotsCount++;
+                radio.prop('disabled', false);
+                label.removeClass('pointer-events-none opacity-40 cursor-not-allowed').addClass('cursor-pointer');
+                card.removeClass('bg-slate-100 border-slate-200 text-slate-400');
+                badge.addClass('hidden');
+            }
+        });
+
+        // If previously checked radio was disabled or nothing is checked, auto-select the first available slot
+        if (checkedSlotIsDisabled || $('.slot-radio:checked').length === 0) {
+            const firstAvailable = $('.slot-radio:not(:disabled)').first();
+            if (firstAvailable.length) {
+                firstAvailable.prop('checked', true);
+            }
+        }
+
+        // Toggle alert if all slots today are closed
+        if (selectedDate === todayDateStr && availableSlotsCount === 0) {
+            $('#allSlotsClosedNotice').removeClass('hidden');
+        } else {
+            $('#allSlotsClosedNotice').addClass('hidden');
+        }
+    }
+
+    $('#expected_delivery_date').on('change input', updateTimeSlotAvailability);
+    updateTimeSlotAvailability();
 
     function renderCartView() {
         let visibleCount = 0;
@@ -616,6 +689,12 @@ $(document).ready(function() {
         const selectedAddress = $('input[name="address_id"]:checked').val();
         if (!selectedAddress) {
             Swal.fire('Address Missing', 'Please select or add a delivery address.', 'warning');
+            return;
+        }
+
+        const selectedSlot = $('input[name="delivery_slot_id"]:checked');
+        if (!selectedSlot.length || selectedSlot.is(':disabled')) {
+            Swal.fire('Slot Unavailable', 'The selected delivery time slot is not available. Please choose an active upcoming slot.', 'warning');
             return;
         }
 

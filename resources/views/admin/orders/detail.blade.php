@@ -13,6 +13,7 @@
                 <span class="px-3 py-1 rounded-full text-xs font-bold uppercase
                     @if($order->order_status === 'delivered') bg-emerald-100 text-emerald-800
                     @elseif($order->order_status === 'out_for_delivery') bg-amber-100 text-amber-800
+                    @elseif($order->order_status === 'cancelled') bg-rose-100 text-rose-800
                     @else bg-sky-100 text-sky-800 @endif">
                     {{ str_replace('_', ' ', $order->order_status) }}
                 </span>
@@ -33,6 +34,23 @@
             </a>
         </div>
     </div>
+
+    @if($order->order_status === 'cancelled')
+    <div class="p-4 rounded-3xl bg-rose-50 border border-rose-200 text-rose-900 flex items-start space-x-3 text-xs shadow-sm">
+        <div class="w-8 h-8 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0 mt-0.5">
+            <i class="fa-solid fa-ban text-sm"></i>
+        </div>
+        <div>
+            <div class="font-black text-rose-900 uppercase tracking-wider text-[11px]">This Order Was Cancelled</div>
+            @if($order->cancellation_reason)
+                <div class="mt-1 text-rose-800"><span class="font-bold">Cancellation Reason:</span> {{ $order->cancellation_reason }}</div>
+            @endif
+            @if($order->cancelled_at)
+                <div class="text-[11px] text-rose-500 mt-0.5">Cancelled at: {{ $order->cancelled_at->format('d M Y, h:i A') }}</div>
+            @endif
+        </div>
+    </div>
+    @endif
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 

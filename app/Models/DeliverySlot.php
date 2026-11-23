@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class DeliverySlot extends Model
@@ -22,5 +23,18 @@ class DeliverySlot extends Model
     public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function isPassedForDate($dateString): bool
+    {
+        $date = Carbon::parse($dateString)->toDateString();
+        $today = Carbon::today()->toDateString();
+
+        if ($date !== $today) {
+            return false;
+        }
+
+        $currentTime = Carbon::now()->format('H:i:s');
+        return $this->start_time <= $currentTime;
     }
 }

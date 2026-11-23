@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Customer\CustomerController;
+use App\Http\Controllers\Customer\SubscriptionController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AdminNotificationController;
 use App\Http\Controllers\Admin\SystemToolsController;
@@ -50,6 +51,14 @@ Route::middleware(['auth', 'role:customer'])->prefix('app')->name('customer.')->
     Route::post('/order/place', [CustomerController::class, 'placeOrder'])->name('order.place');
     Route::get('/orders', [CustomerController::class, 'orders'])->name('orders');
     Route::get('/orders/{id}', [CustomerController::class, 'showOrder'])->name('order.show');
+    Route::post('/orders/{id}/cancel', [CustomerController::class, 'cancelOrder'])->name('order.cancel');
+
+    // Subscriptions
+    Route::get('/subscriptions', [SubscriptionController::class, 'index'])->name('subscriptions.index');
+    Route::post('/subscriptions', [SubscriptionController::class, 'store'])->name('subscriptions.store');
+    Route::post('/subscriptions/{id}/pause', [SubscriptionController::class, 'pause'])->name('subscriptions.pause');
+    Route::post('/subscriptions/{id}/resume', [SubscriptionController::class, 'resume'])->name('subscriptions.resume');
+    Route::post('/subscriptions/{id}/cancel', [SubscriptionController::class, 'cancel'])->name('subscriptions.cancel');
 
     // Due & Payments
     Route::get('/payments', [CustomerController::class, 'payments'])->name('payments');
@@ -75,6 +84,13 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/orders/{id}/status', [AdminController::class, 'updateOrderStatus'])->name('orders.status');
     Route::post('/orders/{id}/assign-driver', [AdminController::class, 'assignDriver'])->name('orders.assign_driver');
     Route::post('/orders/{id}/record-payment', [AdminController::class, 'recordOfflinePayment'])->name('orders.record_payment');
+
+    // Subscriptions & Plans Management
+    Route::get('/subscriptions', [AdminController::class, 'subscriptions'])->name('subscriptions.index');
+    Route::post('/subscriptions/plans', [AdminController::class, 'storeSubscriptionPlan'])->name('subscriptions.plans.store');
+    Route::post('/subscriptions/plans/{id}', [AdminController::class, 'updateSubscriptionPlan'])->name('subscriptions.plans.update');
+    Route::delete('/subscriptions/plans/{id}', [AdminController::class, 'destroySubscriptionPlan'])->name('subscriptions.plans.destroy');
+    Route::post('/subscriptions/{id}/status', [AdminController::class, 'updateCustomerSubscriptionStatus'])->name('subscriptions.status');
 
     // Dues Management Module
     Route::get('/dues', [AdminController::class, 'dues'])->name('dues.index');
@@ -115,6 +131,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/system-tools/clear-cache', [SystemToolsController::class, 'clearCache'])->name('system.clear_cache');
     Route::post('/system-tools/read-log', [SystemToolsController::class, 'readLog'])->name('system.read_log');
     Route::post('/system-tools/rename-log', [SystemToolsController::class, 'renameLog'])->name('system.rename_log');
+
+    // Automated & On-Demand Database Backup & Export
+    Route::get('/database/export', [SystemToolsController::class, 'exportDatabase'])->name('system.db_export');
+    Route::get('/database/backups/{filename}/download', [SystemToolsController::class, 'downloadBackup'])->name('system.db_download');
+    Route::delete('/database/backups/{filename}', [SystemToolsController::class, 'deleteBackup'])->name('system.db_delete');
 
     // App & Dashboard Customization (Brand, Theme, Banner, Colors)
     Route::get('/customization', [AdminController::class, 'customization'])->name('customization.index');

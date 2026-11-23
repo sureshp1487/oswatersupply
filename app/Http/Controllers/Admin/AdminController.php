@@ -15,6 +15,8 @@ use App\Models\PaymentTransaction;
 use App\Models\DeliverySlot;
 use App\Models\DeliveryAssignment;
 use App\Models\Setting;
+use App\Models\Subscription;
+use App\Models\SubscriptionPlan;
 use App\Services\PaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -618,5 +620,111 @@ class AdminController extends Controller
         $user->delete();
 
         return back()->with('success', 'Staff user deleted successfully.');
+    }
+
+    public function subscriptions(Request $request)
+    {
+        $plans = SubscriptionPlan::withCount('subscriptions')->orderBy('id', 'asc')->get();
+
+        $query = Subscription::with(['user', 'plan', 'product', 'deliverySlot', 'address'])->latest();
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $subscriptions = $query->paginate(15)->withQueryString();
+        $totalActive = Subscription::where('status', 'active')->count();
+        $totalPaused = Subscription::where('status', 'paused')->count();
+        $totalCancelled = Subscription::where('status', 'cancelled')->count();
+        $totalCompleted = Subscription::where('status', 'completed')->count();
+
+        return view('admin.subscriptions.index', compact('plans', 'subscriptions', 'totalActive', 'totalPaused', 'totalCancelled', 'totalCompleted'));
+    }
+
+    public function storeSubscriptionPlan(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:150'],
+            'frequency' => ['required', 'string', 'in:daily,alternate_days,weekly'],
+            'deliveries_count' => ['required', 'integer', 'min:1', 'max:365'],
+            'discount_percentage' => ['required', 'numeric', 'min:0', 'max:100'],
+            'badge' => ['nullable', 'string', 'max:100'],
+            'description' => ['nullable', 'string', 'max:500'],
+            'is_active' => ['nullable', 'boolean'],
+        ]);
+
+        $validated['slug'] = Str::slug($validated['name']) . '-' . Str::random(4);
+        $validated['is_active'] = $request->has('is_active');
+
+        SubscriptionPlan::create($validated);
+
+        return back()->with('success', "Subscription plan '{$validated['name']}' created successfully!");
+    }
+
+    public function updateSubscriptionPlan(Request $request, $id)
+    {
+        $plan = SubscriptionPlan::findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:150'],
+            'frequency' => ['required', 'string', 'in:daily,alternate_days,weekly'],
+            'deliveries_count' => ['required', 'integer', 'min:1', 'max:365'],
+            'discount_percentage' => ['required', 'numeric', 'min:0', 'max:100'],
+            'badge' => ['nullable', 'string', 'max:100'],
+            'description' => ['nullable', 'string', 'max:500'],
+            'is_active' => ['nullable', 'boolean'],
+        ]);
+
+        $validated['is_active'] = $request->has('is_active');
+        $plan->update($validated);
+
+        return back()->with('success', "Subscription plan '{$plan->name}' updated successfully!");
+    }
+
+    public function destroySubscriptionPlan($id)
+    {
+        $plan = SubscriptionPlan::findOrFail($id);
+
+        if ($plan->subscriptions()->whereIn('status', ['active', 'paused'])->exists()) {
+            // Plan has active subscribers: deactivate to protect live deliveries
+            $plan->update(['is_active' => false]);
+            return back()->with('success', "Plan '{$plan->name}' has active subscribers, so it has been deactivated instead of deleted.");
+        }
+
+        if ($plan->subscriptions()->exists()) {
+            $plan->update(['is_active' => false]);
+            return back()->with('success', "Plan '{$plan->name}' has historical subscription records, so it has been deactivated.");
+        }
+
+        $plan->delete();
+
+        return back()->with('success', "Subscription plan deleted successfully.");
+    }
+
+    public function updateCustomerSubscriptionStatus(Request $request, $id)
+    {
+        $subscription = Subscription::findOrFail($id);
+        $validated = $request->validate([
+            'status' => ['required', 'string', 'in:active,paused,cancelled,completed'],
+            'reason' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        $updateData = ['status' => $validated['status']];
+
+        if ($validated['status'] === 'paused') {
+            $updateData['paused_at'] = now();
+        } elseif ($validated['status'] === 'cancelled') {
+            $updateData['cancelled_at'] = now();
+            if (!empty($validated['reason'])) {
+                $updateData['cancellation_reason'] = $validated['reason'];
+            }
+        } elseif ($validated['status'] === 'active' && $subscription->status === 'paused') {
+            $updateData['paused_at'] = null;
+            $updateData['next_delivery_date'] = Carbon::tomorrow()->toDateString();
+        }
+
+        $subscription->update($updateData);
+
+        return back()->with('success', "Subscription #{$subscription->subscription_number} status updated to " . ucfirst($validated['status']) . "!");
     }
 }

@@ -134,7 +134,118 @@
         </div>
     </div>
 
-    <!-- SECTION 2: Log File Viewer and Renamer -->
+    <!-- SECTION 2: Automated Database Backups & Export -->
+    <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-3">
+            <div class="flex items-center space-x-2.5">
+                <div class="w-8 h-8 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center">
+                    <i class="fa-solid fa-database text-sm"></i>
+                </div>
+                <div>
+                    <h3 class="text-sm font-extrabold text-slate-900">Automated Database Backups & SQL Export</h3>
+                    <p class="text-[11px] text-slate-400">Scheduled daily backups via Laravel Scheduler and instant on-demand export test endpoints</p>
+                </div>
+            </div>
+
+            <!-- Header Quick Badges -->
+            <div class="flex items-center space-x-2 flex-wrap">
+                <span class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>Daily at 02:00 AM (Automated)</span>
+                </span>
+                <span class="px-3 py-1 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700">
+                    DB: <span class="font-mono font-black text-indigo-600">{{ config('database.connections.' . config('database.default') . '.database') }}</span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Testing Endpoint Banner -->
+        <div class="p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-md">
+            <div class="space-y-1">
+                <div class="flex items-center space-x-2">
+                    <span class="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-indigo-500/30 text-indigo-300 border border-indigo-400/20">
+                        Testing URL
+                    </span>
+                    <span class="text-xs font-bold text-slate-300">Direct Browser Export / Test URL:</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <code id="testExportUrlCode" class="font-mono text-xs text-cyan-300 bg-black/40 px-2.5 py-1 rounded-lg border border-white/10 select-all">
+                        {{ url('/admin/database/export') }}
+                    </code>
+                    <button type="button" onclick="navigator.clipboard.writeText('{{ url('/admin/database/export') }}'); alert('Test URL copied to clipboard!');" class="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white transition" title="Copy URL">
+                        <i class="fa-regular fa-copy text-xs"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2 shrink-0">
+                <a href="{{ route('admin.system.db_export', ['format' => 'json']) }}" target="_blank" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition border border-white/15 flex items-center space-x-1.5">
+                    <i class="fa-solid fa-code text-[11px] text-cyan-300"></i>
+                    <span>Test JSON API</span>
+                </a>
+                <a href="{{ route('admin.system.db_export') }}" class="px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-600 text-white font-extrabold text-xs shadow-md shadow-cyan-500/30 transition flex items-center space-x-1.5 active:scale-95">
+                    <i class="fa-solid fa-download text-xs"></i>
+                    <span>Export & Download (.sql)</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Backups List -->
+        <div class="space-y-3">
+            <div class="flex items-center justify-between">
+                <h4 class="text-xs font-black uppercase tracking-wider text-slate-600">Generated Backups on Server ({{ count($backups) }})</h4>
+                <span class="text-[11px] text-slate-400">Retention: Kept for 14 days (automatically pruned)</span>
+            </div>
+
+            @if(empty($backups))
+            <div class="p-8 text-center text-slate-400 rounded-2xl bg-slate-50 border border-slate-100">
+                <i class="fa-solid fa-database text-3xl text-slate-300 mb-2 block"></i>
+                <p class="text-xs font-bold text-slate-600">No backup files found</p>
+                <p class="text-[11px]">Click "Export & Download (.sql)" or wait for the 02:00 AM daily scheduler.</p>
+            </div>
+            @else
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                    <thead>
+                        <tr class="border-b text-slate-400 uppercase text-[10px]">
+                            <th class="py-2.5 px-3">File Name</th>
+                            <th class="py-2.5 px-3">File Size</th>
+                            <th class="py-2.5 px-3">Generated Date</th>
+                            <th class="py-2.5 px-3 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        @foreach($backups as $b)
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="py-3 px-3 font-mono font-bold text-indigo-600 flex items-center space-x-2">
+                                <i class="fa-regular fa-file-lines text-slate-400"></i>
+                                <span>{{ $b['filename'] }}</span>
+                            </td>
+                            <td class="py-3 px-3 font-semibold text-slate-700">{{ $b['size'] }}</td>
+                            <td class="py-3 px-3 text-slate-500">{{ $b['created_at'] }}</td>
+                            <td class="py-3 px-3 text-right space-x-1">
+                                <a href="{{ route('admin.system.db_download', $b['filename']) }}" class="inline-flex items-center space-x-1 px-3 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-[11px] transition">
+                                    <i class="fa-solid fa-download text-[10px]"></i>
+                                    <span>Download</span>
+                                </a>
+                                <form action="{{ route('admin.system.db_delete', $b['filename']) }}" method="POST" class="inline" onsubmit="return confirm('Delete this database backup file permanently?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition" title="Delete Backup">
+                                        <i class="fa-solid fa-trash-can text-xs"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            @endif
+        </div>
+    </div>
+
+    <!-- SECTION 3: Log File Viewer and Renamer -->
     <div id="logExplorerContainer" class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-5">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-3">
             <div class="flex items-center space-x-2.5">

@@ -15,6 +15,7 @@ use App\Models\CustomerPaymentLedger;
 use App\Services\PaymentService;
 use App\Mail\NewOrderAdminNotification;
 use App\Notifications\NewCustomerOrderAdminNotification;
+use App\Notifications\OrderCancelledAdminNotification;
 use App\Models\User;
 use App\Models\Banner;
 use Illuminate\Http\Request;
@@ -103,6 +104,14 @@ class CustomerController extends Controller
         $user = Auth::user();
         $address = Address::where('user_id', $user->id)->findOrFail($validated['address_id']);
         $slot = DeliverySlot::findOrFail($validated['delivery_slot_id']);
+
+        // Check if selected time slot has passed for today
+        if ($slot->isPassedForDate($validated['expected_delivery_date'])) {
+            return response()->json([
+                'success' => false,
+                'message' => "The selected time slot ({$slot->name}) has already closed for today. Please select an upcoming slot or choose a future delivery date."
+            ], 422);
+        }
 
         // Check slot capacity for expected delivery date
         $currentBookingsCount = Order::where('expected_delivery_date', $validated['expected_delivery_date'])
@@ -322,6 +331,110 @@ class CustomerController extends Controller
             ->findOrFail($id);
 
         return view('customer.order_detail', compact('order'));
+    }
+
+    public function cancelOrder(Request $request, $id)
+    {
+        $user = Auth::user();
+        $order = Order::where('user_id', $user->id)
+            ->with(['items', 'deliveryAssignment'])
+            ->findOrFail($id);
+
+        if (!$order->canBeCancelled()) {
+            $errorMsg = match ($order->order_status) {
+                'preparing' => 'This order is currently being prepared & loaded for delivery and cannot be cancelled automatically. Please contact support.',
+                'out_for_delivery' => 'The delivery captain is already on the way with your order. It cannot be cancelled.',
+                'delivered' => 'This order has already been delivered.',
+                'cancelled' => 'This order has already been cancelled.',
+                default => 'This order cannot be cancelled at this stage.',
+            };
+
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json(['success' => false, 'message' => $errorMsg], 422);
+            }
+            return back()->with('error', $errorMsg);
+        }
+
+        $validated = $request->validate([
+            'reason_preset' => ['required', 'string', 'max:255'],
+            'reason_details' => ['nullable', 'string', 'max:500'],
+        ], [
+            'reason_preset.required' => 'Please select a reason for cancellation.',
+        ]);
+
+        $preset = trim($validated['reason_preset']);
+        $details = trim($validated['reason_details'] ?? '');
+        $fullReason = $preset;
+        if (!empty($details) && $preset !== $details) {
+            $fullReason .= ' - ' . $details;
+        }
+
+        DB::transaction(function () use ($user, $order, $fullReason) {
+            // 1. Restock inventory
+            foreach ($order->items as $item) {
+                Product::where('id', $item->product_id)->increment('stock_quantity', $item->quantity);
+            }
+
+            // 2. Adjust Pay Later outstanding due if applicable
+            $profile = CustomerProfile::firstOrCreate(['user_id' => $user->id]);
+            if ($order->due_amount > 0) {
+                $reversedDue = min($order->due_amount, $profile->total_due_balance);
+                $profile->total_due_balance = max(0, $profile->total_due_balance - $reversedDue);
+                $profile->save();
+
+                CustomerPaymentLedger::create([
+                    'user_id' => $user->id,
+                    'order_id' => $order->id,
+                    'entry_type' => 'credit',
+                    'amount' => $reversedDue,
+                    'balance_after' => $profile->total_due_balance,
+                    'description' => "Order #{$order->order_number} cancelled by customer - outstanding balance reversed",
+                ]);
+
+                $order->due_amount = 0.00;
+            }
+
+            // 3. Cancel delivery assignment if assigned
+            if ($order->deliveryAssignment) {
+                $order->deliveryAssignment->status = 'cancelled';
+                $order->deliveryAssignment->save();
+            }
+
+            // 4. Update order status and cancellation reason
+            $order->order_status = 'cancelled';
+            $order->cancellation_reason = $fullReason;
+            $order->cancelled_at = now();
+            $order->save();
+
+            // 5. Create OrderStatusHistory record
+            OrderStatusHistory::create([
+                'order_id' => $order->id,
+                'status' => 'cancelled',
+                'notes' => 'Self-service cancellation by customer. Reason: ' . $fullReason,
+                'updated_by' => $user->id,
+            ]);
+        });
+
+        // 6. Notify Admin
+        try {
+            $adminUsers = User::where('role', 'admin')->get();
+            foreach ($adminUsers as $admin) {
+                $admin->notify(new OrderCancelledAdminNotification($order, $fullReason));
+            }
+        } catch (\Throwable $e) {
+            Log::error("Failed sending order cancellation notification to admins: " . $e->getMessage());
+        }
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Order #{$order->order_number} has been cancelled successfully.",
+                'redirect_url' => route('customer.order.show', $order->id),
+            ]);
+        }
+
+        return redirect()->route('customer.order.show', $order->id)
+            ->with('success', "Order #{$order->order_number} has been cancelled.");
     }
 
     public function payments(PaymentService $paymentService)

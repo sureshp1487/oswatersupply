@@ -24,6 +24,8 @@ class Order extends Model
         'due_amount',
         'delivery_instructions',
         'internal_notes',
+        'cancellation_reason',
+        'cancelled_at',
         'delivered_at',
     ];
 
@@ -36,8 +38,14 @@ class Order extends Model
         'total_amount' => 'decimal:2',
         'paid_amount' => 'decimal:2',
         'due_amount' => 'decimal:2',
+        'cancelled_at' => 'datetime',
         'delivered_at' => 'datetime',
     ];
+
+    public function canBeCancelled(): bool
+    {
+        return in_array($this->order_status, ['placed', 'confirmed']);
+    }
 
     public function user()
     {

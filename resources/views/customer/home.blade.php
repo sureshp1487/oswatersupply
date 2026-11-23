@@ -186,17 +186,17 @@
     <!-- Promotional Clean Drinking Banner -->
     <div class="bg-gradient-to-r from-cyan-500 via-sky-600 to-ocean-700 rounded-3xl p-6 sm:p-8 text-white shadow-lg relative overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div class="max-w-xl z-10">
-            <span class="text-[10px] uppercase tracking-wider font-extrabold bg-white/20 px-2.5 py-0.5 rounded-full inline-block mb-1.5">Purity Assured</span>
+            <span class="text-[10px] uppercase tracking-wider font-extrabold bg-white/20 px-2.5 py-0.5 rounded-full inline-block mb-1.5">Save up to 15%</span>
             <h4 class="text-lg sm:text-xl font-black leading-tight">Need Weekly or Daily Water Can Subscription?</h4>
-            <p class="text-xs text-cyan-100 mt-1">Book scheduled refills with recurring delivery options directly to your doorway.</p>
+            <p class="text-xs text-cyan-100 mt-1">Book recurring delivery plans (Monthly, Alternate Days, Weekly Once) with automated scheduling and doorstep refills.</p>
         </div>
         <div class="z-10 shrink-0">
-            <a href="{{ route('customer.book') }}" class="inline-block px-5 py-2.5 bg-white text-ocean-700 font-extrabold text-xs rounded-xl shadow hover:bg-slate-50 transition">
-                Schedule Delivery &rarr;
+            <a href="{{ route('customer.subscriptions.index') }}" class="inline-block px-5 py-2.5 bg-white text-ocean-700 font-extrabold text-xs rounded-xl shadow hover:bg-slate-50 transition active:scale-95">
+                Explore Subscriptions &rarr;
             </a>
         </div>
         <div class="absolute -right-4 -bottom-4 text-white/15 text-8xl pointer-events-none">
-            <i class="fa-solid fa-faucet-drip"></i>
+            <i class="fa-solid fa-repeat"></i>
         </div>
     </div>
 

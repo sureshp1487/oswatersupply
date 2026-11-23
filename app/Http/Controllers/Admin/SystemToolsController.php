@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Services\DatabaseExportService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
@@ -20,9 +21,10 @@ class SystemToolsController extends Controller
     /**
      * Display the System Tools UI: Caches & Logs
      */
-    public function index(Request $request)
+    public function index(Request $request, DatabaseExportService $exportService)
     {
         $logFiles = $this->getLogFileList();
+        $backups = $exportService->getBackupsList();
         
         $selectedFile = $request->query('file', 'laravel.log');
         // Validate filename to prevent path traversal
@@ -43,7 +45,7 @@ class SystemToolsController extends Controller
             $totalLines = substr_count($logContent, "\n");
         }
 
-        return view('admin.system.index', compact('logFiles', 'selectedFile', 'logContent', 'logFileSize', 'totalLines'));
+        return view('admin.system.index', compact('logFiles', 'selectedFile', 'logContent', 'logFileSize', 'totalLines', 'backups'));
     }
 
     /**
@@ -278,5 +280,76 @@ class SystemToolsController extends Controller
         $bytes /= (1 << (10 * $pow));
 
         return round($bytes, $precision) . ' ' . $units[$pow];
+    }
+
+    /**
+     * Export complete database on demand.
+     * Accessible via URL /admin/database/export for testing and immediate download.
+     */
+    public function exportDatabase(Request $request, DatabaseExportService $exportService)
+    {
+        try {
+            $result = $exportService->export();
+
+            if ($request->query('format') === 'json' || $request->expectsJson() || $request->has('json')) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Database export completed successfully.',
+                    'metrics' => $result,
+                    'download_url' => route('admin.system.db_download', $result['filename']),
+                ]);
+            }
+
+            // Direct file download for browser clicks
+            return response()->download($result['path'], $result['filename'], [
+                'Content-Type' => 'application/sql',
+            ]);
+        } catch (\Throwable $e) {
+            if ($request->expectsJson() || $request->has('json')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Database export failed: ' . $e->getMessage(),
+                ], 500);
+            }
+
+            return back()->with('error', 'Database export failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Download an existing database backup file.
+     */
+    public function downloadBackup(string $filename)
+    {
+        if (!preg_match('/^db_backup_[a-zA-Z0-9_\-]+\.(sql|gz)$/', $filename)) {
+            abort(400, 'Invalid backup filename.');
+        }
+
+        $filePath = storage_path('app/backups/' . $filename);
+        if (!File::exists($filePath)) {
+            abort(404, 'Backup file not found.');
+        }
+
+        return response()->download($filePath, $filename, [
+            'Content-Type' => 'application/sql',
+        ]);
+    }
+
+    /**
+     * Delete an existing database backup.
+     */
+    public function deleteBackup(string $filename)
+    {
+        if (!preg_match('/^db_backup_[a-zA-Z0-9_\-]+\.(sql|gz)$/', $filename)) {
+            return back()->with('error', 'Invalid backup filename.');
+        }
+
+        $filePath = storage_path('app/backups/' . $filename);
+        if (File::exists($filePath)) {
+            File::delete($filePath);
+            return back()->with('success', "Database backup '{$filename}' deleted successfully.");
+        }
+
+        return back()->with('error', 'Backup file not found.');
     }
 }

@@ -121,10 +121,10 @@ class DatabaseSeeder extends Seeder
         // 5. Seed Users: Admin, Driver, and Demo Customer
         // Admin
         $admin = User::create([
-            'name' => 'AquaFlow Admin',
-            'email' => 'admin@aquaflow.com',
-            'phone' => '9876543210',
-            'password' => Hash::make('admin123'),
+            'name' => 'Admin',
+            'email' => 'p.sureshkk4620@gmail.com',
+            'phone' => '8122043747',
+            'password' => Hash::make('Suresh@14872797!'),
             'role' => 'admin',
             'status' => 'active',
         ]);

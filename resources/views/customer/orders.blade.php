@@ -51,6 +51,21 @@
                     <div class="text-sm font-black text-slate-900">₹{{ number_format($order->total_amount, 2) }}</div>
                 </div>
             </div>
+
+            @if($order->order_status === 'cancelled' && $order->cancellation_reason)
+            <div class="mt-2.5 text-[11px] text-rose-700 bg-rose-50/80 rounded-xl px-3 py-1.5 flex items-center space-x-1.5 border border-rose-100">
+                <i class="fa-solid fa-ban text-[10px] shrink-0 text-rose-500"></i>
+                <span class="truncate font-medium"><span class="font-bold">Cancelled:</span> {{ $order->cancellation_reason }}</span>
+            </div>
+            @elseif($order->canBeCancelled())
+            <div class="mt-2.5 pt-2 border-t border-slate-50 flex items-center justify-between text-[11px]">
+                <span class="text-slate-400">Order placed • Ready for delivery</span>
+                <span class="text-rose-600 font-extrabold hover:underline flex items-center space-x-1">
+                    <span>Manage / Cancel</span>
+                    <i class="fa-solid fa-arrow-right text-[9px]"></i>
+                </span>
+            </div>
+            @endif
         </a>
         @empty
         <div class="col-span-2 text-center py-16 bg-white rounded-3xl border border-slate-100 p-8 space-y-4">

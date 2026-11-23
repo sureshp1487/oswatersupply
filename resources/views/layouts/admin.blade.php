@@ -114,6 +114,15 @@
                     <span>Orders & Dispatch</span>
                 </a>
 
+                <!-- Customer Recurring Subscriptions -->
+                <a href="{{ route('admin.subscriptions.index') }}" class="flex items-center space-x-3 px-3 py-2.5 rounded-xl transition {{ request()->routeIs('admin.subscriptions*') ? 'bg-indigo-600 text-white font-bold shadow-lg shadow-indigo-600/30' : 'hover:bg-slate-900 hover:text-white' }}">
+                    <i class="fa-solid fa-repeat w-5 text-sm text-cyan-400"></i>
+                    <div class="flex items-center justify-between flex-1">
+                        <span>Subscriptions</span>
+                        <span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-cyan-500/30 text-cyan-300 uppercase tracking-tighter">Plans</span>
+                    </div>
+                </a>
+
                 <!-- Dedicated Due Management Module -->
                 <a href="{{ route('admin.dues.index') }}" class="flex items-center space-x-3 px-3 py-2.5 rounded-xl transition {{ request()->routeIs('admin.dues*') ? 'bg-indigo-600 text-white font-bold shadow-lg shadow-indigo-600/30' : 'hover:bg-slate-900 hover:text-white' }}">
                     <i class="fa-solid fa-file-invoice-dollar w-5 text-sm"></i>
