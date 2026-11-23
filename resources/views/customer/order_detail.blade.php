@@ -170,7 +170,7 @@
         @endif
     </div>
 
-    <!-- Payment & Pay Later Due Handling -->
+    <!-- Payment & Outstanding Due Handling -->
     <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm space-y-3">
         <div class="flex items-center justify-between">
             <h4 class="text-xs uppercase font-extrabold tracking-wider text-slate-900">Payment Status</h4>

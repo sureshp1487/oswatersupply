@@ -93,7 +93,7 @@ class CustomerController extends Controller
             'address_id' => ['required', 'exists:addresses,id'],
             'expected_delivery_date' => ['required', 'date', 'after_or_equal:today'],
             'delivery_slot_id' => ['required', 'exists:delivery_slots,id'],
-            'payment_method' => ['required', 'in:razorpay,cod,pay_later'],
+            'payment_method' => ['required', 'in:razorpay,cod'],
             'delivery_instructions' => ['nullable', 'string', 'max:500'],
             // Razorpay verify attributes if payment_method is razorpay
             'razorpay_payment_id' => ['nullable', 'string'],

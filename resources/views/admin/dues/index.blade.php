@@ -10,7 +10,7 @@
         <div>
             <span class="text-xs uppercase tracking-wider text-rose-200 font-extrabold block">Total Business Receivables</span>
             <h2 class="text-3xl font-black mt-1">₹{{ number_format($totalOutstandingAcrossBusiness, 2) }}</h2>
-            <p class="text-xs text-rose-100 mt-1">Total pending dues across all Pay Later orders</p>
+            <p class="text-xs text-rose-100 mt-1">Total pending dues across all outstanding orders</p>
         </div>
 
         <div class="flex items-center space-x-2">

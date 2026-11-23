@@ -314,7 +314,7 @@
             showCancelButton: true,
             showDenyButton: true,
             confirmButtonText: '<i class="fa-solid fa-circle-check mr-1"></i> Collect Cash & Mark Delivered',
-            denyButtonText: '<i class="fa-solid fa-clock mr-1"></i> Mark Delivered (Pay Later / Due)',
+            denyButtonText: '<i class="fa-solid fa-clock mr-1"></i> Mark Delivered (Unpaid Due)',
             cancelButtonText: 'Cancel',
             buttonsStyling: false,
             customClass: {

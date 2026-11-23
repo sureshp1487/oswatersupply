@@ -194,7 +194,7 @@
                 </div>
             </div>
 
-            <!-- 4. Payment Method Selection (Razorpay, COD, Pay Later) -->
+            <!-- 4. Payment Method Selection (Razorpay, COD) -->
             <div class="bg-white rounded-3xl p-5 sm:p-6 border border-slate-100 shadow-sm space-y-4">
                 <div class="border-b border-slate-100 pb-3">
                     <h3 class="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center space-x-2">
@@ -203,7 +203,7 @@
                     </h3>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <!-- Razorpay Online -->
                     <label class="block cursor-pointer">
                         <input type="radio" name="payment_method" value="razorpay" class="peer hidden" checked>
@@ -215,28 +215,6 @@
                                 <div>
                                     <span class="text-xs font-extrabold text-slate-900 block">Razorpay Online</span>
                                     <span class="text-[10px] text-slate-500">UPI, Cards, NetBanking</span>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <i class="fa-solid fa-circle-check text-ocean-600 peer-checked:opacity-100 opacity-0 transition text-sm"></i>
-                            </div>
-                        </div>
-                    </label>
-
-                    <!-- Pay Later / Outstanding Due -->
-                    <label class="block cursor-pointer">
-                        <input type="radio" name="payment_method" value="pay_later" class="peer hidden">
-                        <div class="p-4 rounded-2xl border border-slate-200 peer-checked:border-ocean-600 peer-checked:bg-sky-50/50 flex flex-col justify-between transition h-full">
-                            <div class="flex items-center space-x-3 mb-2">
-                                <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-sm shrink-0">
-                                    <i class="fa-solid fa-clock-rotate-left"></i>
-                                </div>
-                                <div>
-                                    <div class="flex items-center space-x-1.5">
-                                        <span class="text-xs font-extrabold text-slate-900">Pay Later</span>
-                                        <span class="bg-amber-100 text-amber-800 text-[9px] font-bold px-1.5 py-0.2 rounded">Due</span>
-                                    </div>
-                                    <span class="text-[10px] text-slate-500">Add to customer balance</span>
                                 </div>
                             </div>
                             <div class="text-right">
@@ -723,7 +701,7 @@ $(document).ready(function() {
         if (paymentMethod === 'razorpay') {
             initiateRazorpayOrder(items, selectedAddress, expectedDate, slotId, instructions);
         } else {
-            // Direct submission for COD or Pay Later
+            // Direct submission for COD
             submitOrderPayload({
                 items: items,
                 address_id: selectedAddress,

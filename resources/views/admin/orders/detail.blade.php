@@ -139,7 +139,7 @@
                 </div>
             </div>
 
-            <!-- Offline Payment Recording Form (For Pay Later / Due Orders) -->
+            <!-- Offline Payment Recording Form (For Outstanding Due Orders) -->
             @if($order->due_amount > 0)
             <div class="bg-amber-50 border border-amber-200 rounded-3xl p-6 shadow-sm space-y-4">
                 <div>

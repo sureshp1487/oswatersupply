@@ -99,7 +99,7 @@
           "name": "What payment modes are supported for water can delivery?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "We support Razorpay Online (UPI, Google Pay, PhonePe, Cards, NetBanking), Cash on Delivery (COD) at your doorstep, and Pay Later for approved corporate monthly credit accounts."
+            "text": "We support Razorpay Online (UPI, Google Pay, PhonePe, Cards, NetBanking) and Cash on Delivery (COD) at your doorstep."
           }
         },
         {
@@ -476,7 +476,7 @@
                         <div>
                             <h3 class="text-base font-extrabold text-slate-900 group-hover:text-[#0077b6] transition-colors">Confirm your order</h3>
                             <p class="text-xs text-slate-500 leading-relaxed mt-2 font-normal">
-                                Choose to pay online via Razorpay, Cash on Delivery (COD), or Pay Later with approved customer credit terms.
+                                Choose to pay online via Razorpay or Cash on Delivery (COD) at your doorstep.
                             </p>
                         </div>
                     </div>
@@ -917,7 +917,7 @@
                         <span class="text-[#0077b6] transition group-open:rotate-180"><i class="fa-solid fa-chevron-down text-xs"></i></span>
                     </summary>
                     <p class="mt-3 text-xs text-slate-600 leading-relaxed">
-                        Yes. We support Cash on Delivery (COD), UPI (GPay, PhonePe, Paytm), and instant Razorpay online payments. You can also pay later if your account has an approved monthly credit balance.
+                        Yes. We support Cash on Delivery (COD), UPI (GPay, PhonePe, Paytm), and instant Razorpay online payments at your doorstep.
                     </p>
                 </details>
 

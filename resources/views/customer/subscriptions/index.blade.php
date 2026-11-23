@@ -331,14 +331,10 @@
             <!-- 4. Payment Method -->
             <div class="space-y-1.5 pt-2 border-t border-slate-100">
                 <label class="block font-bold text-slate-700 uppercase tracking-wider text-[11px]">4. Payment Option</label>
-                <div class="grid grid-cols-3 gap-2">
+                <div class="grid grid-cols-2 gap-2">
                     <label class="p-2.5 rounded-xl border border-slate-200 hover:border-ocean-500 flex items-center space-x-2 cursor-pointer bg-slate-50/50">
                         <input type="radio" name="payment_method" value="cod" checked class="text-ocean-600">
-                        <span class="font-bold text-[11px]">Pay on Delivery</span>
-                    </label>
-                    <label class="p-2.5 rounded-xl border border-slate-200 hover:border-ocean-500 flex items-center space-x-2 cursor-pointer bg-slate-50/50">
-                        <input type="radio" name="payment_method" value="pay_later" class="text-ocean-600">
-                        <span class="font-bold text-[11px]">Pay Later Due</span>
+                        <span class="font-bold text-[11px]">Pay on Delivery (COD)</span>
                     </label>
                     <label class="p-2.5 rounded-xl border border-slate-200 hover:border-ocean-500 flex items-center space-x-2 cursor-pointer bg-slate-50/50">
                         <input type="radio" name="payment_method" value="razorpay" class="text-ocean-600">

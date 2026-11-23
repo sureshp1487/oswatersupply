@@ -52,7 +52,7 @@ class SubscriptionController extends Controller
             'address_id' => ['required', 'exists:addresses,id'],
             'start_date' => ['required', 'date', 'after_or_equal:today'],
             'preferred_weekday' => ['nullable', 'string', 'in:monday,tuesday,wednesday,thursday,friday,saturday,sunday'],
-            'payment_method' => ['required', 'in:cod,pay_later,razorpay'],
+            'payment_method' => ['required', 'in:cod,razorpay'],
             'special_instructions' => ['nullable', 'string', 'max:500'],
         ], [
             'plan_id.required' => 'Please select a subscription plan.',

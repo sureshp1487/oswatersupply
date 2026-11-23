@@ -45,7 +45,7 @@
         <!-- Unpaid Orders Section -->
         <div class="space-y-3">
             <div class="flex items-center justify-between">
-                <h3 class="text-xs uppercase font-extrabold tracking-wider text-slate-900">Unpaid / Pay Later Orders</h3>
+                <h3 class="text-xs uppercase font-extrabold tracking-wider text-slate-900">Unpaid / Outstanding Orders</h3>
                 <span class="text-xs text-slate-400 font-semibold">{{ $unpaidOrders->count() }} Orders Pending</span>
             </div>
 
