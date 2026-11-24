@@ -173,11 +173,23 @@
     <header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-100 shadow-sm">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3 flex items-center justify-between gap-2">
             <div class="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
-                <a href="{{ route('customer.home') }}" class="flex items-center space-x-2 min-w-0">
+                <!-- Desktop: Brand Logo & Name -->
+                <a href="{{ route('customer.home') }}" class="hidden sm:flex items-center space-x-2 min-w-0">
                     <img src="/icons/logo.svg" alt="HydroPro Logo" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl shadow-md shadow-indigo-500/20 object-contain p-0.5 bg-gradient-to-br from-blue-500 to-indigo-600 shrink-0">
                     <div class="min-w-0">
                         <span class="text-[11px] sm:text-xs font-black uppercase tracking-wider text-ocean-600 block leading-tight truncate">{{ $appSettings['business_name'] ?? 'HydroPro' }}</span>
                         <h1 class="text-xs sm:text-sm font-extrabold text-slate-900 leading-tight truncate">Drinking Water</h1>
+                    </div>
+                </a>
+
+                <!-- Mobile: Show Customer Name (Brand Name Removed on Mobile) -->
+                <a href="{{ route('customer.profile') }}" class="flex sm:hidden items-center space-x-2.5 min-w-0 py-0.5">
+                    <div class="w-8 h-8 rounded-full bg-[#18b59b] flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-sm">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <span class="text-[10px] text-slate-400 font-bold block leading-none">Hi, Welcome 👋</span>
+                        <h2 class="text-xs sm:text-sm font-black text-slate-900 block leading-tight truncate">{{ auth()->user()->name }}</h2>
                     </div>
                 </a>
 
@@ -224,7 +236,7 @@
                     </a>
                 </div>
 
-                <form action="{{ route('logout') }}" method="POST" class="inline" onsubmit="if(window.CartManager){ window.CartManager.saveCart({}); }">
+                <form action="{{ route('logout') }}" method="POST" class="hidden sm:inline" onsubmit="if(window.CartManager){ window.CartManager.saveCart({}); }">
                     @csrf
                     <button type="submit" class="p-2 text-slate-400 hover:text-rose-600 rounded-full hover:bg-slate-100 transition" title="Logout">
                         <i class="fa-solid fa-arrow-right-from-bracket"></i>

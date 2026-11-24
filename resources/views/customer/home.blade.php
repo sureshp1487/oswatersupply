@@ -5,47 +5,15 @@
 @section('content')
 <div class="space-y-6">
 
-    <!-- Compact Customer Details Bar (Reduced Space) -->
-    <div class="bg-gradient-to-r from-ocean-700 via-ocean-600 to-sky-600 rounded-2xl px-4 py-3 sm:px-5 sm:py-3.5 text-white shadow-md relative overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-        <div class="flex items-center space-x-3 min-w-0">
-            <div class="w-10 h-10 rounded-xl bg-white/15 backdrop-blur border border-white/20 flex items-center justify-center text-lg text-sky-200 shrink-0 shadow-inner">
-                <i class="fa-solid fa-user"></i>
-            </div>
-            <div class="min-w-0">
-                <div class="flex items-center space-x-2">
-                    <h2 class="text-base sm:text-lg font-black truncate leading-tight">Hi, {{ explode(' ', $user->name)[0] }} 👋</h2>
-                    @if($profile->total_due_balance > 0)
-                    <a href="{{ route('customer.payments') }}" class="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-500 text-white shadow-sm shrink-0 hover:bg-rose-600 transition">
-                        Due: ₹{{ number_format($profile->total_due_balance, 2) }}
-                    </a>
-                    @endif
-                </div>
-                <div class="flex items-center space-x-1.5 text-[11px] text-sky-100 font-medium truncate mt-0.5">
-                    <i class="fa-solid fa-location-dot text-sky-300 text-[10px] shrink-0"></i>
-                    <span class="truncate">{{ $defaultAddress ? $defaultAddress->formatted_address : 'Set delivery location' }}</span>
-                    <a href="{{ route('customer.profile') }}" class="text-white underline font-bold hover:text-sky-200 shrink-0 ml-1">Change</a>
-                </div>
-            </div>
-        </div>
-
-        <div class="flex items-center space-x-2 self-end sm:self-auto shrink-0">
-            <div class="bg-white/15 backdrop-blur-md rounded-xl px-3 py-1.5 border border-white/20 flex items-center space-x-2">
-                <i class="fa-solid fa-bottle-water text-xs text-sky-300"></i>
-                <div class="text-right">
-                    <span class="text-[9px] text-sky-200 block uppercase font-bold leading-none">Cans Held</span>
-                    <span class="text-sm font-black leading-tight">{{ $profile->total_empty_cans_held }}</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Hero Banner Carousel (Auto-Scrolling Slider) -->
+    <!-- Hero Banner Carousel (Smooth Right-to-Left Slider) -->
     @if(isset($banners) && $banners->count() > 0)
-    <div class="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg border border-slate-100 group" id="heroBannerCarousel">
-        <!-- Slides Track -->
-        <div class="relative w-full h-44 sm:h-56 md:h-64 lg:h-72 overflow-hidden bg-slate-900">
-            @foreach($banners as $index => $banner)
-            <div class="hero-slide absolute inset-0 transition-opacity duration-700 ease-in-out {{ $index === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none' }}" data-index="{{ $index }}">
+    <div class="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg border border-slate-100 group select-none" id="heroBannerCarousel">
+        <!-- Viewport -->
+        <div class="relative w-full h-56 sm:h-72 md:h-80 lg:h-96 overflow-hidden bg-slate-900">
+            <!-- Sliding Track (Moves Right to Left) -->
+            <div id="heroTrack" class="flex w-full h-full will-change-transform">
+                @foreach($banners as $index => $banner)
+                <div class="hero-slide w-full h-full shrink-0 flex-none relative" data-index="{{ $index }}">
                 @if($banner->link_url)
                 <a href="{{ $banner->link_url }}" class="block w-full h-full relative group/item">
                 @else
@@ -82,6 +50,7 @@
                 @endif
             </div>
             @endforeach
+            </div>
         </div>
 
         <!-- Carousel Navigation Controls (< & >) -->
@@ -103,7 +72,88 @@
     </div>
     @endif
 
-    <!-- Dynamic Products Section (Responsive Grid: 1 col on mobile, 2 on sm, 4 on lg) -->
+    <!-- Available Services Section (Water Can, Car Wash, Rental House) -->
+    @if(isset($services) && $services->count() > 0)
+    <div class="space-y-3.5">
+        <div class="flex items-center justify-between">
+            <div>
+                <h3 class="text-base sm:text-lg font-black text-slate-900 tracking-tight flex items-center space-x-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-ocean-600 inline-block shadow-sm"></span>
+                    <span>Available Services</span>
+                </h3>
+                <p class="text-[11px] sm:text-xs text-slate-500 font-medium">Doorstep solutions for drinking water, vehicle care, and property rental</p>
+            </div>
+            <a href="{{ route('customer.services') }}" class="text-xs font-bold text-ocean-600 hover:text-ocean-700 flex items-center space-x-1 shrink-0 group">
+                <span>View All</span>
+                <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i>
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+            @foreach($services as $srv)
+            <div class="bg-white hover:bg-sky-50/50 rounded-3xl p-5 border border-slate-200/80 hover:border-ocean-500 shadow-sm hover:shadow-xl hover:-translate-y-1.5 hover:ring-2 hover:ring-ocean-500/15 transition-all duration-300 flex flex-col justify-between group">
+                <div class="space-y-3.5">
+                    <!-- Image Card with Gradient Badge -->
+                    <div class="relative w-full h-44 sm:h-48 rounded-2xl overflow-hidden bg-slate-900">
+                        <img src="{{ $srv->image_path }}" alt="{{ $srv->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent flex flex-col justify-end p-3.5 text-white">
+                            <span class="text-xs text-sky-200 font-bold block drop-shadow">{{ $srv->tagline }}</span>
+                        </div>
+                        @if($srv->badge_text)
+                        <div class="absolute top-2.5 left-2.5">
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-white/95 text-slate-900 backdrop-blur shadow-sm">
+                                {{ $srv->badge_text }}
+                            </span>
+                        </div>
+                        @endif
+                    </div>
+
+                    <!-- Title & Description -->
+                    <div>
+                        <h4 class="text-base font-black text-slate-900 group-hover:text-ocean-600 transition-colors leading-tight">
+                            {{ $srv->name }}
+                        </h4>
+                        @if($srv->description)
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">
+                            {{ $srv->description }}
+                        </p>
+                        @endif
+                    </div>
+
+                    <!-- Highlights / Feature list -->
+                    @if(!empty($srv->features) && count($srv->features) > 0)
+                    <ul class="text-xs text-slate-600 space-y-1.5 pt-2 border-t border-slate-100 group-hover:border-ocean-100 transition-colors">
+                        @foreach(array_slice($srv->features, 0, 3) as $feat)
+                        <li class="flex items-center space-x-2 text-[11px] truncate">
+                            <i class="fa-solid fa-circle-check text-ocean-600 text-[10px] shrink-0"></i>
+                            <span class="truncate">{{ $feat }}</span>
+                        </li>
+                        @endforeach
+                    </ul>
+                    @endif
+                </div>
+
+                <!-- CTA Action Button (Consistent Default & Hover styling across all cards) -->
+                <div class="pt-4">
+                    @if($srv->action_url && !str_starts_with($srv->action_url, '#'))
+                    <a href="{{ $srv->action_url }}" class="w-full py-2.5 rounded-xl bg-ocean-600 hover:bg-ocean-700 text-white font-extrabold text-xs text-center shadow-md shadow-ocean-600/20 active:scale-95 transition-all flex items-center justify-center space-x-1.5">
+                        <span>{{ $srv->action_text ?: 'Order Now' }}</span>
+                        <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </a>
+                    @else
+                    <button type="button" onclick="openHomeServiceInquiry('{{ addslashes($srv->name) }}', '{{ addslashes($srv->tagline ?? $srv->description ?? 'Service request') }}')" class="w-full py-2.5 rounded-xl bg-ocean-600 hover:bg-ocean-700 text-white font-extrabold text-xs text-center shadow-md shadow-ocean-600/20 active:scale-95 transition-all flex items-center justify-center space-x-1.5">
+                        <span>{{ $srv->action_text ?: 'Book Service' }}</span>
+                        <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </button>
+                    @endif
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+    @endif
+
+    <!-- Dynamic Products Section (2 Columns Grid on Mobile & Tablet, 4 on Desktop) -->
     <div class="space-y-3">
         <div class="flex items-center justify-between">
             <div>
@@ -113,68 +163,68 @@
             <a href="{{ route('customer.book') }}" class="text-xs font-bold text-ocean-600 hover:underline">View All &rarr;</a>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4">
             @foreach($featuredProducts as $product)
-            <div class="product-card bg-white rounded-3xl p-4 border border-slate-100 shadow-sm flex flex-col justify-between group hover:shadow-md transition" data-id="{{ $product->id }}" data-price="{{ $product->selling_price }}">
+            <div class="product-card bg-white rounded-2xl sm:rounded-3xl p-3 sm:p-4 border border-slate-100 shadow-sm flex flex-col justify-between group hover:shadow-md transition" data-id="{{ $product->id }}" data-price="{{ $product->selling_price }}">
                 <div>
                     <!-- Product Image with Zoom on Hover -->
-                    <div class="w-full h-40 sm:h-48 rounded-2xl bg-slate-50 overflow-hidden relative mb-3">
+                    <div class="w-full h-32 sm:h-44 md:h-48 rounded-xl sm:rounded-2xl bg-slate-50 overflow-hidden relative mb-2.5 sm:mb-3">
                         <img src="{{ $product->image ?: 'https://images.unsplash.com/photo-1548839140-29a749e1bc4e?w=500' }}" alt="{{ $product->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                        <span class="absolute top-2.5 left-2.5 bg-slate-900/80 backdrop-blur text-white font-extrabold text-[10px] px-2.5 py-0.5 rounded-lg shadow-sm">
+                        <span class="absolute top-2 left-2 bg-slate-900/80 backdrop-blur text-white font-extrabold text-[9px] sm:text-[10px] px-2 py-0.5 rounded-md sm:rounded-lg shadow-sm">
                             {{ $product->volume }} {{ $product->unit }}
                         </span>
                         @if($product->volume == '20')
-                            <span class="absolute top-2.5 right-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-black text-[9px] uppercase px-2 py-0.5 rounded-md shadow-sm">
+                            <span class="absolute top-2 right-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-black text-[8px] sm:text-[9px] uppercase px-1.5 sm:px-2 py-0.5 rounded-md shadow-sm">
                                 Popular
                             </span>
                         @endif
                     </div>
 
-                    <h4 class="text-sm font-extrabold text-slate-900 leading-snug line-clamp-2 group-hover:text-ocean-600 transition-colors">{{ $product->name }}</h4>
-                    <p class="text-xs text-slate-400 line-clamp-2 mt-1">{{ $product->description }}</p>
+                    <h4 class="text-xs sm:text-sm font-extrabold text-slate-900 leading-snug line-clamp-2 group-hover:text-ocean-600 transition-colors">{{ $product->name }}</h4>
+                    <p class="text-[11px] sm:text-xs text-slate-400 line-clamp-1 sm:line-clamp-2 mt-0.5 sm:mt-1">{{ $product->description }}</p>
                 </div>
 
                 <!-- Product Pricing, Quantity Selector & Action Buttons -->
-                <div class="mt-4 pt-3 border-t border-slate-100 space-y-3">
+                <div class="mt-3 sm:mt-4 pt-2.5 sm:pt-3 border-t border-slate-100 space-y-2 sm:space-y-3">
                     <!-- Price and 1:1 Exchange badge -->
                     <div class="flex items-center justify-between">
                         <div>
                             <div class="flex items-baseline space-x-1">
-                                <span class="text-lg font-black text-slate-900">₹{{ number_format($product->selling_price, 2) }}</span>
+                                <span class="text-base sm:text-lg font-black text-slate-900">₹{{ number_format($product->selling_price, 2) }}</span>
                             </div>
-                            <span class="text-[10px] text-slate-400 block -mt-0.5">Incl. all taxes</span>
+                            <span class="text-[9px] sm:text-[10px] text-slate-400 block -mt-0.5">Incl. taxes</span>
                         </div>
-                        <span class="px-2 py-0.5 rounded-lg border border-sky-200 bg-sky-50 text-sky-700 text-[10px] font-bold">
-                            1:1 Exchange
+                        <span class="px-1.5 sm:px-2 py-0.5 rounded-md sm:rounded-lg border border-sky-200 bg-sky-50 text-sky-700 text-[9px] sm:text-[10px] font-bold">
+                            1:1 Exch.
                         </span>
                     </div>
 
                     <!-- Quantity Row -->
                     <div class="flex items-center justify-between text-xs text-slate-600">
-                        <span class="font-bold text-slate-500 text-[11px]">Quantity:</span>
-                        <div class="flex items-center border border-slate-200 rounded-full px-2 py-0.5 bg-slate-50/50 space-x-3">
+                        <span class="font-bold text-slate-500 text-[10px] sm:text-[11px]">Qty:</span>
+                        <div class="flex items-center border border-slate-200 rounded-full px-1.5 sm:px-2 py-0.5 bg-slate-50/50 space-x-2 sm:space-x-3">
                             <button type="button" class="btn-home-qty-minus text-slate-400 hover:text-slate-800 text-xs px-1 font-extrabold active:scale-95 transition">
-                                <i class="fa-solid fa-minus text-[10px]"></i>
+                                <i class="fa-solid fa-minus text-[9px] sm:text-[10px]"></i>
                             </button>
-                            <span class="home-qty-display font-black text-slate-800 text-xs w-4 text-center">1</span>
+                            <span class="home-qty-display font-black text-slate-800 text-[11px] sm:text-xs w-3 sm:w-4 text-center">1</span>
                             <button type="button" class="btn-home-qty-plus text-slate-400 hover:text-slate-800 text-xs px-1 font-extrabold active:scale-95 transition">
-                                <i class="fa-solid fa-plus text-[10px]"></i>
+                                <i class="fa-solid fa-plus text-[9px] sm:text-[10px]"></i>
                             </button>
                         </div>
                     </div>
 
                     <!-- Action Buttons: Add Cart & Buy Now -->
-                    <div class="grid grid-cols-2 gap-2 pt-1">
+                    <div class="grid grid-cols-2 gap-1.5 sm:gap-2 pt-1">
                         <!-- Add Cart Button -->
-                        <button type="button" class="btn-add-cart w-full py-2 px-2 rounded-xl border border-sky-200 bg-sky-50 hover:bg-sky-100 text-ocean-700 font-extrabold text-[11px] flex items-center justify-center space-x-1.5 transition active:scale-95 shadow-sm">
-                            <i class="fa-solid fa-bag-shopping text-xs"></i>
+                        <button type="button" class="btn-add-cart w-full py-1.5 sm:py-2 px-1 rounded-xl border border-sky-200 bg-sky-50 hover:bg-sky-100 text-ocean-700 font-extrabold text-[10px] sm:text-[11px] flex items-center justify-center space-x-1 transition active:scale-95 shadow-sm">
+                            <i class="fa-solid fa-bag-shopping text-[10px] sm:text-xs"></i>
                             <span>Add Cart</span>
                         </button>
 
                         <!-- Buy Now Button -->
-                        <button type="button" class="btn-buy-now w-full py-2 px-2 rounded-xl bg-gradient-to-r from-sky-600 to-ocean-700 hover:from-sky-700 hover:to-ocean-800 text-white font-extrabold text-[11px] flex items-center justify-center space-x-1.5 shadow-md shadow-sky-600/20 transition active:scale-95">
+                        <button type="button" class="btn-buy-now w-full py-1.5 sm:py-2 px-1 rounded-xl bg-gradient-to-r from-sky-600 to-ocean-700 hover:from-sky-700 hover:to-ocean-800 text-white font-extrabold text-[10px] sm:text-[11px] flex items-center justify-center space-x-1 shadow-md shadow-sky-600/20 transition active:scale-95">
                             <span>Buy Now</span>
-                            <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                            <i class="fa-solid fa-arrow-right text-[8px] sm:text-[10px]"></i>
                         </button>
                     </div>
                 </div>
@@ -219,73 +269,169 @@
 
 </div>
 
+<!-- Service Inquiry Modal for Home Page -->
+<div id="homeServiceInquiryModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl space-y-4">
+        <div class="flex items-center justify-between border-b pb-3">
+            <div>
+                <h3 id="homeInquiryServiceTitle" class="text-base font-black text-slate-900">Service Request</h3>
+                <p id="homeInquiryServiceSubtitle" class="text-xs text-slate-400">Doorstep assistance request</p>
+            </div>
+            <button type="button" onclick="closeHomeServiceInquiry()" class="text-slate-400 hover:text-slate-700 p-1">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+        
+        <form onsubmit="handleHomeInquirySubmit(event)" class="space-y-3.5 text-xs">
+            <div>
+                <label class="block font-bold text-slate-700 mb-1">Your Name</label>
+                <input type="text" id="homeInqName" value="{{ auth()->user()->name }}" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-ocean-500">
+            </div>
+            <div>
+                <label class="block font-bold text-slate-700 mb-1">Contact Mobile Number</label>
+                <input type="text" id="homeInqPhone" value="{{ auth()->user()->phone }}" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-ocean-500">
+            </div>
+            <div>
+                <label class="block font-bold text-slate-700 mb-1">Preferred Location / Notes</label>
+                <textarea id="homeInqNotes" rows="2" placeholder="e.g. Madipakkam / Sedan car wash / 2 BHK flat rental" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-ocean-500"></textarea>
+            </div>
+            <button type="submit" class="w-full py-3.5 rounded-2xl bg-ocean-600 hover:bg-ocean-700 text-white font-extrabold text-xs shadow-md shadow-sky-600/30 transition flex items-center justify-center space-x-2">
+                <span>Submit Request</span>
+                <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+        </form>
+    </div>
+</div>
+
 @push('scripts')
 <script>
+function openHomeServiceInquiry(title, subtitle) {
+    document.getElementById('homeInquiryServiceTitle').textContent = title;
+    document.getElementById('homeInquiryServiceSubtitle').textContent = subtitle;
+    const modal = document.getElementById('homeServiceInquiryModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+function closeHomeServiceInquiry() {
+    const modal = document.getElementById('homeServiceInquiryModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+function handleHomeInquirySubmit(e) {
+    e.preventDefault();
+    closeHomeServiceInquiry();
+    Swal.fire({
+        icon: 'success',
+        title: 'Request Received!',
+        text: 'Our team will contact you shortly regarding your service requirements.',
+        confirmButtonColor: '#0284c7'
+    });
+}
+</script>
+<script>
 $(document).ready(function() {
-    // Hero Banner Auto-Scrolling Carousel
+    // Hero Banner Auto-Scrolling Carousel (Smooth Right-to-Left Sliding)
+    const track = document.getElementById('heroTrack');
     const heroSlides = $('.hero-slide');
     const heroDots = $('.hero-dot');
-    const totalHeroSlides = heroSlides.length;
-    let currentHeroIndex = 0;
+    const totalRealSlides = heroSlides.length;
+    let trackIndex = 0;
     let heroAutoTimer = null;
+    let isAnimating = false;
 
-    function renderHeroSlide(index) {
-        if (totalHeroSlides <= 1) return;
-        if (index >= totalHeroSlides) index = 0;
-        if (index < 0) index = totalHeroSlides - 1;
-        currentHeroIndex = index;
+    if (track && totalRealSlides > 1) {
+        // Clone the first slide and append to track for infinite smooth loop
+        const firstClone = heroSlides.first().clone(true);
+        $(track).append(firstClone);
 
-        heroSlides.each(function(i) {
-            if (i === currentHeroIndex) {
-                $(this).removeClass('opacity-0 z-0 pointer-events-none').addClass('opacity-100 z-10 pointer-events-auto');
-            } else {
-                $(this).removeClass('opacity-100 z-10 pointer-events-auto').addClass('opacity-0 z-0 pointer-events-none');
-            }
-        });
-
-        heroDots.each(function(i) {
-            if (i === currentHeroIndex) {
-                $(this).removeClass('bg-white/50 w-2').addClass('bg-white w-5');
-            } else {
-                $(this).removeClass('bg-white w-5').addClass('bg-white/50 w-2');
-            }
-        });
-    }
-
-    function startHeroTimer() {
-        if (totalHeroSlides > 1 && !heroAutoTimer) {
-            heroAutoTimer = setInterval(function() {
-                renderHeroSlide(currentHeroIndex + 1);
-            }, 4000); // Automatically rotates every 4 seconds
+        function updateDots(activeIdx) {
+            heroDots.each(function(i) {
+                if (i === activeIdx) {
+                    $(this).removeClass('bg-white/50 w-2').addClass('bg-white w-5');
+                } else {
+                    $(this).removeClass('bg-white w-5').addClass('bg-white/50 w-2');
+                }
+            });
         }
-    }
 
-    function stopHeroTimer() {
-        if (heroAutoTimer) {
-            clearInterval(heroAutoTimer);
-            heroAutoTimer = null;
+        function moveToSlide(targetIndex, withAnimation = true) {
+            if (isAnimating && withAnimation) return;
+
+            if (withAnimation) {
+                isAnimating = true;
+                track.style.transition = 'transform 650ms cubic-bezier(0.25, 1, 0.5, 1)';
+            } else {
+                track.style.transition = 'none';
+            }
+
+            trackIndex = targetIndex;
+            track.style.transform = `translateX(-${trackIndex * 100}%)`;
+
+            // Active dot
+            const activeDot = trackIndex >= totalRealSlides ? 0 : trackIndex;
+            updateDots(activeDot);
+
+            if (withAnimation) {
+                setTimeout(() => {
+                    isAnimating = false;
+                    // When reaching the cloned first slide, jump silently to real slide 0
+                    if (trackIndex >= totalRealSlides) {
+                        track.style.transition = 'none';
+                        trackIndex = 0;
+                        track.style.transform = 'translateX(0%)';
+                    }
+                }, 650);
+            }
         }
-    }
 
-    if (totalHeroSlides > 1) {
+        function nextSlide() {
+            moveToSlide(trackIndex + 1, true);
+        }
+
+        function prevSlide() {
+            if (isAnimating) return;
+            if (trackIndex === 0) {
+                // Instantly snap to the clone at the end, then slide back to the last real slide
+                track.style.transition = 'none';
+                trackIndex = totalRealSlides;
+                track.style.transform = `translateX(-${trackIndex * 100}%)`;
+                void track.offsetHeight; // Force reflow
+                moveToSlide(totalRealSlides - 1, true);
+            } else {
+                moveToSlide(trackIndex - 1, true);
+            }
+        }
+
+        function startHeroTimer() {
+            if (!heroAutoTimer) {
+                heroAutoTimer = setInterval(nextSlide, 3500); // Smoothly moves right to left every 3.5s
+            }
+        }
+
+        function stopHeroTimer() {
+            if (heroAutoTimer) {
+                clearInterval(heroAutoTimer);
+                heroAutoTimer = null;
+            }
+        }
+
         startHeroTimer();
 
         // Pause on hover
         $('#heroBannerCarousel').on('mouseenter', stopHeroTimer).on('mouseleave', startHeroTimer);
 
-        // Previous button
+        // Controls
         $('#heroPrevBtn').on('click', function(e) {
             e.preventDefault();
             stopHeroTimer();
-            renderHeroSlide(currentHeroIndex - 1);
+            prevSlide();
             startHeroTimer();
         });
 
-        // Next button
         $('#heroNextBtn').on('click', function(e) {
             e.preventDefault();
             stopHeroTimer();
-            renderHeroSlide(currentHeroIndex + 1);
+            nextSlide();
             startHeroTimer();
         });
 
@@ -293,25 +439,34 @@ $(document).ready(function() {
         heroDots.on('click', function() {
             const idx = parseInt($(this).data('index'));
             stopHeroTimer();
-            renderHeroSlide(idx);
+            moveToSlide(idx, true);
             startHeroTimer();
         });
 
-        // Touch swipe support for mobile devices
+        // Touch swipe support for mobile
         let startX = 0;
+        let startY = 0;
         const carouselEl = document.getElementById('heroBannerCarousel');
         if (carouselEl) {
             carouselEl.addEventListener('touchstart', function(e) {
                 startX = e.changedTouches[0].screenX;
+                startY = e.changedTouches[0].screenY;
                 stopHeroTimer();
             }, { passive: true });
 
             carouselEl.addEventListener('touchend', function(e) {
                 const endX = e.changedTouches[0].screenX;
-                if (startX - endX > 45) {
-                    renderHeroSlide(currentHeroIndex + 1);
-                } else if (endX - startX > 45) {
-                    renderHeroSlide(currentHeroIndex - 1);
+                const endY = e.changedTouches[0].screenY;
+                const diffX = startX - endX;
+                const diffY = startY - endY;
+
+                // Ensure it's predominantly a horizontal swipe
+                if (Math.abs(diffX) > Math.abs(diffY)) {
+                    if (diffX > 40) {
+                        nextSlide(); // Swipe left -> advance slide right-to-left
+                    } else if (diffX < -40) {
+                        prevSlide(); // Swipe right -> previous slide
+                    }
                 }
                 startHeroTimer();
             }, { passive: true });

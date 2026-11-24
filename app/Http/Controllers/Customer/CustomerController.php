@@ -18,6 +18,7 @@ use App\Notifications\NewCustomerOrderAdminNotification;
 use App\Notifications\OrderCancelledAdminNotification;
 use App\Models\User;
 use App\Models\Banner;
+use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -57,13 +58,15 @@ class CustomerController extends Controller
         $defaultAddress = $user->defaultAddress ?: $user->addresses()->first();
 
         $banners = Banner::where('is_active', true)->orderBy('display_order', 'asc')->get();
+        $services = Service::where('is_active', true)->orderBy('display_order', 'asc')->get();
 
-        return view('customer.home', compact('user', 'profile', 'categories', 'featuredProducts', 'upcomingDeliveries', 'recentOrders', 'defaultAddress', 'banners'));
+        return view('customer.home', compact('user', 'profile', 'categories', 'featuredProducts', 'upcomingDeliveries', 'recentOrders', 'defaultAddress', 'banners', 'services'));
     }
 
     public function services()
     {
-        return view('customer.services');
+        $services = Service::where('is_active', true)->orderBy('display_order', 'asc')->get();
+        return view('customer.services', compact('services'));
     }
 
     public function products()

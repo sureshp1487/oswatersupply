@@ -168,6 +168,15 @@
                     </div>
                 </a>
 
+                <!-- Available Services Menu (Water Can, Car Wash, Rental House) -->
+                <a href="{{ route('admin.services.index') }}" class="flex items-center space-x-3 px-3 py-2.5 rounded-xl transition {{ request()->routeIs('admin.services*') ? 'bg-indigo-600 text-white font-bold shadow-lg shadow-indigo-600/30' : 'hover:bg-slate-900 hover:text-white' }}">
+                    <i class="fa-solid fa-bell-concierge w-5 text-sm text-cyan-400"></i>
+                    <div class="flex items-center justify-between flex-1">
+                        <span>Available Services</span>
+                        <span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-cyan-500/30 text-cyan-300 uppercase tracking-tighter">Services</span>
+                    </div>
+                </a>
+
                 <!-- Brand & Dashboard Customization Menu -->
                 <a href="{{ route('admin.customization.index') }}" class="flex items-center space-x-3 px-3 py-2.5 rounded-xl transition {{ request()->routeIs('admin.customization*') ? 'bg-indigo-600 text-white font-bold shadow-lg shadow-indigo-600/30' : 'hover:bg-slate-900 hover:text-white' }}">
                     <i class="fa-solid fa-wand-magic-sparkles w-5 text-sm text-indigo-400"></i>

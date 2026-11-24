@@ -17,119 +17,174 @@
         <div class="absolute -right-8 -bottom-8 w-36 h-36 rounded-full bg-white/10 pointer-events-none"></div>
     </div>
 
-    <!-- 3 Services Grid -->
+    <!-- Services Grid -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-
-        <!-- 1. Water Can Supply -->
-        <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-sm hover:shadow-md hover:border-ocean-500 transition-all flex flex-col justify-between group">
-            <div class="space-y-4">
-                <div class="w-14 h-14 rounded-2xl bg-sky-50 text-ocean-600 flex items-center justify-center text-2xl group-hover:bg-ocean-600 group-hover:text-white transition-all shadow-sm">
-                    <i class="fa-solid fa-bottle-water"></i>
-                </div>
-                <div>
-                    <div class="flex items-center space-x-2">
-                        <h2 class="text-lg font-black text-slate-900">Water Can Supply</h2>
-                        <span class="text-[10px] bg-emerald-50 text-emerald-700 font-extrabold px-2 py-0.5 rounded-full border border-emerald-200">Active</span>
+        @if(isset($services) && $services->count() > 0)
+            @foreach($services as $srv)
+            <div class="bg-white hover:bg-sky-50/50 rounded-3xl p-5 sm:p-6 border border-slate-200/90 hover:border-ocean-500 shadow-sm hover:shadow-xl hover:-translate-y-1.5 hover:ring-2 hover:ring-ocean-500/15 transition-all duration-300 flex flex-col justify-between group">
+                <div class="space-y-4">
+                    <!-- Image Card with Badge -->
+                    <div class="relative w-full h-44 rounded-2xl overflow-hidden bg-slate-900">
+                        <img src="{{ $srv->image_path }}" alt="{{ $srv->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent flex flex-col justify-end p-3.5 text-white">
+                            <span class="text-xs text-sky-200 font-bold block drop-shadow">{{ $srv->tagline }}</span>
+                        </div>
+                        @if($srv->badge_text)
+                        <div class="absolute top-2.5 left-2.5">
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-white/95 text-slate-900 backdrop-blur shadow-sm">
+                                {{ $srv->badge_text }}
+                            </span>
+                        </div>
+                        @endif
                     </div>
-                    <p class="text-xs text-slate-500 mt-1 leading-relaxed">
-                        100% hygienic, lab-tested 20-litre and 10-litre packaged drinking water cans delivered right to your doorstep.
-                    </p>
-                </div>
-                <ul class="text-xs text-slate-600 space-y-2 pt-2 border-t border-slate-100">
-                    <li class="flex items-center space-x-2">
-                        <i class="fa-solid fa-circle-check text-ocean-600 text-[11px]"></i>
-                        <span>1:1 empty container digital ledger</span>
-                    </li>
-                    <li class="flex items-center space-x-2">
-                        <i class="fa-solid fa-circle-check text-ocean-600 text-[11px]"></i>
-                        <span>Morning & evening scheduled slots</span>
-                    </li>
-                    <li class="flex items-center space-x-2">
-                        <i class="fa-solid fa-circle-check text-ocean-600 text-[11px]"></i>
-                        <span>Cash on Delivery & Razorpay UPI</span>
-                    </li>
-                </ul>
-            </div>
-            <div class="pt-6">
-                <a href="{{ route('customer.cart') }}" class="block w-full py-3 rounded-2xl bg-ocean-600 hover:bg-ocean-700 text-white font-extrabold text-xs text-center shadow-md shadow-sky-600/25 active:scale-95 transition-all">
-                    Order Water Cans Now &rarr;
-                </a>
-            </div>
-        </div>
 
-        <!-- 2. Car Wash -->
-        <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-sm hover:shadow-md hover:border-cyan-500 transition-all flex flex-col justify-between group">
-            <div class="space-y-4">
-                <div class="w-14 h-14 rounded-2xl bg-cyan-50 text-cyan-600 flex items-center justify-center text-2xl group-hover:bg-cyan-600 group-hover:text-white transition-all shadow-sm">
-                    <i class="fa-solid fa-car-wash"></i>
-                </div>
-                <div>
-                    <div class="flex items-center space-x-2">
-                        <h2 class="text-lg font-black text-slate-900">Doorstep Car Wash</h2>
-                        <span class="text-[10px] bg-sky-50 text-sky-700 font-extrabold px-2 py-0.5 rounded-full border border-sky-200">New</span>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <h2 class="text-lg font-black text-slate-900 group-hover:text-ocean-600 transition-colors">{{ $srv->name }}</h2>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                            {{ $srv->description }}
+                        </p>
                     </div>
-                    <p class="text-xs text-slate-500 mt-1 leading-relaxed">
-                        Professional pressure wash, foam cleaning, and interior vacuuming at your apartment parking or villa doorstep.
-                    </p>
-                </div>
-                <ul class="text-xs text-slate-600 space-y-2 pt-2 border-t border-slate-100">
-                    <li class="flex items-center space-x-2">
-                        <i class="fa-solid fa-circle-check text-cyan-600 text-[11px]"></i>
-                        <span>Eco-friendly water-saving foam wash</span>
-                    </li>
-                    <li class="flex items-center space-x-2">
-                        <i class="fa-solid fa-circle-check text-cyan-600 text-[11px]"></i>
-                        <span>Interior vacuum & dashboard polish</span>
-                    </li>
-                    <li class="flex items-center space-x-2">
-                        <i class="fa-solid fa-circle-check text-cyan-600 text-[11px]"></i>
-                        <span>Daily & alternate day subscription plans</span>
-                    </li>
-                </ul>
-            </div>
-            <div class="pt-6">
-                <button type="button" onclick="openServiceInquiry('Car Wash', 'Doorstep pressure foam wash and interior vacuuming')" class="block w-full py-3 rounded-2xl bg-white border border-slate-200 text-slate-800 hover:bg-cyan-600 hover:text-white hover:border-cyan-600 font-extrabold text-xs text-center transition-all">
-                    Book Car Wash &rarr;
-                </button>
-            </div>
-        </div>
 
-        <!-- 3. Rental House, Lease, Buy & Sales -->
-        <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-sm hover:shadow-md hover:border-indigo-500 transition-all flex flex-col justify-between group">
-            <div class="space-y-4">
-                <div class="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-2xl group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm">
-                    <i class="fa-solid fa-building-circle-check"></i>
+                    @if(!empty($srv->features) && count($srv->features) > 0)
+                    <ul class="text-xs text-slate-600 space-y-2 pt-2 border-t border-slate-100 group-hover:border-ocean-100 transition-colors">
+                        @foreach(array_slice($srv->features, 0, 3) as $feat)
+                        <li class="flex items-center space-x-2">
+                            <i class="fa-solid fa-circle-check text-ocean-600 text-[11px] shrink-0"></i>
+                            <span>{{ $feat }}</span>
+                        </li>
+                        @endforeach
+                    </ul>
+                    @endif
                 </div>
-                <div>
-                    <div class="flex items-center space-x-2">
-                        <h2 class="text-lg font-black text-slate-900">Rental, Lease & Property Sales</h2>
-                        <span class="text-[10px] bg-indigo-50 text-indigo-700 font-extrabold px-2 py-0.5 rounded-full border border-indigo-200">Verified</span>
+
+                <div class="pt-6">
+                    @if($srv->action_url && !str_starts_with($srv->action_url, '#'))
+                    <a href="{{ $srv->action_url }}" class="block w-full py-3 rounded-2xl bg-ocean-600 hover:bg-ocean-700 text-white font-extrabold text-xs text-center shadow-md shadow-ocean-600/25 active:scale-95 transition-all">
+                        {{ $srv->action_text ?: 'Order Now' }} &rarr;
+                    </a>
+                    @else
+                    <button type="button" onclick="openServiceInquiry('{{ addslashes($srv->name) }}', '{{ addslashes($srv->tagline ?? $srv->description ?? 'Service request') }}')" class="block w-full py-3 rounded-2xl bg-ocean-600 hover:bg-ocean-700 text-white font-extrabold text-xs text-center shadow-md shadow-ocean-600/25 active:scale-95 transition-all">
+                        {{ $srv->action_text ?: 'Book Service' }} &rarr;
+                    </button>
+                    @endif
+                </div>
+            </div>
+            @endforeach
+        @else
+            <!-- 1. Water Can Supply -->
+            <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-sm hover:shadow-md hover:border-ocean-500 transition-all flex flex-col justify-between group">
+                <div class="space-y-4">
+                    <div class="w-14 h-14 rounded-2xl bg-sky-50 text-ocean-600 flex items-center justify-center text-2xl group-hover:bg-ocean-600 group-hover:text-white transition-all shadow-sm">
+                        <i class="fa-solid fa-bottle-water"></i>
                     </div>
-                    <p class="text-xs text-slate-500 mt-1 leading-relaxed">
-                        Verified residential and commercial rental houses, long-term leases, flats, plots, and property buying/selling assistance.
-                    </p>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <h2 class="text-lg font-black text-slate-900">Water Can Supply</h2>
+                            <span class="text-[10px] bg-emerald-50 text-emerald-700 font-extrabold px-2 py-0.5 rounded-full border border-emerald-200">Active</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                            100% hygienic, lab-tested 20-litre and 10-litre packaged drinking water cans delivered right to your doorstep.
+                        </p>
+                    </div>
+                    <ul class="text-xs text-slate-600 space-y-2 pt-2 border-t border-slate-100">
+                        <li class="flex items-center space-x-2">
+                            <i class="fa-solid fa-circle-check text-ocean-600 text-[11px]"></i>
+                            <span>1:1 empty container digital ledger</span>
+                        </li>
+                        <li class="flex items-center space-x-2">
+                            <i class="fa-solid fa-circle-check text-ocean-600 text-[11px]"></i>
+                            <span>Morning & evening scheduled slots</span>
+                        </li>
+                        <li class="flex items-center space-x-2">
+                            <i class="fa-solid fa-circle-check text-ocean-600 text-[11px]"></i>
+                            <span>Cash on Delivery & Razorpay UPI</span>
+                        </li>
+                    </ul>
                 </div>
-                <ul class="text-xs text-slate-600 space-y-2 pt-2 border-t border-slate-100">
-                    <li class="flex items-center space-x-2">
-                        <i class="fa-solid fa-circle-check text-indigo-600 text-[11px]"></i>
-                        <span>1 BHK, 2 BHK, 3 BHK & Independent villas</span>
-                    </li>
-                    <li class="flex items-center space-x-2">
-                        <i class="fa-solid fa-circle-check text-indigo-600 text-[11px]"></i>
-                        <span>Lease agreements & document assistance</span>
-                    </li>
-                    <li class="flex items-center space-x-2">
-                        <i class="fa-solid fa-circle-check text-indigo-600 text-[11px]"></i>
-                        <span>Direct owner verified listings</span>
-                    </li>
-                </ul>
+                <div class="pt-6">
+                    <a href="{{ route('customer.cart') }}" class="block w-full py-3 rounded-2xl bg-ocean-600 hover:bg-ocean-700 text-white font-extrabold text-xs text-center shadow-md shadow-sky-600/25 active:scale-95 transition-all">
+                        Order Water Cans Now &rarr;
+                    </a>
+                </div>
             </div>
-            <div class="pt-6">
-                <button type="button" onclick="openServiceInquiry('Rental & Property Services', 'Rental houses, commercial lease, buy and property sale assistance')" class="block w-full py-3 rounded-2xl bg-white border border-slate-200 text-slate-800 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 font-extrabold text-xs text-center transition-all">
-                    Explore Properties &rarr;
-                </button>
+
+            <!-- 2. Car Wash -->
+            <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-sm hover:shadow-md hover:border-cyan-500 transition-all flex flex-col justify-between group">
+                <div class="space-y-4">
+                    <div class="w-14 h-14 rounded-2xl bg-cyan-50 text-cyan-600 flex items-center justify-center text-2xl group-hover:bg-cyan-600 group-hover:text-white transition-all shadow-sm">
+                        <i class="fa-solid fa-car-wash"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <h2 class="text-lg font-black text-slate-900">Doorstep Car Wash</h2>
+                            <span class="text-[10px] bg-sky-50 text-sky-700 font-extrabold px-2 py-0.5 rounded-full border border-sky-200">New</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                            Professional pressure wash, foam cleaning, and interior vacuuming at your apartment parking or villa doorstep.
+                        </p>
+                    </div>
+                    <ul class="text-xs text-slate-600 space-y-2 pt-2 border-t border-slate-100">
+                        <li class="flex items-center space-x-2">
+                            <i class="fa-solid fa-circle-check text-cyan-600 text-[11px]"></i>
+                            <span>Eco-friendly water-saving foam wash</span>
+                        </li>
+                        <li class="flex items-center space-x-2">
+                            <i class="fa-solid fa-circle-check text-cyan-600 text-[11px]"></i>
+                            <span>Interior vacuum & dashboard polish</span>
+                        </li>
+                        <li class="flex items-center space-x-2">
+                            <i class="fa-solid fa-circle-check text-cyan-600 text-[11px]"></i>
+                            <span>Daily & alternate day subscription plans</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="pt-6">
+                    <button type="button" onclick="openServiceInquiry('Car Wash', 'Doorstep pressure foam wash and interior vacuuming')" class="block w-full py-3 rounded-2xl bg-white border border-slate-200 text-slate-800 hover:bg-cyan-600 hover:text-white hover:border-cyan-600 font-extrabold text-xs text-center transition-all">
+                        Book Car Wash &rarr;
+                    </button>
+                </div>
             </div>
-        </div>
+
+            <!-- 3. Rental House, Lease, Buy & Sales -->
+            <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-sm hover:shadow-md hover:border-indigo-500 transition-all flex flex-col justify-between group">
+                <div class="space-y-4">
+                    <div class="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-2xl group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm">
+                        <i class="fa-solid fa-building-circle-check"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <h2 class="text-lg font-black text-slate-900">Rental, Lease & Property Sales</h2>
+                            <span class="text-[10px] bg-indigo-50 text-indigo-700 font-extrabold px-2 py-0.5 rounded-full border border-indigo-200">Verified</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                            Verified residential and commercial rental houses, long-term leases, flats, plots, and property buying/selling assistance.
+                        </p>
+                    </div>
+                    <ul class="text-xs text-slate-600 space-y-2 pt-2 border-t border-slate-100">
+                        <li class="flex items-center space-x-2">
+                            <i class="fa-solid fa-circle-check text-indigo-600 text-[11px]"></i>
+                            <span>1 BHK, 2 BHK, 3 BHK & Independent villas</span>
+                        </li>
+                        <li class="flex items-center space-x-2">
+                            <i class="fa-solid fa-circle-check text-indigo-600 text-[11px]"></i>
+                            <span>Lease agreements & document assistance</span>
+                        </li>
+                        <li class="flex items-center space-x-2">
+                            <i class="fa-solid fa-circle-check text-indigo-600 text-[11px]"></i>
+                            <span>Direct owner verified listings</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="pt-6">
+                    <button type="button" onclick="openServiceInquiry('Rental & Property Services', 'Rental houses, commercial lease, buy and property sale assistance')" class="block w-full py-3 rounded-2xl bg-white border border-slate-200 text-slate-800 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 font-extrabold text-xs text-center transition-all">
+                        Explore Properties &rarr;
+                    </button>
+                </div>
+            </div>
+        @endif
+    </div>
 
     </div>
 
