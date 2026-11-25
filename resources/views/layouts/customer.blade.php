@@ -184,7 +184,7 @@
 
                 <!-- Mobile: Show Customer Name (Brand Name Removed on Mobile) -->
                 <a href="{{ route('customer.profile') }}" class="flex sm:hidden items-center space-x-2.5 min-w-0 py-0.5">
-                    <div class="w-8 h-8 rounded-full bg-[#18b59b] flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-sm">
+                    <div class="w-8 h-8 rounded-full bg-sky-400 flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-sm">
                         <i class="fa-solid fa-user"></i>
                     </div>
                     <div class="min-w-0">
@@ -193,55 +193,86 @@
                     </div>
                 </a>
 
-                <!-- Desktop / Tablet Navigation Links -->
-                <nav class="hidden md:flex items-center space-x-1 ml-6 text-xs font-bold text-slate-600">
-                    <a href="{{ route('customer.home') }}" class="px-3 py-2 rounded-xl transition {{ request()->routeIs('customer.home') ? 'bg-sky-50 text-ocean-600' : 'hover:bg-slate-50' }}">
-                        <i class="fa-solid fa-house mr-1"></i> Home
+                <!-- Desktop / Tablet Navigation Links (Redesigned: Home, Products, Services, Subscriptions) -->
+                <nav class="hidden md:flex items-center space-x-1.5 ml-6 text-xs font-bold bg-slate-100/70 p-1 rounded-2xl border border-slate-200/50">
+                    <a href="{{ route('customer.home') }}" class="px-3.5 py-1.5 rounded-xl transition flex items-center space-x-1.5 {{ request()->routeIs('customer.home') ? 'bg-white text-sky-700 shadow-xs font-black' : 'text-slate-600 hover:text-slate-900 hover:bg-white/60 font-bold' }}">
+                        <i class="fa-solid fa-house text-xs {{ request()->routeIs('customer.home') ? 'text-sky-500' : 'text-slate-400' }}"></i>
+                        <span>Home</span>
                     </a>
-                    <a href="{{ route('customer.services') }}" class="px-3 py-2 rounded-xl transition {{ request()->routeIs('customer.services') ? 'bg-sky-50 text-ocean-600' : 'hover:bg-slate-50' }}">
-                        <i class="fa-solid fa-bell-concierge mr-1"></i> Services
+                    <a href="{{ route('customer.products') }}" class="px-3.5 py-1.5 rounded-xl transition flex items-center space-x-1.5 {{ request()->routeIs('customer.products*') ? 'bg-white text-sky-700 shadow-xs font-black' : 'text-slate-600 hover:text-slate-900 hover:bg-white/60 font-bold' }}">
+                        <i class="fa-solid fa-bottle-water text-xs {{ request()->routeIs('customer.products*') ? 'text-sky-500' : 'text-slate-400' }}"></i>
+                        <span>Products</span>
                     </a>
-                    <a href="{{ route('customer.subscriptions.index') }}" class="px-3 py-2 rounded-xl transition {{ request()->routeIs('customer.subscriptions*') ? 'bg-sky-50 text-ocean-600' : 'hover:bg-slate-50' }}">
-                        <i class="fa-solid fa-repeat mr-1"></i> Subscriptions
+                    <a href="{{ route('customer.services') }}" class="px-3.5 py-1.5 rounded-xl transition flex items-center space-x-1.5 {{ request()->routeIs('customer.services*') ? 'bg-white text-sky-700 shadow-xs font-black' : 'text-slate-600 hover:text-slate-900 hover:bg-white/60 font-bold' }}">
+                        <i class="fa-solid fa-bell-concierge text-xs {{ request()->routeIs('customer.services*') ? 'text-sky-500' : 'text-slate-400' }}"></i>
+                        <span>Services</span>
                     </a>
-                    <a href="{{ route('customer.orders') }}" class="px-3 py-2 rounded-xl transition {{ request()->routeIs('customer.orders*') ? 'bg-sky-50 text-ocean-600' : 'hover:bg-slate-50' }}">
-                        <i class="fa-solid fa-boxes-stacked mr-1"></i> My Orders
-                    </a>
-                    <a href="{{ route('customer.payments') }}" class="px-3 py-2 rounded-xl transition {{ request()->routeIs('customer.payments') ? 'bg-sky-50 text-ocean-600' : 'hover:bg-slate-50' }}">
-                        <i class="fa-solid fa-wallet mr-1"></i> Payments & Dues
+                    <a href="{{ route('customer.subscriptions.index') }}" class="px-3.5 py-1.5 rounded-xl transition flex items-center space-x-1.5 {{ request()->routeIs('customer.subscriptions*') ? 'bg-white text-sky-700 shadow-xs font-black' : 'text-slate-600 hover:text-slate-900 hover:bg-white/60 font-bold' }}">
+                        <i class="fa-solid fa-repeat text-xs {{ request()->routeIs('customer.subscriptions*') ? 'text-sky-500' : 'text-slate-400' }}"></i>
+                        <span>Subscriptions</span>
                     </a>
                 </nav>
             </div>
 
-            <!-- Header Action Links -->
+            <!-- Header Action Links (Desktop & Mobile) -->
             <div class="flex items-center space-x-2 sm:space-x-3 shrink-0">
-                <!-- PWA Install Button (Desktop & Tablet only; hidden on mobile header to prevent horizontal wrapping) -->
+                <!-- PWA Install Button (Desktop & Tablet only) -->
                 <button id="pwaInstallHeaderBtn" onclick="triggerPwaInstall()" class="hidden md:inline-flex items-center space-x-1.5 px-3 py-1.5 text-xs font-bold bg-sky-50 hover:bg-sky-100 text-ocean-700 border border-sky-200 rounded-full shadow-sm transition-all animate-pulse">
                     <i class="fa-solid fa-cloud-arrow-down text-ocean-600"></i>
                     <span>Install App</span>
                 </button>
 
-                <!-- Header Cart Icon with Live Badge -->
-                <a href="{{ route('customer.cart') }}" id="headerCartBtn" class="relative p-2 text-slate-600 hover:text-ocean-600 rounded-full hover:bg-slate-100 transition {{ request()->routeIs('customer.cart', 'customer.book') ? 'text-ocean-600 bg-sky-50' : '' }}" title="My Cart">
-                    <i class="fa-solid fa-cart-shopping text-lg"></i>
-                    <span id="headerCartBadge" class="absolute -top-0.5 -right-0.5 w-5 h-5 bg-sky-600 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white shadow-sm hidden">
-                        0
-                    </span>
-                </a>
+                <!-- Search Button (Desktop: Light Blue Circle with White Magnifying Glass) -->
+                <button type="button" onclick="openSearchModal()" class="hidden sm:flex w-9 h-9 rounded-full bg-sky-400 hover:bg-sky-500 text-white items-center justify-center transition shadow-sm" title="Search products & services">
+                    <i class="fa-solid fa-magnifying-glass text-sm"></i>
+                </button>
 
-                <div class="hidden sm:flex items-center space-x-2 pl-2 border-l border-slate-200">
-                    <a href="{{ route('customer.profile') }}" class="text-xs font-bold text-slate-700 hover:text-ocean-600 flex items-center space-x-1.5">
-                        <i class="fa-solid fa-circle-user text-base text-ocean-600"></i>
-                        <span>{{ auth()->user()->name }}</span>
-                    </a>
+                <!-- Desktop User Profile Dropdown -->
+                <div class="relative hidden sm:block" id="desktopUserDropdownContainer">
+                    <button type="button" id="desktopUserMenuBtn" onclick="toggleDesktopUserMenu(event)" class="flex items-center space-x-2 py-1 px-1.5 rounded-full hover:bg-slate-100/80 transition focus:outline-none select-none">
+                        <!-- Light Blue Circle with User Outline Icon -->
+                        <div class="w-9 h-9 rounded-full bg-sky-400 text-white flex items-center justify-center shrink-0 shadow-sm">
+                            <i class="fa-regular fa-user text-sm"></i>
+                        </div>
+                        <span class="text-sm font-semibold text-slate-800 leading-tight max-w-[130px] truncate">{{ auth()->user()->name }}</span>
+                        <i class="fa-solid fa-chevron-down text-xs text-slate-600 transition-transform duration-200" id="desktopUserChevron"></i>
+                    </button>
+
+                    <!-- Dropdown Menu Box -->
+                    <div id="desktopUserMenuDropdown" class="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-slate-100 py-2.5 z-50 transform origin-top-right transition-all duration-200 hidden">
+                        <a href="javascript:void(0)" onclick="closeDesktopUserMenu(); openModal('profileDetailsModal');" class="block px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-sky-50 hover:text-sky-700 transition">
+                            Account Settings
+                        </a>
+                        <a href="javascript:void(0)" onclick="closeDesktopUserMenu(); openModal('addressBookModal');" class="block px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-sky-50 hover:text-sky-700 transition">
+                            Manage Addresses
+                        </a>
+                        <a href="{{ route('customer.orders') }}" class="block px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-sky-50 hover:text-sky-700 transition">
+                            My Orders
+                        </a>
+                        <a href="{{ route('customer.subscriptions.index') }}" class="block px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-sky-50 hover:text-sky-700 transition">
+                            My Subscriptions
+                        </a>
+                        <a href="javascript:void(0)" onclick="closeDesktopUserMenu(); openModal('walletModal');" class="block px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-sky-50 hover:text-sky-700 transition">
+                            {{ explode(' ', $appSettings['business_name'] ?? 'AquaFlow')[0] }} Wallet
+                        </a>
+                        <a href="javascript:void(0)" onclick="closeDesktopUserMenu(); openModal('returnJarModal');" class="block px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-sky-50 hover:text-sky-700 transition">
+                            Return Jar
+                        </a>
+                        <a href="javascript:void(0)" onclick="closeDesktopUserMenu(); confirmLogout();" class="block px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-rose-50 hover:text-rose-600 transition">
+                            Logout
+                        </a>
+                    </div>
                 </div>
 
-                <form action="{{ route('logout') }}" method="POST" class="hidden sm:inline" onsubmit="if(window.CartManager){ window.CartManager.saveCart({}); }">
-                    @csrf
-                    <button type="submit" class="p-2 text-slate-400 hover:text-rose-600 rounded-full hover:bg-slate-100 transition" title="Logout">
-                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                    </button>
-                </form>
+                <!-- Header Cart Icon with Live Badge (Desktop: Light Blue Circle) -->
+                <div class="relative">
+                    <a href="{{ route('customer.cart') }}" id="headerCartBtn" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-sky-400 hover:bg-sky-500 text-white flex items-center justify-center transition shadow-sm {{ request()->routeIs('customer.cart', 'customer.book') ? 'ring-2 ring-sky-400/50' : '' }}" title="My Cart">
+                        <i class="fa-solid fa-cart-shopping text-sm"></i>
+                    </a>
+                    <span id="headerCartBadge" class="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1 bg-[#d4ba54] text-slate-900 text-[11px] font-black rounded-full flex items-center justify-center border-2 border-white shadow-sm hidden">
+                        0
+                    </span>
+                </div>
             </div>
         </div>
     </header>
@@ -287,44 +318,71 @@
         @yield('content')
     </main>
 
-    <!-- Customer Mobile Bottom Navigation Bar -->
-    <nav class="md:hidden fixed bottom-0 inset-x-0 z-50 bg-white/95 backdrop-blur border-t border-slate-200/80 shadow-lg pb-safe-nav">
-        <div class="max-w-md mx-auto px-4 h-16 flex items-center justify-around">
-            <!-- Services (Left First) -->
-            <a href="{{ route('customer.services') }}" class="flex flex-col items-center justify-center flex-1 py-1 {{ request()->routeIs('customer.services') ? 'text-ocean-600 font-bold' : 'text-slate-500 hover:text-slate-800' }}">
-                <i class="fa-solid fa-bell-concierge text-lg mb-1"></i>
-                <span class="text-[11px]">Services</span>
+    <!-- Customer Mobile Bottom Navigation Bar (Redesigned: Home, Products, Services, Profile) -->
+    <nav class="md:hidden fixed bottom-0 inset-x-0 z-50 bg-white/95 backdrop-blur-xl border-t border-slate-200/80 shadow-[0_-8px_30px_rgba(0,0,0,0.08)] pb-safe-nav">
+        <div class="max-w-md mx-auto px-2 h-16 flex items-center justify-around">
+            <!-- 1. Home -->
+            <a href="{{ route('customer.home') }}" class="flex flex-col items-center justify-center flex-1 py-1 px-1 relative transition-all group active:scale-95 select-none">
+                @if(request()->routeIs('customer.home'))
+                    <span class="absolute top-0 w-8 h-1 rounded-full bg-gradient-to-r from-sky-400 to-ocean-600 shadow-xs shadow-sky-500/40"></span>
+                    <div class="w-10 h-7 rounded-xl bg-sky-50 flex items-center justify-center text-sky-600 text-base mb-0.5">
+                        <i class="fa-solid fa-house"></i>
+                    </div>
+                    <span class="text-[11px] font-black text-sky-700 tracking-tight leading-none">Home</span>
+                @else
+                    <div class="w-10 h-7 flex items-center justify-center text-slate-400 group-hover:text-slate-700 text-base mb-0.5 transition-colors">
+                        <i class="fa-solid fa-house"></i>
+                    </div>
+                    <span class="text-[11px] font-semibold text-slate-500 group-hover:text-slate-800 tracking-tight leading-none">Home</span>
+                @endif
             </a>
 
-            <!-- Orders -->
-            <a href="{{ route('customer.orders') }}" class="flex flex-col items-center justify-center flex-1 py-1 {{ request()->routeIs('customer.orders*') ? 'text-ocean-600 font-bold' : 'text-slate-500 hover:text-slate-800' }}">
-                <i class="fa-solid fa-boxes-stacked text-lg mb-1"></i>
-                <span class="text-[11px]">My Orders</span>
+            <!-- 2. Products -->
+            <a href="{{ route('customer.products') }}" class="flex flex-col items-center justify-center flex-1 py-1 px-1 relative transition-all group active:scale-95 select-none">
+                @if(request()->routeIs('customer.products*'))
+                    <span class="absolute top-0 w-8 h-1 rounded-full bg-gradient-to-r from-sky-400 to-ocean-600 shadow-xs shadow-sky-500/40"></span>
+                    <div class="w-10 h-7 rounded-xl bg-sky-50 flex items-center justify-center text-sky-600 text-base mb-0.5">
+                        <i class="fa-solid fa-bottle-water"></i>
+                    </div>
+                    <span class="text-[11px] font-black text-sky-700 tracking-tight leading-none">Products</span>
+                @else
+                    <div class="w-10 h-7 flex items-center justify-center text-slate-400 group-hover:text-slate-700 text-base mb-0.5 transition-colors">
+                        <i class="fa-solid fa-bottle-water"></i>
+                    </div>
+                    <span class="text-[11px] font-semibold text-slate-500 group-hover:text-slate-800 tracking-tight leading-none">Products</span>
+                @endif
             </a>
 
-            <!-- Prominent Center Home Floating Action Button -->
-            <div class="flex-1 flex justify-center -mt-6">
-                <a href="{{ route('customer.home') }}" class="w-14 h-14 rounded-full water-wave-bg text-white shadow-xl shadow-sky-600/35 flex flex-col items-center justify-center border-4 border-slate-50 hover:scale-105 active:scale-95 transition-transform relative {{ request()->routeIs('customer.home') ? 'ring-2 ring-ocean-500' : '' }}">
-                    <i class="fa-solid fa-house text-xl"></i>
-                    <span class="text-[9px] font-extrabold uppercase mt-0.5 tracking-tighter">Home</span>
-                </a>
-            </div>
-
-            <!-- Payments & Dues -->
-            <a href="{{ route('customer.payments') }}" class="flex flex-col items-center justify-center flex-1 py-1 relative {{ request()->routeIs('customer.payments') ? 'text-ocean-600 font-bold' : 'text-slate-500 hover:text-slate-800' }}">
-                <div class="relative">
-                    <i class="fa-solid fa-receipt text-lg mb-1"></i>
-                    @if(auth()->user()->customerProfile && auth()->user()->customerProfile->total_due_balance > 0)
-                        <span class="absolute -top-1 -right-1.5 w-2 h-2 bg-rose-500 rounded-full"></span>
-                    @endif
-                </div>
-                <span class="text-[11px]">Payments</span>
+            <!-- 3. Services -->
+            <a href="{{ route('customer.services') }}" class="flex flex-col items-center justify-center flex-1 py-1 px-1 relative transition-all group active:scale-95 select-none">
+                @if(request()->routeIs('customer.services*'))
+                    <span class="absolute top-0 w-8 h-1 rounded-full bg-gradient-to-r from-sky-400 to-ocean-600 shadow-xs shadow-sky-500/40"></span>
+                    <div class="w-10 h-7 rounded-xl bg-sky-50 flex items-center justify-center text-sky-600 text-base mb-0.5">
+                        <i class="fa-solid fa-bell-concierge"></i>
+                    </div>
+                    <span class="text-[11px] font-black text-sky-700 tracking-tight leading-none">Services</span>
+                @else
+                    <div class="w-10 h-7 flex items-center justify-center text-slate-400 group-hover:text-slate-700 text-base mb-0.5 transition-colors">
+                        <i class="fa-solid fa-bell-concierge"></i>
+                    </div>
+                    <span class="text-[11px] font-semibold text-slate-500 group-hover:text-slate-800 tracking-tight leading-none">Services</span>
+                @endif
             </a>
 
-            <!-- Profile -->
-            <a href="{{ route('customer.profile') }}" class="flex flex-col items-center justify-center flex-1 py-1 {{ request()->routeIs('customer.profile') ? 'text-ocean-600 font-bold' : 'text-slate-500 hover:text-slate-800' }}">
-                <i class="fa-solid fa-circle-user text-lg mb-1"></i>
-                <span class="text-[11px]">Profile</span>
+            <!-- 4. Profile -->
+            <a href="{{ route('customer.profile') }}" class="flex flex-col items-center justify-center flex-1 py-1 px-1 relative transition-all group active:scale-95 select-none">
+                @if(request()->routeIs('customer.profile*'))
+                    <span class="absolute top-0 w-8 h-1 rounded-full bg-gradient-to-r from-sky-400 to-ocean-600 shadow-xs shadow-sky-500/40"></span>
+                    <div class="w-10 h-7 rounded-xl bg-sky-50 flex items-center justify-center text-sky-600 text-base mb-0.5">
+                        <i class="fa-solid fa-circle-user"></i>
+                    </div>
+                    <span class="text-[11px] font-black text-sky-700 tracking-tight leading-none">Profile</span>
+                @else
+                    <div class="w-10 h-7 flex items-center justify-center text-slate-400 group-hover:text-slate-700 text-base mb-0.5 transition-colors">
+                        <i class="fa-solid fa-circle-user"></i>
+                    </div>
+                    <span class="text-[11px] font-semibold text-slate-500 group-hover:text-slate-800 tracking-tight leading-none">Profile</span>
+                @endif
             </a>
         </div>
     </nav>
@@ -582,6 +640,7 @@
             });
         }
     </script>
+    @include('customer.partials.profile_modals')
     @stack('scripts')
 </body>
 </html>
