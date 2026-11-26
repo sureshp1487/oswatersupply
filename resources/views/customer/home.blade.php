@@ -5,11 +5,11 @@
 @section('content')
 <div class="space-y-6">
 
-    <!-- Hero Banner Carousel (Smooth Right-to-Left Slider) -->
+    <!-- Hero Banner Carousel (Full width, light shadow) -->
     @if(isset($banners) && $banners->count() > 0)
-    <div class="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg border border-slate-100 group select-none" id="heroBannerCarousel">
+    <div class="relative -mx-4 sm:-mx-6 lg:mx-0 w-[calc(100%+2rem)] sm:w-[calc(100%+3rem)] lg:w-full rounded-none sm:rounded-3xl overflow-hidden shadow-sm border-y sm:border border-slate-100 group select-none" id="heroBannerCarousel">
         <!-- Viewport -->
-        <div class="relative w-full h-56 sm:h-72 md:h-80 lg:h-96 overflow-hidden bg-slate-900">
+        <div class="relative w-full h-56 sm:h-72 md:h-80 lg:h-96 overflow-hidden bg-slate-50">
             <!-- Sliding Track (Moves Right to Left) -->
             <div id="heroTrack" class="flex w-full h-full will-change-transform">
                 @foreach($banners as $index => $banner)
@@ -22,27 +22,36 @@
                     <!-- Image -->
                     <img src="{{ $banner->image_path }}" alt="{{ $banner->title ?? 'Hero Banner' }}" class="w-full h-full object-cover">
                     
-                    <!-- Gradient Overlay with Title and Subtitle -->
-                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/30 to-transparent flex flex-col justify-end p-5 sm:p-7 md:p-8 text-white">
+                    @if($banner->title || $banner->subtitle)
+                    <!-- Gradient Overlay (Light shadow so image remains bright) -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent flex flex-col justify-end p-5 sm:p-7 md:p-8 text-white">
                         @if($banner->title)
-                        <h3 class="text-lg sm:text-2xl md:text-3xl font-black tracking-tight leading-tight drop-shadow-md">
+                        <h3 class="text-lg sm:text-2xl md:text-3xl font-black tracking-tight leading-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">
                             {{ $banner->title }}
                         </h3>
                         @endif
                         @if($banner->subtitle)
-                        <p class="text-xs sm:text-sm md:text-base text-sky-100 mt-1 max-w-xl font-medium drop-shadow line-clamp-2">
+                        <p class="text-xs sm:text-sm md:text-base text-sky-100 mt-1 max-w-xl font-medium drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)] line-clamp-2">
                             {{ $banner->subtitle }}
                         </p>
                         @endif
                         @if($banner->link_url)
                         <div class="mt-3">
-                            <span class="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl bg-white text-ocean-700 font-extrabold text-xs shadow-md group-hover/item:bg-sky-50 transition">
+                            <span class="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl bg-white text-sky-700 font-extrabold text-xs shadow-md group-hover/item:bg-sky-50 transition">
                                 <span>Order Now</span>
                                 <i class="fa-solid fa-arrow-right text-[10px]"></i>
                             </span>
                         </div>
                         @endif
                     </div>
+                    @elseif($banner->link_url)
+                    <div class="absolute bottom-4 right-4 z-10">
+                        <span class="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl bg-white/90 backdrop-blur text-sky-700 font-extrabold text-xs shadow-md group-hover:bg-white transition">
+                            <span>Order Now</span>
+                            <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                        </span>
+                    </div>
+                    @endif
                 @if($banner->link_url)
                 </a>
                 @else
@@ -55,51 +64,62 @@
 
         <!-- Carousel Navigation Controls (< & >) -->
         @if($banners->count() > 1)
-        <button type="button" id="heroPrevBtn" class="absolute left-2.5 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur flex items-center justify-center opacity-0 group-hover:opacity-100 transition shadow-md">
+        <button type="button" id="heroPrevBtn" class="absolute left-2.5 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/80 hover:bg-white text-slate-800 backdrop-blur flex items-center justify-center opacity-0 group-hover:opacity-100 transition shadow-md">
             <i class="fa-solid fa-chevron-left text-xs sm:text-sm"></i>
         </button>
-        <button type="button" id="heroNextBtn" class="absolute right-2.5 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur flex items-center justify-center opacity-0 group-hover:opacity-100 transition shadow-md">
+        <button type="button" id="heroNextBtn" class="absolute right-2.5 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/80 hover:bg-white text-slate-800 backdrop-blur flex items-center justify-center opacity-0 group-hover:opacity-100 transition shadow-md">
             <i class="fa-solid fa-chevron-right text-xs sm:text-sm"></i>
         </button>
 
         <!-- Carousel Dots Indicator -->
-        <div class="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex items-center space-x-1.5 bg-black/30 backdrop-blur-sm px-2.5 py-1 rounded-full">
+        <div class="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex items-center space-x-1.5 bg-black/20 backdrop-blur-sm px-2.5 py-1 rounded-full">
             @foreach($banners as $index => $banner)
-            <button type="button" class="hero-dot h-2 rounded-full transition-all duration-300 {{ $index === 0 ? 'bg-white w-5' : 'bg-white/50 hover:bg-white/80 w-2' }}" data-index="{{ $index }}"></button>
+            <button type="button" class="hero-dot h-2 rounded-full transition-all duration-300 {{ $index === 0 ? 'bg-white w-5 shadow-xs' : 'bg-white/60 hover:bg-white w-2' }}" data-index="{{ $index }}"></button>
             @endforeach
         </div>
         @endif
     </div>
     @endif
 
-    <!-- Available Services Section (Water Can, Car Wash, Rental House) -->
+    <!-- Available Services Section (Services in a Row with Coming Soon option) -->
     @if(isset($services) && $services->count() > 0)
     <div class="space-y-3.5">
         <div class="flex items-center justify-between">
             <div>
                 <h3 class="text-base sm:text-lg font-black text-slate-900 tracking-tight flex items-center space-x-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-ocean-600 inline-block shadow-sm"></span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-sky-500 inline-block shadow-sm"></span>
                     <span>Available Services</span>
                 </h3>
                 <p class="text-[11px] sm:text-xs text-slate-500 font-medium">Doorstep solutions for drinking water, vehicle care, and property rental</p>
             </div>
-            <a href="{{ route('customer.services') }}" class="text-xs font-bold text-ocean-600 hover:text-ocean-700 flex items-center space-x-1 shrink-0 group">
+            <a href="{{ route('customer.services') }}" class="text-xs font-bold text-sky-600 hover:text-sky-700 flex items-center space-x-1 shrink-0 group">
                 <span>View All</span>
                 <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i>
             </a>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+        <!-- Available Services Grid: 1 by 1 on Mobile, Multi-column on Desktop -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             @foreach($services as $srv)
-            <div class="bg-white hover:bg-sky-50/50 rounded-3xl p-5 border border-slate-200/80 hover:border-ocean-500 shadow-sm hover:shadow-xl hover:-translate-y-1.5 hover:ring-2 hover:ring-ocean-500/15 transition-all duration-300 flex flex-col justify-between group">
-                <div class="space-y-3.5">
-                    <!-- Image Card with Gradient Badge -->
-                    <div class="relative w-full h-44 sm:h-48 rounded-2xl overflow-hidden bg-slate-900">
+            @php
+                $isComingSoon = strtolower(trim($srv->badge_text ?? '')) === 'coming soon' || strtolower(trim($srv->action_text ?? '')) === 'coming soon' || $srv->action_url === '#comingSoon';
+            @endphp
+            <div class="w-full bg-white hover:bg-sky-50/40 rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-slate-200/80 hover:border-sky-400 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col justify-between group">
+                <div class="space-y-3">
+                    <!-- Image Card with Badge -->
+                    <div class="relative w-full h-44 sm:h-40 rounded-xl sm:rounded-2xl overflow-hidden bg-slate-100">
                         <img src="{{ $srv->image_path }}" alt="{{ $srv->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent flex flex-col justify-end p-3.5 text-white">
-                            <span class="text-xs text-sky-200 font-bold block drop-shadow">{{ $srv->tagline }}</span>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent flex flex-col justify-end p-3 text-white">
+                            <span class="text-xs text-sky-100 font-bold block drop-shadow">{{ $srv->tagline }}</span>
                         </div>
-                        @if($srv->badge_text)
+                        @if($isComingSoon)
+                        <div class="absolute top-2.5 left-2.5">
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500 text-white shadow-sm flex items-center space-x-1">
+                                <i class="fa-regular fa-clock text-[9px]"></i>
+                                <span>Coming Soon</span>
+                            </span>
+                        </div>
+                        @elseif($srv->badge_text)
                         <div class="absolute top-2.5 left-2.5">
                             <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-white/95 text-slate-900 backdrop-blur shadow-sm">
                                 {{ $srv->badge_text }}
@@ -110,11 +130,11 @@
 
                     <!-- Title & Description -->
                     <div>
-                        <h4 class="text-base font-black text-slate-900 group-hover:text-ocean-600 transition-colors leading-tight">
+                        <h4 class="text-sm sm:text-base font-black text-slate-900 group-hover:text-sky-600 transition-colors leading-tight line-clamp-1">
                             {{ $srv->name }}
                         </h4>
                         @if($srv->description)
-                        <p class="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">
+                        <p class="text-[11px] sm:text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">
                             {{ $srv->description }}
                         </p>
                         @endif
@@ -122,10 +142,10 @@
 
                     <!-- Highlights / Feature list -->
                     @if(!empty($srv->features) && count($srv->features) > 0)
-                    <ul class="text-xs text-slate-600 space-y-1.5 pt-2 border-t border-slate-100 group-hover:border-ocean-100 transition-colors">
-                        @foreach(array_slice($srv->features, 0, 3) as $feat)
-                        <li class="flex items-center space-x-2 text-[11px] truncate">
-                            <i class="fa-solid fa-circle-check text-ocean-600 text-[10px] shrink-0"></i>
+                    <ul class="text-xs text-slate-600 space-y-1 pt-2 border-t border-slate-100">
+                        @foreach(array_slice($srv->features, 0, 2) as $feat)
+                        <li class="flex items-center space-x-1.5 text-[11px] truncate">
+                            <i class="fa-solid fa-circle-check {{ $isComingSoon ? 'text-amber-500' : 'text-sky-500' }} text-[10px] shrink-0"></i>
                             <span class="truncate">{{ $feat }}</span>
                         </li>
                         @endforeach
@@ -133,15 +153,20 @@
                     @endif
                 </div>
 
-                <!-- CTA Action Button (Consistent Default & Hover styling across all cards) -->
-                <div class="pt-4">
-                    @if($srv->action_url && !str_starts_with($srv->action_url, '#'))
-                    <a href="{{ $srv->action_url }}" class="w-full py-2.5 rounded-xl bg-ocean-600 hover:bg-ocean-700 text-white font-extrabold text-xs text-center shadow-md shadow-ocean-600/20 active:scale-95 transition-all flex items-center justify-center space-x-1.5">
+                <!-- CTA Action Button (Active or Coming Soon) -->
+                <div class="pt-3 sm:pt-4">
+                    @if($isComingSoon)
+                    <button type="button" onclick="openHomeServiceInquiry('{{ addslashes($srv->name) }}', 'Coming soon service pre-registration')" class="w-full py-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200/80 font-extrabold text-xs text-center transition flex items-center justify-center space-x-1.5 shadow-xs">
+                        <i class="fa-regular fa-bell text-xs text-amber-600"></i>
+                        <span>Coming Soon &bull; Notify Me</span>
+                    </button>
+                    @elseif($srv->action_url && !str_starts_with($srv->action_url, '#'))
+                    <a href="{{ $srv->action_url }}" class="w-full py-2.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-extrabold text-xs text-center shadow-md shadow-sky-500/20 active:scale-95 transition-all flex items-center justify-center space-x-1.5">
                         <span>{{ $srv->action_text ?: 'Order Now' }}</span>
                         <i class="fa-solid fa-arrow-right text-[10px]"></i>
                     </a>
                     @else
-                    <button type="button" onclick="openHomeServiceInquiry('{{ addslashes($srv->name) }}', '{{ addslashes($srv->tagline ?? $srv->description ?? 'Service request') }}')" class="w-full py-2.5 rounded-xl bg-ocean-600 hover:bg-ocean-700 text-white font-extrabold text-xs text-center shadow-md shadow-ocean-600/20 active:scale-95 transition-all flex items-center justify-center space-x-1.5">
+                    <button type="button" onclick="openHomeServiceInquiry('{{ addslashes($srv->name) }}', '{{ addslashes($srv->tagline ?? $srv->description ?? 'Service request') }}')" class="w-full py-2.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-extrabold text-xs text-center shadow-md shadow-sky-500/20 active:scale-95 transition-all flex items-center justify-center space-x-1.5">
                         <span>{{ $srv->action_text ?: 'Book Service' }}</span>
                         <i class="fa-solid fa-arrow-right text-[10px]"></i>
                     </button>

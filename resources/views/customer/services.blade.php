@@ -17,19 +17,29 @@
         <div class="absolute -right-8 -bottom-8 w-36 h-36 rounded-full bg-white/10 pointer-events-none"></div>
     </div>
 
-    <!-- Services Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+    <!-- Services Grid (Supports Active & Coming Soon Services) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
         @if(isset($services) && $services->count() > 0)
             @foreach($services as $srv)
-            <div class="bg-white hover:bg-sky-50/50 rounded-3xl p-5 sm:p-6 border border-slate-200/90 hover:border-ocean-500 shadow-sm hover:shadow-xl hover:-translate-y-1.5 hover:ring-2 hover:ring-ocean-500/15 transition-all duration-300 flex flex-col justify-between group">
+            @php
+                $isComingSoon = strtolower(trim($srv->badge_text ?? '')) === 'coming soon' || strtolower(trim($srv->action_text ?? '')) === 'coming soon' || $srv->action_url === '#comingSoon';
+            @endphp
+            <div class="bg-white hover:bg-sky-50/50 rounded-3xl p-5 sm:p-6 border border-slate-200/90 hover:border-sky-400 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group">
                 <div class="space-y-4">
                     <!-- Image Card with Badge -->
-                    <div class="relative w-full h-44 rounded-2xl overflow-hidden bg-slate-900">
+                    <div class="relative w-full h-44 rounded-2xl overflow-hidden bg-slate-100">
                         <img src="{{ $srv->image_path }}" alt="{{ $srv->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent flex flex-col justify-end p-3.5 text-white">
-                            <span class="text-xs text-sky-200 font-bold block drop-shadow">{{ $srv->tagline }}</span>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent flex flex-col justify-end p-3.5 text-white">
+                            <span class="text-xs text-sky-100 font-bold block drop-shadow">{{ $srv->tagline }}</span>
                         </div>
-                        @if($srv->badge_text)
+                        @if($isComingSoon)
+                        <div class="absolute top-2.5 left-2.5">
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500 text-white shadow-sm flex items-center space-x-1">
+                                <i class="fa-regular fa-clock text-[9px]"></i>
+                                <span>Coming Soon</span>
+                            </span>
+                        </div>
+                        @elseif($srv->badge_text)
                         <div class="absolute top-2.5 left-2.5">
                             <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-white/95 text-slate-900 backdrop-blur shadow-sm">
                                 {{ $srv->badge_text }}
@@ -40,7 +50,7 @@
 
                     <div>
                         <div class="flex items-center space-x-2">
-                            <h2 class="text-lg font-black text-slate-900 group-hover:text-ocean-600 transition-colors">{{ $srv->name }}</h2>
+                            <h2 class="text-lg font-black text-slate-900 group-hover:text-sky-600 transition-colors">{{ $srv->name }}</h2>
                         </div>
                         <p class="text-xs text-slate-500 mt-1 leading-relaxed">
                             {{ $srv->description }}
@@ -48,10 +58,10 @@
                     </div>
 
                     @if(!empty($srv->features) && count($srv->features) > 0)
-                    <ul class="text-xs text-slate-600 space-y-2 pt-2 border-t border-slate-100 group-hover:border-ocean-100 transition-colors">
+                    <ul class="text-xs text-slate-600 space-y-2 pt-2 border-t border-slate-100">
                         @foreach(array_slice($srv->features, 0, 3) as $feat)
                         <li class="flex items-center space-x-2">
-                            <i class="fa-solid fa-circle-check text-ocean-600 text-[11px] shrink-0"></i>
+                            <i class="fa-solid fa-circle-check {{ $isComingSoon ? 'text-amber-500' : 'text-sky-500' }} text-[11px] shrink-0"></i>
                             <span>{{ $feat }}</span>
                         </li>
                         @endforeach
@@ -60,12 +70,16 @@
                 </div>
 
                 <div class="pt-6">
-                    @if($srv->action_url && !str_starts_with($srv->action_url, '#'))
-                    <a href="{{ $srv->action_url }}" class="block w-full py-3 rounded-2xl bg-ocean-600 hover:bg-ocean-700 text-white font-extrabold text-xs text-center shadow-md shadow-ocean-600/25 active:scale-95 transition-all">
+                    @if($isComingSoon)
+                    <button type="button" onclick="openServiceInquiry('{{ addslashes($srv->name) }}', 'Coming soon service pre-registration')" class="block w-full py-3 rounded-2xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 font-extrabold text-xs text-center transition shadow-xs">
+                        <i class="fa-regular fa-bell text-xs mr-1 text-amber-600"></i> Coming Soon &bull; Notify Me
+                    </button>
+                    @elseif($srv->action_url && !str_starts_with($srv->action_url, '#'))
+                    <a href="{{ $srv->action_url }}" class="block w-full py-3 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white font-extrabold text-xs text-center shadow-md shadow-sky-500/25 active:scale-95 transition-all">
                         {{ $srv->action_text ?: 'Order Now' }} &rarr;
                     </a>
                     @else
-                    <button type="button" onclick="openServiceInquiry('{{ addslashes($srv->name) }}', '{{ addslashes($srv->tagline ?? $srv->description ?? 'Service request') }}')" class="block w-full py-3 rounded-2xl bg-ocean-600 hover:bg-ocean-700 text-white font-extrabold text-xs text-center shadow-md shadow-ocean-600/25 active:scale-95 transition-all">
+                    <button type="button" onclick="openServiceInquiry('{{ addslashes($srv->name) }}', '{{ addslashes($srv->tagline ?? $srv->description ?? 'Service request') }}')" class="block w-full py-3 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white font-extrabold text-xs text-center shadow-md shadow-sky-500/25 active:scale-95 transition-all">
                         {{ $srv->action_text ?: 'Book Service' }} &rarr;
                     </button>
                     @endif

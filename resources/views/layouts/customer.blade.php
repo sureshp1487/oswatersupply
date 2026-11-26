@@ -279,18 +279,6 @@
 
     <!-- Main Content Canvas (Fluid with mobile, tablet, and wide desktop support) -->
     <main class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 pb-20 md:pb-8">
-        <!-- Announcement Banner if Enabled -->
-        @if(!empty($appSettings['banner_enabled']) && $appSettings['banner_enabled'] == '1' && !empty($appSettings['announcement_banner']))
-            <div class="mb-4 p-3.5 bg-gradient-to-r from-indigo-900 to-indigo-800 text-white rounded-2xl flex items-center justify-between text-xs font-semibold shadow-md border border-indigo-700/50">
-                <div class="flex items-center space-x-2.5">
-                    <span class="w-6 h-6 rounded-lg bg-indigo-500/40 flex items-center justify-center text-indigo-200">
-                        <i class="fa-solid fa-bullhorn text-[11px]"></i>
-                    </span>
-                    <span>{{ $appSettings['announcement_banner'] }}</span>
-                </div>
-            </div>
-        @endif
-
         <!-- Flash notifications (Single source, with dismiss button and auto-hide) -->
         @if(session('success'))
             <div id="flashSuccessAlert" class="flash-alert mb-4 p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl flex items-center justify-between text-xs font-semibold shadow-sm transition-all duration-500">

@@ -212,18 +212,6 @@
 </head>
 <body class="bg-white text-slate-800 antialiased selection:bg-[var(--brand-primary)] selection:text-white">
 
-    <!-- Announcement Banner from Admin Customization if Enabled -->
-    @if(!empty($appSettings['banner_enabled']) && $appSettings['banner_enabled'] == '1' && !empty($appSettings['announcement_banner']))
-        <div class="bg-gradient-to-r from-[var(--brand-primary)] to-[var(--brand-accent)] text-white text-xs font-semibold py-2.5 px-4 text-center shadow-sm relative z-50">
-            <div class="max-w-7xl mx-auto flex items-center justify-center space-x-2">
-                <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white/20 text-white shrink-0">
-                    <i class="fa-solid fa-bullhorn text-[10px]"></i>
-                </span>
-                <span>{{ $appSettings['announcement_banner'] }}</span>
-            </div>
-        </div>
-    @endif
-
     <!-- Clean White Navigation Header matching user image -->
     <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-100 transition-all">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
