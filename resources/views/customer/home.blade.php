@@ -546,37 +546,10 @@ $(document).ready(function() {
                 img: prodImg,
                 subtitle: `<span class="text-sky-600 font-bold">+${qty} Added</span> &bull; ₹${(prodPrice * qty).toFixed(2)}`,
                 escape: escapeHtml,
-                timer: 3500
+                timer: 1800
             });
         }
     });
-
-    // Auto load cart popup on page load if items exist in cart (Desktop & Mobile)
-    if (window.CartManager && window.CartManager.getTotalCount() > 0) {
-        setTimeout(() => {
-            const cart = window.CartManager.getCart();
-            const firstProdId = Object.keys(cart)[0];
-            let popupImg = '/icons/logo.svg';
-            let popupName = 'Items in Cart';
-
-            if (firstProdId) {
-                const matchedCard = $(`.product-card[data-id="${firstProdId}"]`);
-                if (matchedCard.length) {
-                    popupImg = matchedCard.find('img').attr('src') || popupImg;
-                    popupName = matchedCard.find('h4').text().trim() || popupName;
-                }
-            }
-
-            const total = window.CartManager.getTotalCount();
-            window.CartManager.showCartPopup({
-                name: popupName,
-                img: popupImg,
-                subtitle: `<span class="text-sky-600 font-bold">${total} Can${total > 1 ? 's' : ''} saved</span> &bull; Ready to checkout`,
-                escape: escapeHtml,
-                timer: 4500
-            });
-        }, 1200);
-    }
 
     function escapeHtml(text) {
         if (!text) return '';

@@ -563,54 +563,75 @@
                 }
             },
             showCartPopup: function(options = {}) {
-                if (typeof Swal === 'undefined') return;
-
-                const isMobile = window.innerWidth < 640;
                 const totalCount = this.getTotalCount();
-                const name = options.name || (totalCount > 0 ? (totalCount + ' Water Can' + (totalCount > 1 ? 's' : '') + ' in Cart') : 'Your Cart');
-                const subtitle = options.subtitle || (totalCount > 0 ? 'Ready for fast doorstep delivery' : 'Your cart is currently empty');
+                const rawName = options.name || (totalCount > 0 ? (totalCount + ' Item' + (totalCount > 1 ? 's' : '') + ' in Cart') : 'Cart Updated');
+                const safeName = options.escape ? options.escape(rawName) : rawName;
+                const subtitle = options.subtitle || 'Ready for fast doorstep delivery';
                 const cartUrl = "{{ route('customer.cart') }}";
                 const img = options.img || '/icons/logo.svg';
+                const duration = options.timer !== undefined ? options.timer : 1800;
 
-                Swal.fire({
-                    toast: true,
-                    position: isMobile ? 'top' : 'top-end',
-                    width: isMobile ? '94%' : '380px',
-                    showConfirmButton: false,
-                    timer: options.timer !== undefined ? options.timer : 3500,
-                    timerProgressBar: true,
-                    showClass: {
-                        popup: 'cart-popup-fadein'
-                    },
-                    hideClass: {
-                        popup: 'cart-popup-fadeout'
-                    },
-                    customClass: {
-                        container: 'p-2 sm:p-4 !z-[9999]',
-                        popup: 'rounded-2xl shadow-2xl border border-sky-100 p-2.5 sm:p-3 bg-white/95 backdrop-blur-md',
-                        timerProgressBar: 'bg-sky-500'
-                    },
-                    html: `
-                        <div class="flex items-center space-x-2.5 sm:space-x-3 text-left w-full">
-                            <div class="relative shrink-0">
-                                <img src="${img}" alt="" onerror="this.onerror=null;this.src='/icons/logo.svg';" class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl object-cover border border-slate-100 shadow-xs">
-                                <span class="absolute -top-1 -right-1 bg-emerald-500 text-white w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-black shadow-xs">
-                                    <i class="fa-solid fa-check"></i>
-                                </span>
-                            </div>
-                            <div class="flex-1 min-w-0 pr-1">
-                                <p class="text-[11px] sm:text-xs font-black text-slate-900 leading-tight truncate">${options.escape ? options.escape(name) : name}</p>
-                                <p class="text-[10px] sm:text-[11px] text-slate-500 font-semibold mt-0.5 truncate">
-                                    ${subtitle}
-                                </p>
-                            </div>
-                            <a href="${cartUrl}" class="shrink-0 px-2 sm:px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-sky-600 to-ocean-700 text-white font-extrabold text-[10px] sm:text-[11px] hover:shadow-md hover:scale-105 active:scale-95 transition flex items-center space-x-1">
-                                <span>Cart (${totalCount})</span>
-                                <i class="fa-solid fa-arrow-right text-[8px]"></i>
-                            </a>
+                // Remove any existing active toast to avoid duplicates
+                const oldToast = document.getElementById('cart-floating-toast');
+                if (oldToast) {
+                    oldToast.remove();
+                }
+
+                const toast = document.createElement('div');
+                toast.id = 'cart-floating-toast';
+                toast.className = 'fixed top-3 left-3 right-3 sm:left-auto sm:right-6 sm:top-5 max-w-sm sm:w-96 mx-auto sm:mx-0 z-[99999] pointer-events-auto transition-all duration-250 ease-out transform -translate-y-3 opacity-0 scale-95';
+                
+                toast.innerHTML = `
+                    <div class="bg-white/95 backdrop-blur-md rounded-2xl p-2.5 sm:p-3 border border-sky-100 shadow-[0_12px_28px_-6px_rgba(14,165,233,0.3)] flex items-center space-x-2.5 sm:space-x-3">
+                        <div class="relative shrink-0">
+                            <img src="${img}" alt="" onerror="this.onerror=null;this.src='/icons/logo.svg';" class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl object-cover border border-slate-100 shadow-xs bg-slate-50">
+                            <span class="absolute -top-1 -right-1 bg-emerald-500 text-white w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-black shadow-xs ring-2 ring-white">
+                                <i class="fa-solid fa-check"></i>
+                            </span>
                         </div>
-                    `
+                        <div class="flex-1 min-w-0 pr-1">
+                            <p class="text-xs sm:text-[13px] font-black text-slate-900 leading-tight truncate">${safeName}</p>
+                            <p class="text-[10px] sm:text-[11px] text-slate-500 font-semibold mt-0.5 truncate">${subtitle}</p>
+                        </div>
+                        <a href="${cartUrl}" class="shrink-0 px-2.5 sm:px-3 py-1.5 rounded-xl bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 active:scale-95 text-white font-extrabold text-[11px] shadow-sm shadow-sky-500/25 transition-all flex items-center space-x-1">
+                            <span>Cart (${totalCount})</span>
+                            <i class="fa-solid fa-arrow-right text-[8px]"></i>
+                        </a>
+                        <button type="button" class="btn-toast-dismiss text-slate-300 hover:text-slate-600 text-xs px-1 transition" aria-label="Close">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                `;
+
+                document.body.appendChild(toast);
+
+                // Entrance transition
+                requestAnimationFrame(() => {
+                    toast.classList.remove('-translate-y-3', 'opacity-0', 'scale-95');
+                    toast.classList.add('translate-y-0', 'opacity-100', 'scale-100');
                 });
+
+                function dismissToast() {
+                    toast.classList.remove('translate-y-0', 'opacity-100', 'scale-100');
+                    toast.classList.add('-translate-y-3', 'opacity-0', 'scale-95');
+                    setTimeout(() => {
+                        if (toast && toast.parentNode) {
+                            toast.remove();
+                        }
+                    }, 250);
+                }
+
+                const dismissTimer = setTimeout(dismissToast, duration);
+
+                // Allow user to dismiss on close button click
+                const closeBtn = toast.querySelector('.btn-toast-dismiss');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        clearTimeout(dismissTimer);
+                        dismissToast();
+                    });
+                }
             }
         };
 

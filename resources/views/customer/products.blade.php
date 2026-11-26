@@ -245,7 +245,7 @@
                         name: prodName,
                         img: prodImg,
                         subtitle: `<span class="text-sky-600 font-bold">+${qty} Added</span> &bull; ₹${(prodPrice * qty).toFixed(2)}`,
-                        timer: 3500
+                        timer: 1800
                     });
                 }
             }
