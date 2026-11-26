@@ -672,6 +672,102 @@
     </div>
 </div>
 
+<!-- 18. GPS Current Location & Map Pinpoint Modal -->
+<div id="gpsLocationModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-4 sm:p-6 space-y-3.5 shadow-2xl border border-slate-100 relative my-auto">
+        <!-- Close / Header -->
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center text-sm font-bold">
+                    <i class="fa-solid fa-location-crosshairs"></i>
+                </div>
+                <div>
+                    <h3 class="text-sm sm:text-base font-black text-slate-900 leading-tight">Confirm Delivery Location</h3>
+                    <p class="text-[11px] text-slate-400">Auto-detect GPS or drag the pin to your doorstep</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeModal('gpsLocationModal')" class="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-100 transition" title="Close">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+
+        <!-- Form for saving GPS Location -->
+        <form id="gpsLocationForm" onsubmit="submitGpsLocation(event)" class="space-y-3.5">
+            @csrf
+
+            <!-- 1. Auto-Detect My GPS Location Button -->
+            <button type="button" id="btnGpsAutoDetect" onclick="detectCurrentGpsLocation()" class="w-full py-2.5 sm:py-3 px-3 rounded-2xl bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 text-xs sm:text-sm font-bold transition flex items-center justify-center space-x-2 active:scale-95 shadow-sm">
+                <i class="fa-solid fa-location-crosshairs text-sm text-sky-600 animate-pulse"></i>
+                <span id="gpsAutoDetectText">Auto-Detect My GPS Location</span>
+            </button>
+            <div id="gpsModalStatusMsg" class="text-[11px] text-center hidden"></div>
+
+            <!-- 2. Interactive Leaflet Map Container -->
+            <div class="relative">
+                <div id="gpsLocationModalMap" class="w-full h-56 sm:h-64 rounded-2xl border border-slate-200 shadow-inner bg-slate-100 z-0"></div>
+                <div class="absolute bottom-2 left-2 right-2 z-[400] pointer-events-none">
+                    <div class="bg-slate-900/80 backdrop-blur-sm text-white px-3 py-1.5 rounded-xl text-[10px] sm:text-[11px] flex items-center justify-between shadow-md">
+                        <span class="flex items-center space-x-1.5">
+                            <i class="fa-solid fa-hand-pointer text-cyan-300"></i>
+                            <span>Tap map or drag pin to correct location</span>
+                        </span>
+                        <span id="gpsModalCoordsBadge" class="font-mono text-cyan-300 font-semibold">12.9812, 80.2340</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Pinned Delivery Location Card Preview -->
+            <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1">
+                <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 flex items-center space-x-1.5">
+                        <i class="fa-solid fa-location-dot text-rose-500"></i>
+                        <span>PINNED DELIVERY LOCATION</span>
+                    </span>
+                    <span id="gpsModalGeocodeBadge" class="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-black">Location Set</span>
+                </div>
+                <p id="gpsModalAddressPreview" class="text-xs sm:text-sm font-bold text-slate-800 leading-snug">
+                    Chennai, Tamil Nadu, India
+                </p>
+            </div>
+
+            <!-- 4. Optional Door/Flat No. & Delivery Instructions (2 Columns) -->
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Door / Flat No. <span class="text-slate-400 font-normal">(Optional)</span></label>
+                    <input type="text" name="door_number" id="gps_door_number" placeholder="e.g. Flat 204 / No. 12"
+                           class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500 bg-slate-50/50 hover:bg-white focus:bg-white transition">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Delivery Instructions <span class="text-slate-400 font-normal">(Optional)</span></label>
+                    <input type="text" name="delivery_instructions" id="gps_delivery_instructions" placeholder="e.g. Leave at gate"
+                           class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500 bg-slate-50/50 hover:bg-white focus:bg-white transition">
+                </div>
+            </div>
+
+            <!-- 5. Friendly Address Note -->
+            <div class="p-2.5 rounded-xl bg-sky-50 border border-sky-100 text-[11px] text-sky-800 flex items-center space-x-2">
+                <i class="fa-solid fa-circle-check text-sky-600 text-xs shrink-0"></i>
+                <span>You can review or change your address anytime later in your <strong>Profile</strong>.</span>
+            </div>
+
+            <!-- Hidden Fields for Coordinates and Address Components -->
+            <input type="hidden" name="latitude" id="gps_latitude" value="13.0827">
+            <input type="hidden" name="longitude" id="gps_longitude" value="80.2707">
+            <input type="hidden" name="house_or_building" id="gps_house_or_building" value="My Pinned Location">
+            <input type="hidden" name="street" id="gps_street" value="Near Pinned Location">
+            <input type="hidden" name="area_locality" id="gps_area_locality" value="Chennai Area">
+            <input type="hidden" name="city" id="gps_city" value="Chennai">
+            <input type="hidden" name="pincode" id="gps_pincode" value="600001">
+
+            <!-- 6. Submit Button -->
+            <button type="submit" id="btnSubmitGpsLocation" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-sky-600 to-cyan-600 hover:from-sky-700 hover:to-cyan-700 text-white font-extrabold text-xs sm:text-sm shadow-lg shadow-sky-600/30 transition flex items-center justify-center space-x-2 active:scale-[0.99]">
+                <i class="fa-solid fa-circle-check"></i>
+                <span id="btnSubmitGpsLocationText">Complete Registration & Go to Home Page</span>
+            </button>
+        </form>
+    </div>
+</div>
+
 <!-- Hidden Logout Form -->
 <form id="profileLogoutForm" action="{{ route('logout') }}" method="POST" class="hidden" onsubmit="if(window.CartManager){ window.CartManager.saveCart({}); }">
     @csrf
@@ -990,4 +1086,198 @@
             });
         });
     });
+
+    // GPS Location Modal & Interactive Leaflet Map
+    let gpsModalMap = null;
+    let gpsModalMarker = null;
+    let gpsCurrentLat = 13.0827;
+    let gpsCurrentLng = 80.2707;
+
+    function getGpsCustomPin() {
+        return L.divIcon({
+            className: 'custom-gps-pin',
+            html: `<div style="transform: translate(-50%, -100%);">
+                     <div style="background: linear-gradient(135deg, #0284c7, #06b6d4); color: white; width: 34px; height: 34px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.35); border: 2.5px solid white;">
+                         <i class="fa-solid fa-droplet" style="transform: rotate(45deg); font-size: 14px;"></i>
+                     </div>
+                   </div>`,
+            iconSize: [34, 34],
+            iconAnchor: [17, 34]
+        });
+    }
+
+    function openGpsLocationModal(autoDetect = false) {
+        openModal('gpsLocationModal');
+        setTimeout(() => {
+            initGpsLocationMap();
+            if (autoDetect) {
+                detectCurrentGpsLocation();
+            }
+        }, 200);
+    }
+
+    function initGpsLocationMap() {
+        if (typeof L === 'undefined') return;
+
+        if (gpsModalMap) {
+            gpsModalMap.invalidateSize();
+            return;
+        }
+
+        const mapElem = document.getElementById('gpsLocationModalMap');
+        if (!mapElem) return;
+
+        gpsModalMap = L.map('gpsLocationModalMap', {
+            center: [gpsCurrentLat, gpsCurrentLng],
+            zoom: 15,
+            zoomControl: true
+        });
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(gpsModalMap);
+
+        gpsModalMarker = L.marker([gpsCurrentLat, gpsCurrentLng], {
+            draggable: true,
+            icon: getGpsCustomPin()
+        }).addTo(gpsModalMap);
+
+        gpsModalMarker.on('dragend', function() {
+            const pos = gpsModalMarker.getLatLng();
+            updateGpsMapLocation(pos.lat, pos.lng);
+        });
+
+        gpsModalMap.on('click', function(e) {
+            gpsModalMarker.setLatLng(e.latlng);
+            updateGpsMapLocation(e.latlng.lat, e.latlng.lng);
+        });
+
+        setTimeout(() => {
+            if (gpsModalMap) gpsModalMap.invalidateSize();
+        }, 250);
+
+        updateGpsMapLocation(gpsCurrentLat, gpsCurrentLng);
+    }
+
+    function detectCurrentGpsLocation() {
+        const btnText = $('#gpsAutoDetectText');
+        const statusMsg = $('#gpsModalStatusMsg');
+
+        if (!navigator.geolocation) {
+            statusMsg.removeClass('hidden text-emerald-600 text-sky-600').addClass('text-rose-500 font-bold block').text('Geolocation is not supported by your browser.');
+            return;
+        }
+
+        btnText.text('Detecting GPS location...');
+        statusMsg.removeClass('hidden text-rose-500 text-emerald-600').addClass('text-sky-600 font-bold block').text('Fetching your GPS coordinates...');
+
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                btnText.text('Auto-Detect My GPS Location');
+                statusMsg.removeClass('text-sky-600 text-rose-500').addClass('text-emerald-600 font-bold block').text('GPS location detected! Adjust pin on the map if needed.');
+
+                if (gpsModalMap && gpsModalMarker) {
+                    gpsModalMap.setView([lat, lon], 16);
+                    gpsModalMarker.setLatLng([lat, lon]);
+                }
+                updateGpsMapLocation(lat, lon);
+            },
+            function(error) {
+                btnText.text('Auto-Detect My GPS Location');
+                let msg = 'Unable to detect GPS.';
+                if (error.code === error.PERMISSION_DENIED) {
+                    msg = 'Location permission was denied. You can tap the map or drag the pin manually.';
+                }
+                statusMsg.removeClass('hidden text-emerald-600 text-sky-600').addClass('text-amber-600 font-bold block').text(msg);
+            },
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
+    }
+
+    function updateGpsMapLocation(lat, lng) {
+        gpsCurrentLat = lat;
+        gpsCurrentLng = lng;
+        $('#gps_latitude').val(lat.toFixed(7));
+        $('#gps_longitude').val(lng.toFixed(7));
+        $('#gpsModalCoordsBadge').text(`${lat.toFixed(4)}, ${lng.toFixed(4)}`);
+
+        $('#gpsModalGeocodeBadge').text('Resolving address...').removeClass('bg-emerald-100 text-emerald-800').addClass('bg-amber-100 text-amber-800');
+
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`)
+            .then(res => res.json())
+            .then(data => {
+                $('#gpsModalGeocodeBadge').text('Location Set').removeClass('bg-amber-100 text-amber-800').addClass('bg-emerald-100 text-emerald-800');
+
+                if (data && data.address) {
+                    const addr = data.address;
+                    const road = addr.road || addr.street || addr.residential || addr.suburb || 'Near Pinned Location';
+                    const locality = addr.suburb || addr.neighbourhood || addr.city_district || addr.locality || 'Chennai Area';
+                    const cityVal = addr.city || addr.town || addr.state_district || 'Chennai';
+                    const postcode = addr.postcode ? addr.postcode.replace(/\D/g, '').slice(0, 6) : '600001';
+
+                    $('#gps_house_or_building').val(road);
+                    $('#gps_street').val(road);
+                    $('#gps_area_locality').val(locality);
+                    $('#gps_city').val(cityVal);
+                    $('#gps_pincode').val(postcode);
+
+                    const displayParts = [road, locality, cityVal].filter(Boolean);
+                    const displayFull = displayParts.join(', ');
+                    $('#gpsModalAddressPreview').text(displayFull || (data.display_name || 'Pinned Location'));
+                } else if (data && data.display_name) {
+                    $('#gpsModalAddressPreview').text(data.display_name);
+                    $('#gps_house_or_building').val('Pinned Location');
+                    $('#gps_street').val('Near Pinned Location');
+                }
+            })
+            .catch(() => {
+                $('#gpsModalGeocodeBadge').text('Location Set').removeClass('bg-amber-100 text-amber-800').addClass('bg-emerald-100 text-emerald-800');
+                $('#gpsModalAddressPreview').text(`Location Pinned (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
+            });
+    }
+
+    function submitGpsLocation(e) {
+        e.preventDefault();
+        const btn = $('#btnSubmitGpsLocation');
+        const originalText = $('#btnSubmitGpsLocationText').text();
+        btn.attr('disabled', 'disabled');
+        $('#btnSubmitGpsLocationText').text('Saving Location...');
+
+        $.ajax({
+            url: "{{ route('customer.location.gps') }}",
+            type: "POST",
+            data: $('#gpsLocationForm').serialize(),
+            success: function(res) {
+                btn.removeAttr('disabled');
+                $('#btnSubmitGpsLocationText').text(originalText);
+                closeModal('gpsLocationModal');
+
+                if (res.formatted) {
+                    $('#currentDeliveryAddressHeader').text(res.formatted);
+                }
+
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Delivery Location Confirmed!',
+                        text: 'Your GPS doorstep location has been saved successfully.',
+                        timer: 1800,
+                        showConfirmButton: false
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    location.reload();
+                }
+            },
+            error: function(xhr) {
+                btn.removeAttr('disabled');
+                $('#btnSubmitGpsLocationText').text(originalText);
+                alert(xhr.responseJSON?.message || 'Failed to save location. Please try again.');
+            }
+        });
+    }
 </script>

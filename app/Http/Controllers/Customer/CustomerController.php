@@ -637,6 +637,83 @@ class CustomerController extends Controller
         return back()->with('success', "Default address updated to {$address->label}.");
     }
 
+    public function updateGpsLocation(Request $request)
+    {
+        $user = Auth::user();
+        $validated = $request->validate([
+            'latitude' => ['required', 'numeric', 'between:-90,90'],
+            'longitude' => ['required', 'numeric', 'between:-180,180'],
+            'door_number' => ['nullable', 'string', 'max:100'],
+            'house_or_building' => ['nullable', 'string', 'max:255'],
+            'street' => ['nullable', 'string', 'max:255'],
+            'area_locality' => ['nullable', 'string', 'max:255'],
+            'city' => ['nullable', 'string', 'max:100'],
+            'pincode' => ['nullable', 'string', 'max:20'],
+            'delivery_instructions' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        $door = !empty($validated['door_number']) ? trim($validated['door_number']) : null;
+        $building = !empty($validated['house_or_building']) ? trim($validated['house_or_building']) : ($door ? 'Door ' . $door : 'My Pinned Location');
+        $street = !empty($validated['street']) ? trim($validated['street']) : 'Near Pinned Location';
+        $area = !empty($validated['area_locality']) ? trim($validated['area_locality']) : 'Chennai Area';
+        $city = !empty($validated['city']) ? trim($validated['city']) : 'Chennai';
+        $pincode = !empty($validated['pincode']) ? preg_replace('/\D/', '', $validated['pincode']) : '600001';
+        if (strlen($pincode) !== 6) {
+            $pincode = '600001';
+        }
+
+        // Find existing default address or first address
+        $address = Address::where('user_id', $user->id)->where('is_default', true)->first()
+                   ?: Address::where('user_id', $user->id)->first();
+
+        if ($address) {
+            $address->update([
+                'house_or_building' => $building,
+                'door_number' => $door ?: ($address->door_number ?: 'Main Entrance'),
+                'street' => $street,
+                'area_locality' => $area,
+                'city' => $city,
+                'pincode' => $pincode,
+                'delivery_instructions' => $validated['delivery_instructions'] ?? $address->delivery_instructions,
+                'latitude' => $validated['latitude'],
+                'longitude' => $validated['longitude'],
+                'is_default' => true,
+            ]);
+        } else {
+            $address = Address::create([
+                'user_id' => $user->id,
+                'label' => 'Home',
+                'house_or_building' => $building,
+                'door_number' => $door ?: 'Main Entrance',
+                'street' => $street,
+                'area_locality' => $area,
+                'city' => $city,
+                'pincode' => $pincode,
+                'delivery_instructions' => $validated['delivery_instructions'] ?? null,
+                'latitude' => $validated['latitude'],
+                'longitude' => $validated['longitude'],
+                'is_default' => true,
+            ]);
+        }
+
+        if ($user->customerProfile) {
+            $user->customerProfile->update(['onboarding_completed' => true]);
+        }
+
+        $formatted = trim(($address->door_number ? $address->door_number . ', ' : '') . $address->street . ', ' . $address->city);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Delivery location saved successfully!',
+                'address' => $address,
+                'formatted' => $formatted
+            ]);
+        }
+
+        return redirect()->route('customer.home')->with('success', 'Delivery location saved successfully!');
+    }
+
     public function deleteAddress($id)
     {
         $user = Auth::user();

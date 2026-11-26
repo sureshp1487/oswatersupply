@@ -70,6 +70,7 @@ Route::middleware(['auth', 'role:customer'])->prefix('app')->name('customer.')->
     Route::get('/profile', [CustomerController::class, 'profile'])->name('profile');
     Route::post('/profile', [CustomerController::class, 'updateProfile'])->name('profile.update');
     Route::post('/address', [CustomerController::class, 'saveAddress'])->name('address.save');
+    Route::post('/location/gps', [CustomerController::class, 'updateGpsLocation'])->name('location.gps');
     Route::post('/address/{id}/default', [CustomerController::class, 'setDefaultAddress'])->name('address.default');
     Route::delete('/address/{id}', [CustomerController::class, 'deleteAddress'])->name('address.delete');
 });

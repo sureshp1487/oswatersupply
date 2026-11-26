@@ -189,6 +189,9 @@ class GoogleAuthController extends Controller
                 return redirect()->route('driver.dashboard');
             }
 
+            // Flash session flag so home page automatically prompts for GPS location
+            $request->session()->flash('ask_gps_location', true);
+
             return redirect()->route('customer.home')->with('success', 'Successfully signed in with Google! Welcome to AquaFlow.');
         } catch (\Throwable $e) {
             Log::error('Exception in Google OAuth callback: ' . $e->getMessage(), [

@@ -3,7 +3,33 @@
 @section('title', 'Home - AquaFlow Water Delivery')
 
 @section('content')
-<div class="space-y-6">
+<div class="space-y-4 sm:space-y-6">
+
+    <!-- Pinned Delivery Location Quick Bar -->
+    @php
+        $dispAddress = $defaultAddress ?: (auth()->check() ? auth()->user()->addresses()->first() : null);
+    @endphp
+    <div class="bg-white rounded-2xl px-3.5 py-2.5 border border-slate-100 shadow-xs flex items-center justify-between gap-2">
+        <div class="flex items-center space-x-2.5 min-w-0">
+            <div class="w-8 h-8 rounded-full bg-sky-50 text-sky-600 flex items-center justify-center shrink-0 shadow-xs">
+                <i class="fa-solid fa-location-dot text-rose-500 text-sm"></i>
+            </div>
+            <div class="min-w-0">
+                <span class="text-[10px] text-slate-400 font-bold block uppercase tracking-wider leading-none">Deliver To</span>
+                <span id="currentDeliveryAddressHeader" class="text-xs font-black text-slate-800 truncate block mt-0.5">
+                    @if($dispAddress && $dispAddress->house_or_building !== 'My Pinned Location')
+                        {{ $dispAddress->door_number ? $dispAddress->door_number . ', ' : '' }}{{ $dispAddress->street }}, {{ $dispAddress->city }}
+                    @else
+                        Set your exact GPS doorstep delivery location
+                    @endif
+                </span>
+            </div>
+        </div>
+        <button type="button" onclick="openGpsLocationModal(false)" class="shrink-0 px-3 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200/80 font-black text-[11px] transition active:scale-95 flex items-center space-x-1">
+            <i class="fa-solid fa-location-crosshairs text-[10px] text-sky-600"></i>
+            <span>{{ ($dispAddress && $dispAddress->house_or_building !== 'My Pinned Location') ? 'Change' : 'Set GPS' }}</span>
+        </button>
+    </div>
 
     <!-- Hero Banner Carousel (Full width, light shadow) -->
     @if(isset($banners) && $banners->count() > 0)
@@ -567,6 +593,14 @@ $(document).ready(function() {
         window.CartManager.setItemQty(prodId, qty);
         window.location.href = "{{ route('customer.cart') }}?product_id=" + prodId + "&qty=" + qty;
     });
+
+    @if(session('ask_gps_location') || request()->has('set_location'))
+    setTimeout(function() {
+        if (typeof openGpsLocationModal === 'function') {
+            openGpsLocationModal(true);
+        }
+    }, 500);
+    @endif
 });
 </script>
 @endpush
